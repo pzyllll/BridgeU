@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试新闻翻译</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .section {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+        button:hover { background: #1976d2; }
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            border-radius: 4px;
+        }
+        .error {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+        .success {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 测试新闻翻译</h1>
+        
+        <div class="section">
+            <h3>1. 检查翻译API配置</h3>
+            <button onclick="checkConfig()">检查配置</button>
+            <div id="configResult"></div>
+        </div>
+        
+        <div class="section">
+            <h3>2. 测试翻译单个新闻</h3>
+            <label>新闻ID: <input type="text" id="newsId" placeholder="输入新闻ID" style="padding: 0.5rem; width: 300px;"></label>
+            <button onclick="testTranslateSingle()">翻译单个新闻</button>
+            <div id="singleResult"></div>
+        </div>
+        
+        <div class="section">
+            <h3>3. 批量翻译所有新闻</h3>
+            <label>管理员 Token: <input type="text" id="adminToken" placeholder="输入管理员 Token" style="padding: 0.5rem; width: 400px;"></label>
+            <button onclick="loadToken()">从 localStorage 加载</button>
+            <br>
+            <button onclick="translateAll()">强制翻译所有新闻</button>
+            <div id="allResult"></div>
+        </div>
+        
+        <div class="section">
+            <h3>4. 检查数据库中的翻译数据</h3>
+            <button onclick="checkDatabase()">检查数据库</button>
+            <div id="dbResult"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        
+        function loadToken() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('adminToken').value = token;
+                showResult('allResult', '✅ 已从 localStorage 加载 Token', 'success');
+            } else {
+                showResult('allResult', '⚠️ localStorage 中没有找到 Token', 'error');
+            }
+        }
+        
+        function showResult(elementId, message, type = 'result') {
+            const div = document.getElementById(elementId);
+            div.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+        
+        async function checkConfig() {
+            showResult('configResult', '正在检查配置...', 'result');
+            try {
+                // 这里无法直接检查配置，但可以尝试翻译一个测试文本
+                showResult('configResult', '⚠️ 无法直接检查配置，请尝试翻译功能来测试', 'error');
+            } catch (error) {
+                showResult('configResult', `❌ 错误: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testTranslateSingle() {
+            const newsId = document.getElementById('newsId').value.trim();
+            if (!newsId) {
+                showResult('singleResult', '❌ 请输入新闻ID', 'error');
+                return;
+            }
+            
+            showResult('singleResult', '正在翻译...', 'result');
+            
+            try {
+                // 先获取新闻详情
+                const newsResponse = await fetch(`${API_BASE}/news/daily-briefing?page=0&size=100&lang=zh`);
+                const newsData = await newsResponse.json();
+                const news = newsData.data?.find(n => n.id == newsId);
+                
+                if (!news) {
+                    showResult('singleResult', `❌ 未找到ID为 ${newsId} 的新闻`, 'error');
+                    return;
+                }
+                
+                showResult('singleResult', `
+                    <strong>新闻信息:</strong><br>
+                    ID: ${news.id}<br>
+                    标题: ${news.title}<br>
+                    标题中文: ${news.titleZh || '无'}<br>
+                    摘要中文: ${news.summaryZh ? '有' : '无'}<br>
+                    <br>
+                    <strong>请使用批量翻译功能来翻译所有新闻</strong>
+                `, 'result');
+                
+            } catch (error) {
+                showResult('singleResult', `❌ 错误: ${error.message}`, 'error');
+            }
+        }
+        
+        async function translateAll() {
+            const token = document.getElementById('adminToken').value.trim() || localStorage.getItem('token');
+            if (!token) {
+                showResult('allResult', '❌ 需要管理员 Token！', 'error');
+                return;
+            }
+            
+            showResult('allResult', '正在翻译所有新闻（这可能需要一些时间）...', 'result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/news/translate-news?force=true&limit=0`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                
+                showResult('allResult', `
+                    <strong>✅ 翻译完成！</strong><br>
+                    总计: ${data.totalProcessed || 0}<br>
+                    成功: ${data.successCount || 0}<br>
+                    跳过: ${data.skipCount || 0}<br>
+                    失败: ${data.errorCount || 0}<br>
+                    耗时: ${data.costMs || 0}ms<br>
+                    <br>
+                    <strong>💡 请查看后端日志了解详细信息</strong><br>
+                    <strong>💡 刷新前端页面查看效果</strong>
+                `, 'success');
+                
+            } catch (error) {
+                showResult('allResult', `❌ 翻译失败: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkDatabase() {
+            showResult('dbResult', '正在检查数据库...', 'result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/news/daily-briefing?page=0&size=20&lang=zh`);
+                const data = await response.json();
+                const news = data.data || [];
+                
+                let stats = {
+                    total: news.length,
+                    hasTitleZh: 0,
+                    hasSummaryZh: 0,
+                    hasTitleEn: 0,
+                    hasSummaryEn: 0,
+                    thaiTitle: 0
+                };
+                
+                news.forEach(n => {
+                    if (n.titleZh && n.titleZh.trim() !== '') stats.hasTitleZh++;
+                    if (n.summaryZh && n.summaryZh.trim() !== '') stats.hasSummaryZh++;
+                    if (n.titleEn && n.titleEn.trim() !== '') stats.hasTitleEn++;
+                    if (n.summaryEn && n.summaryEn.trim() !== '') stats.hasSummaryEn++;
+                    if (/[ก-๙]/.test(n.title || '')) stats.thaiTitle++;
+                });
+                
+                showResult('dbResult', `
+                    <strong>数据库统计（前20条新闻）:</strong><br>
+                    总计: ${stats.total}<br>
+                    有中文标题: ${stats.hasTitleZh} (${Math.round(stats.hasTitleZh/stats.total*100)}%)<br>
+                    有中文摘要: ${stats.hasSummaryZh} (${Math.round(stats.hasSummaryZh/stats.total*100)}%)<br>
+                    有英文标题: ${stats.hasTitleEn} (${Math.round(stats.hasTitleEn/stats.total*100)}%)<br>
+                    有英文摘要: ${stats.hasSummaryEn} (${Math.round(stats.hasSummaryEn/stats.total*100)}%)<br>
+                    泰语标题: ${stats.thaiTitle}<br>
+                    <br>
+                    <pre>${JSON.stringify(news.slice(0, 5).map(n => ({
+                        id: n.id,
+                        title: n.title?.substring(0, 50),
+                        titleZh: n.titleZh?.substring(0, 50) || 'null',
+                        summaryZh: n.summaryZh ? '有' : 'null'
+                    })), null, 2)}</pre>
+                `, stats.hasTitleZh < stats.total ? 'error' : 'success');
+                
+            } catch (error) {
+                showResult('dbResult', `❌ 错误: ${error.message}`, 'error');
+            }
+        }
+        
+        // 页面加载时自动加载 token
+        window.onload = function() {
+            loadToken();
+        };
+    </script>
+</body>
+</html>
+

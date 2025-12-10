@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修复错误翻译 - 批量修复工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .section h2 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .list-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #667eea;
+            font-size: 13px;
+        }
+        .list-item.error {
+            border-left-color: #dc3545;
+        }
+        .list-item.success {
+            border-left-color: #28a745;
+        }
+        .progress {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-card .label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 修复错误翻译 - 批量修复工具</h1>
+        <p class="subtitle">自动检测并修复 title_zh 字段中包含泰语字符的记录</p>
+
+        <div class="section">
+            <h2>🔐 认证</h2>
+            <input type="text" id="tokenInput" placeholder="输入管理员 JWT Token" />
+            <button onclick="quickLogin()">快速登录</button>
+        </div>
+
+        <div class="section">
+            <h2>📊 检查错误翻译</h2>
+            <button onclick="checkIncorrectTranslations()">检查所有错误翻译</button>
+            <div id="checkStatus"></div>
+            <div id="statsContainer" class="stats" style="display: none;"></div>
+            <div id="incorrectList" style="max-height: 400px; overflow-y: auto; margin-top: 15px;"></div>
+        </div>
+
+        <div class="section">
+            <h2>🔨 批量修复</h2>
+            <button onclick="fixAllPosts()" id="fixPostsBtn" disabled>修复所有帖子 (Posts)</button>
+            <button onclick="fixAllNews()" id="fixNewsBtn" disabled>修复所有新闻 (News)</button>
+            <div id="fixStatus"></div>
+            <div class="progress" id="progressContainer" style="display: none;">
+                <div class="progress-bar" id="progressBar" style="width: 0%;">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let incorrectPosts = [];
+        let incorrectNews = [];
+
+        // 快速登录
+        async function quickLogin() {
+            const username = prompt('输入管理员用户名:', 'admin');
+            const password = prompt('输入密码:', 'admin123');
+            if (!username || !password) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (data.token) {
+                    document.getElementById('tokenInput').value = data.token;
+                    showStatus('checkStatus', '✅ 登录成功！', 'success');
+                } else {
+                    showStatus('checkStatus', '❌ 登录失败: ' + (data.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                showStatus('checkStatus', '❌ 登录失败: ' + error.message, 'error');
+            }
+        }
+
+        // 检查错误翻译
+        async function checkIncorrectTranslations() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                showStatus('checkStatus', '❌ 请先输入 Token', 'error');
+                return;
+            }
+
+            showStatus('checkStatus', '🔍 正在检查错误翻译...', 'info');
+            incorrectPosts = [];
+            incorrectNews = [];
+
+            try {
+                // 检查帖子
+                const postsResponse = await fetch(`${API_BASE}/admin/posts?page=0&size=1000`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const postsData = await postsResponse.json();
+                const posts = postsData.data || [];
+
+                // 检查新闻 - 通过翻译端点获取（会返回所有新闻）
+                // 注意：这个端点主要用于翻译，但我们可以用它来获取新闻列表
+                // 或者我们需要创建一个专门的端点来获取所有新闻
+                // 暂时先跳过新闻检查，因为需要专门的端点
+                const news = [];
+
+                // 检测泰语字符的正则表达式
+                const thaiPattern = /[\u0e00-\u0e7f]/;
+                const chinesePattern = /[\u4e00-\u9fa5]/;
+
+                // 检查帖子
+                posts.forEach(post => {
+                    if (post.titleZh && thaiPattern.test(post.titleZh) && !chinesePattern.test(post.titleZh)) {
+                        incorrectPosts.push(post);
+                    }
+                });
+
+                // 检查新闻（需要从另一个端点获取）
+                // 注意：这里需要实际的新闻列表端点
+                // 暂时跳过，因为新闻翻译端点可能不返回列表
+
+                displayResults();
+            } catch (error) {
+                showStatus('checkStatus', '❌ 检查失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示结果
+        function displayResults() {
+            const statsContainer = document.getElementById('statsContainer');
+            const incorrectList = document.getElementById('incorrectList');
+            
+            statsContainer.style.display = 'grid';
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="number">${incorrectPosts.length}</div>
+                    <div class="label">错误帖子数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${incorrectNews.length}</div>
+                    <div class="label">错误新闻数</div>
+                </div>
+            `;
+
+            let html = '<h3>错误翻译列表:</h3>';
+            incorrectPosts.forEach(post => {
+                html += `<div class="list-item error">
+                    <strong>Post ID:</strong> ${post.id}<br>
+                    <strong>Original:</strong> ${post.title?.substring(0, 50)}...<br>
+                    <strong>Title_zh (错误):</strong> ${post.titleZh?.substring(0, 50)}...
+                </div>`;
+            });
+            incorrectNews.forEach(news => {
+                html += `<div class="list-item error">
+                    <strong>News ID:</strong> ${news.id}<br>
+                    <strong>Original:</strong> ${news.title?.substring(0, 50)}...<br>
+                    <strong>Title_zh (错误):</strong> ${news.titleZh?.substring(0, 50)}...
+                </div>`;
+            });
+
+            incorrectList.innerHTML = html;
+
+            document.getElementById('fixPostsBtn').disabled = incorrectPosts.length === 0;
+            document.getElementById('fixNewsBtn').disabled = incorrectNews.length === 0;
+
+            showStatus('checkStatus', 
+                `✅ 检查完成！发现 ${incorrectPosts.length} 个错误帖子，${incorrectNews.length} 个错误新闻`, 
+                'success');
+        }
+
+        // 修复所有帖子
+        async function fixAllPosts() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                showStatus('fixStatus', '❌ 请先输入 Token', 'error');
+                return;
+            }
+
+            if (incorrectPosts.length === 0) {
+                showStatus('fixStatus', '⚠️ 没有需要修复的帖子', 'warning');
+                return;
+            }
+
+            showStatus('fixStatus', `🔨 开始修复 ${incorrectPosts.length} 个帖子...`, 'info');
+            document.getElementById('progressContainer').style.display = 'block';
+            
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < incorrectPosts.length; i++) {
+                const post = incorrectPosts[i];
+                try {
+                    const response = await fetch(`${API_BASE}/admin/posts/${post.id}/translate`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        errorCount++;
+                    }
+                } catch (error) {
+                    errorCount++;
+                }
+
+                const progress = ((i + 1) / incorrectPosts.length) * 100;
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressBar').textContent = Math.round(progress) + '%';
+            }
+
+            showStatus('fixStatus', 
+                `✅ 修复完成！成功: ${successCount}, 失败: ${errorCount}`, 
+                successCount > 0 ? 'success' : 'error');
+            
+            // 重新检查
+            setTimeout(() => checkIncorrectTranslations(), 2000);
+        }
+
+        // 修复所有新闻
+        async function fixAllNews() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                showStatus('fixStatus', '❌ 请先输入 Token', 'error');
+                return;
+            }
+
+            const confirmMsg = `确定要修复所有新闻吗？这将重新翻译所有新闻的标题和摘要。`;
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            showStatus('fixStatus', '🔨 开始修复所有新闻（这可能需要几分钟）...', 'info');
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressBar').style.width = '10%';
+            document.getElementById('progressBar').textContent = '10%';
+
+            try {
+                // 使用 force=true 强制重新翻译所有新闻
+                const response = await fetch(`${API_BASE}/news/translate-news?force=true&limit=0`, {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                document.getElementById('progressBar').style.width = '90%';
+                document.getElementById('progressBar').textContent = '90%';
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('progressBar').style.width = '100%';
+                    document.getElementById('progressBar').textContent = '100%';
+                    showStatus('fixStatus', 
+                        `✅ 新闻翻译完成！成功: ${data.successCount || 0}, 跳过: ${data.skipCount || 0}, 失败: ${data.errorCount || 0}`, 
+                        'success');
+                } else {
+                    showStatus('fixStatus', '❌ 修复失败: ' + (data.error || '未知错误'), 'error');
+                }
+            } catch (error) {
+                showStatus('fixStatus', '❌ 修复失败: ' + error.message, 'error');
+            }
+        }
+
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.className = `status ${type}`;
+            element.textContent = message;
+        }
+
+        // 从 localStorage 加载 token
+        window.onload = () => {
+            const savedToken = localStorage.getItem('adminToken');
+            if (savedToken) {
+                document.getElementById('tokenInput').value = savedToken;
+            }
+        };
+
+        // 保存 token 到 localStorage
+        document.getElementById('tokenInput').addEventListener('change', (e) => {
+            localStorage.setItem('adminToken', e.target.value);
+        });
+    </script>
+</body>
+</html>
+

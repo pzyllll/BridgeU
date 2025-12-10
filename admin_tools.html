@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理工具 - 统一管理面板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 2rem;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        
+        .token-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .token-section label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .token-section input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+            background: #f5f5f5;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: #7f8c8d;
+        }
+        
+        .btn-small {
+            min-width: auto;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #1976d2;
+        }
+        
+        .status.success {
+            background: #e8f5e9;
+            color: #388e3c;
+            border-left: 4px solid #388e3c;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #d32f2f;
+            border-left: 4px solid #d32f2f;
+        }
+        
+        .status.warning {
+            background: #fff3e0;
+            color: #f57c00;
+            border-left: 4px solid #f57c00;
+        }
+        
+        .item-list {
+            margin-top: 2rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .item {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: #fafafa;
+        }
+        
+        .item h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .item .meta {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        .progress {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛠️ 管理工具 - 统一管理面板</h1>
+        <p class="subtitle">翻译、删除和管理内容的一站式工具</p>
+        
+        <div class="token-section">
+            <label for="adminToken">管理员 JWT Token:</label>
+            <input type="text" id="adminToken" placeholder="输入管理员 JWT Token">
+            <button class="btn-secondary btn-small" onclick="loadTokenFromStorage()" style="margin-top: 0.5rem;">
+                从 localStorage 加载
+            </button>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('posts-translate')">📝 翻译帖子</button>
+            <button class="tab" onclick="switchTab('posts-delete')">🗑️ 删除帖子</button>
+            <button class="tab" onclick="switchTab('news-translate')">📰 翻译新闻</button>
+        </div>
+        
+        <!-- 翻译帖子 Tab -->
+        <div id="posts-translate" class="tab-content active">
+            <div class="section-title">翻译泰语帖子</div>
+            <div class="controls">
+                <button class="btn-primary" onclick="checkThaiPosts()">1. 检查需要翻译的帖子</button>
+                <button class="btn-primary" id="translatePostsBtn" onclick="translateThaiPosts()" disabled>2. 开始翻译</button>
+                <button class="btn-secondary" onclick="location.reload()">刷新页面</button>
+            </div>
+            <div id="postsTranslateStatus"></div>
+            <div id="postsTranslateProgress" style="display: none;"></div>
+            <div id="postsTranslateList" class="item-list"></div>
+        </div>
+        
+        <!-- 删除帖子 Tab -->
+        <div id="posts-delete" class="tab-content">
+            <div class="section-title">删除未翻译的帖子</div>
+            <div class="controls">
+                <button class="btn-primary" onclick="checkPostsToDelete()">1. 检查要删除的帖子</button>
+                <button class="btn-danger" id="deletePostsBtn" onclick="deletePosts()" disabled>2. 删除帖子</button>
+                <button class="btn-secondary" onclick="location.reload()">刷新页面</button>
+            </div>
+            <div id="postsDeleteStatus"></div>
+            <div id="postsDeleteProgress" style="display: none;"></div>
+            <div id="postsDeleteList" class="item-list"></div>
+        </div>
+        
+        <!-- 翻译新闻 Tab -->
+        <div id="news-translate" class="tab-content">
+            <div class="section-title">翻译新闻标题</div>
+            <div class="controls">
+                <button class="btn-primary" onclick="checkUntranslatedNews()">1. 检查未翻译的新闻</button>
+                <button class="btn-primary" id="translateNewsBtn" onclick="translateNews()" disabled>2. 开始翻译</button>
+                <button class="btn-secondary" onclick="location.reload()">刷新页面</button>
+            </div>
+            <div id="newsTranslateStatus"></div>
+            <div id="newsTranslateProgress" style="display: none;"></div>
+            <div id="newsTranslateList" class="item-list"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        
+        // 过滤浏览器扩展相关的错误
+        window.addEventListener('error', function(event) {
+            const isExtensionError = event.message && (
+                event.message.includes('content-all.js') ||
+                event.message.includes('chrome-extension') ||
+                event.message.includes('moz-extension') ||
+                event.message.includes('Could not establish connection') ||
+                event.message.includes('Receiving end does not exist')
+            );
+            
+            if (isExtensionError) {
+                event.preventDefault();
+                console.warn('⚠️ 已过滤浏览器扩展相关错误:', event.message);
+                return false;
+            }
+        }, true);
+        
+        // 过滤 Promise rejection 中的扩展错误
+        window.addEventListener('unhandledrejection', function(event) {
+            const error = event.reason;
+            const errorMessage = error?.message || error?.toString() || '';
+            
+            const isExtensionError = errorMessage.includes('content-all.js') ||
+                                   errorMessage.includes('chrome-extension') ||
+                                   errorMessage.includes('moz-extension') ||
+                                   errorMessage.includes('Could not establish connection') ||
+                                   errorMessage.includes('Receiving end does not exist');
+            
+            if (isExtensionError) {
+                event.preventDefault();
+                console.warn('⚠️ 已过滤浏览器扩展相关的 Promise rejection:', errorMessage);
+                return false;
+            }
+        });
+        
+        // 全局状态
+        let postsToTranslate = [];
+        let postsToDelete = [];
+        let newsToTranslate = [];
+        
+        // Tab 切换
+        function switchTab(tabId) {
+            // 隐藏所有 tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有 tab 的 active 类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的 tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // 激活选中的 tab
+            event.target.classList.add('active');
+        }
+        
+        // Token 管理
+        function loadTokenFromStorage() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('adminToken').value = token;
+                showStatus('postsTranslateStatus', '✅ 已从 localStorage 加载 Token', 'success');
+            } else {
+                showStatus('postsTranslateStatus', '⚠️ localStorage 中没有找到 Token', 'warning');
+            }
+        }
+        
+        window.onload = function() {
+            loadTokenFromStorage();
+        };
+        
+        function getToken() {
+            const tokenInput = document.getElementById('adminToken');
+            return tokenInput.value.trim() || localStorage.getItem('token') || '';
+        }
+        
+        function showStatus(elementId, message, type = 'info') {
+            const statusDiv = document.getElementById(elementId);
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // ============ 翻译帖子功能 ============
+        
+        async function checkThaiPosts() {
+            const statusDiv = document.getElementById('postsTranslateStatus');
+            const listDiv = document.getElementById('postsTranslateList');
+            const translateBtn = document.getElementById('translatePostsBtn');
+            
+            showStatus('postsTranslateStatus', '正在检查需要翻译的泰语帖子...', 'info');
+            listDiv.innerHTML = '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/posts?lang=zh`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const allPosts = await response.json();
+                
+                postsToTranslate = allPosts.filter(post => {
+                    const hasThaiChars = /[ก-๙]/.test(post.title || '');
+                    const titleStillThai = hasThaiChars && (!post.titleZh || /[ก-๙]/.test(post.titleZh || ''));
+                    const needsTranslation = 
+                        titleStillThai ||
+                        !post.titleZh || !post.titleEn || 
+                        !post.contentZh || !post.contentEn;
+                    
+                    return hasThaiChars && needsTranslation;
+                });
+                
+                if (postsToTranslate.length === 0) {
+                    showStatus('postsTranslateStatus', '✅ 所有泰语帖子都已翻译完成！', 'success');
+                    translateBtn.disabled = true;
+                    return;
+                }
+                
+                showStatus('postsTranslateStatus', `⚠️ 找到 ${postsToTranslate.length} 个需要翻译的帖子`, 'warning');
+                translateBtn.disabled = false;
+                
+                listDiv.innerHTML = postsToTranslate.map((post, index) => `
+                    <div class="item">
+                        <h3>${index + 1}. ${post.title}</h3>
+                        <div class="meta">
+                            ID: ${post.id}<br>
+                            标题翻译: ${post.titleZh || '无'}<br>
+                            内容翻译: ${post.contentZh ? '有' : '无'}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error checking posts:', error);
+                showStatus('postsTranslateStatus', `❌ 错误: ${error.message}`, 'error');
+                translateBtn.disabled = true;
+            }
+        }
+        
+        async function translateThaiPosts() {
+            if (postsToTranslate.length === 0) {
+                showStatus('postsTranslateStatus', '⚠️ 没有要翻译的帖子', 'warning');
+                return;
+            }
+            
+            const token = getToken();
+            if (!token) {
+                showStatus('postsTranslateStatus', '❌ 错误: 需要管理员 Token！', 'error');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('postsTranslateStatus');
+            const progressDiv = document.getElementById('postsTranslateProgress');
+            const translateBtn = document.getElementById('translatePostsBtn');
+            
+            translateBtn.disabled = true;
+            progressDiv.style.display = 'block';
+            showStatus('postsTranslateStatus', '正在翻译帖子...', 'info');
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (let i = 0; i < postsToTranslate.length; i++) {
+                const post = postsToTranslate[i];
+                const progress = ((i + 1) / postsToTranslate.length) * 100;
+                
+                progressDiv.innerHTML = `
+                    <div class="progress">
+                        <div>正在翻译: ${i + 1} / ${postsToTranslate.length}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%">
+                                ${Math.round(progress)}%
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                try {
+                    const response = await fetch(`${API_BASE}/admin/posts/${post.id}/translate`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.titleZh === '未翻译' || data.contentZh === '未翻译') {
+                            errorCount++;
+                        } else {
+                            successCount++;
+                        }
+                    } else {
+                        errorCount++;
+                    }
+                } catch (error) {
+                    // 过滤浏览器扩展相关的错误
+                    const isExtensionError = error.message && (
+                        error.message.includes('content-all.js') ||
+                        error.message.includes('chrome-extension') ||
+                        error.message.includes('moz-extension') ||
+                        error.message.includes('Could not establish connection') ||
+                        error.message.includes('Receiving end does not exist')
+                    );
+                    
+                    if (!isExtensionError) {
+                        console.error(`Error translating post ${post.id}:`, error);
+                        errorCount++;
+                    }
+                }
+            }
+            
+            progressDiv.style.display = 'none';
+            showStatus('postsTranslateStatus', 
+                `✅ 翻译完成！成功: ${successCount}，失败: ${errorCount}`, 
+                successCount > errorCount ? 'success' : 'warning');
+            translateBtn.disabled = false;
+            
+            setTimeout(() => checkThaiPosts(), 2000);
+        }
+        
+        // ============ 删除帖子功能 ============
+        
+        async function checkPostsToDelete() {
+            const statusDiv = document.getElementById('postsDeleteStatus');
+            const listDiv = document.getElementById('postsDeleteList');
+            const deleteBtn = document.getElementById('deletePostsBtn');
+            
+            showStatus('postsDeleteStatus', '正在检查要删除的帖子...', 'info');
+            listDiv.innerHTML = '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/posts?lang=zh`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const allPosts = await response.json();
+                
+                postsToDelete = allPosts.filter(post => {
+                    const title = post.title || '';
+                    const hasThaiChars = /[ก-๙]/.test(title);
+                    if (!hasThaiChars) return false;
+                    
+                    const titleZh = post.titleZh || '';
+                    const titleStillThai = !titleZh || /[ก-๙]/.test(titleZh);
+                    
+                    const matchesKeywords = title.includes('ไชยยงค์') ||
+                                          title.includes('เถ้าแก่น้อย') ||
+                                          title.includes('สสส.') ||
+                                          title.includes('ICONIC Run Fest') ||
+                                          title.includes('โอ-ออ') ||
+                                          title.includes('นัทปง');
+                    
+                    return matchesKeywords && titleStillThai;
+                });
+                
+                if (postsToDelete.length === 0) {
+                    showStatus('postsDeleteStatus', '✅ 没有找到需要删除的帖子！', 'success');
+                    deleteBtn.disabled = true;
+                    return;
+                }
+                
+                showStatus('postsDeleteStatus', `⚠️ 找到 ${postsToDelete.length} 个需要删除的帖子`, 'warning');
+                deleteBtn.disabled = false;
+                
+                listDiv.innerHTML = postsToDelete.map((post, index) => `
+                    <div class="item">
+                        <h3>${index + 1}. ${post.title}</h3>
+                        <div class="meta">
+                            ID: ${post.id}<br>
+                            标题翻译: ${post.titleZh || '无'}<br>
+                            创建时间: ${post.createdAt || '未知'}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                // 过滤浏览器扩展相关的错误
+                const isExtensionError = error.message && (
+                    error.message.includes('content-all.js') ||
+                    error.message.includes('chrome-extension') ||
+                    error.message.includes('moz-extension') ||
+                    error.message.includes('Could not establish connection') ||
+                    error.message.includes('Receiving end does not exist')
+                );
+                
+                if (isExtensionError) {
+                    console.warn('⚠️ 已忽略浏览器扩展相关错误');
+                    return;
+                }
+                
+                console.error('Error checking posts:', error);
+                showStatus('postsDeleteStatus', `❌ 错误: ${error.message}`, 'error');
+                deleteBtn.disabled = true;
+            }
+        }
+        
+        async function deletePosts() {
+            if (postsToDelete.length === 0) {
+                showStatus('postsDeleteStatus', '⚠️ 没有要删除的帖子', 'warning');
+                return;
+            }
+            
+            const token = getToken();
+            if (!token) {
+                showStatus('postsDeleteStatus', '❌ 错误: 需要管理员 Token！', 'error');
+                return;
+            }
+            
+            const confirmed = confirm(`确定要删除 ${postsToDelete.length} 个帖子吗？\n\n此操作不可逆！`);
+            if (!confirmed) {
+                return;
+            }
+            
+            const statusDiv = document.getElementById('postsDeleteStatus');
+            const progressDiv = document.getElementById('postsDeleteProgress');
+            const deleteBtn = document.getElementById('deletePostsBtn');
+            
+            deleteBtn.disabled = true;
+            progressDiv.style.display = 'block';
+            showStatus('postsDeleteStatus', '正在删除帖子...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/posts/delete-untranslated`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                progressDiv.style.display = 'none';
+                
+                if (data.deletedCount > 0) {
+                    showStatus('postsDeleteStatus', 
+                        `✅ 成功删除 ${data.deletedCount} 个帖子！<br>删除的帖子ID: ${data.deletedPostIds.join(', ')}`, 
+                        'success');
+                    postsToDelete = [];
+                    document.getElementById('postsDeleteList').innerHTML = '';
+                } else {
+                    showStatus('postsDeleteStatus', 'ℹ️ 没有找到需要删除的帖子', 'info');
+                }
+                
+            } catch (error) {
+                // 过滤浏览器扩展相关的错误
+                const isExtensionError = error.message && (
+                    error.message.includes('content-all.js') ||
+                    error.message.includes('chrome-extension') ||
+                    error.message.includes('moz-extension') ||
+                    error.message.includes('Could not establish connection') ||
+                    error.message.includes('Receiving end does not exist')
+                );
+                
+                if (isExtensionError) {
+                    console.warn('⚠️ 已忽略浏览器扩展相关错误');
+                    return;
+                }
+                
+                console.error('Error deleting posts:', error);
+                progressDiv.style.display = 'none';
+                showStatus('postsDeleteStatus', `❌ 删除失败: ${error.message}`, 'error');
+                deleteBtn.disabled = false;
+            }
+        }
+        
+        // ============ 翻译新闻功能 ============
+        
+        async function checkUntranslatedNews() {
+            const statusDiv = document.getElementById('newsTranslateStatus');
+            const listDiv = document.getElementById('newsTranslateList');
+            const translateBtn = document.getElementById('translateNewsBtn');
+            
+            showStatus('newsTranslateStatus', '正在检查未翻译的新闻...', 'info');
+            listDiv.innerHTML = '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/news/daily-briefing?page=0&size=50&lang=zh`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const allNews = data.data || [];
+                
+                newsToTranslate = allNews.filter(news => {
+                    const title = news.title || '';
+                    const titleZh = news.titleZh || '';
+                    
+                    const hasThaiChars = /[ก-๙]/.test(title);
+                    if (!hasThaiChars) return false;
+                    
+                    const titleZhStillThai = !titleZh || /[ก-๙]/.test(titleZh);
+                    
+                    return titleZhStillThai;
+                });
+                
+                if (newsToTranslate.length === 0) {
+                    showStatus('newsTranslateStatus', '✅ 所有新闻都已翻译完成！', 'success');
+                    translateBtn.disabled = true;
+                    return;
+                }
+                
+                showStatus('newsTranslateStatus', `⚠️ 找到 ${newsToTranslate.length} 个需要翻译的新闻`, 'warning');
+                translateBtn.disabled = false;
+                
+                listDiv.innerHTML = newsToTranslate.map((news, index) => `
+                    <div class="item">
+                        <h3>${index + 1}. ${news.title}</h3>
+                        <div class="meta">
+                            ID: ${news.id}<br>
+                            标题翻译: ${news.titleZh || '无'}<br>
+                            摘要翻译: ${news.summaryZh ? '有' : '无'}<br>
+                            来源: ${news.source || '未知'}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                // 过滤浏览器扩展相关的错误
+                const isExtensionError = error.message && (
+                    error.message.includes('content-all.js') ||
+                    error.message.includes('chrome-extension') ||
+                    error.message.includes('moz-extension') ||
+                    error.message.includes('Could not establish connection') ||
+                    error.message.includes('Receiving end does not exist')
+                );
+                
+                if (isExtensionError) {
+                    console.warn('⚠️ 已忽略浏览器扩展相关错误');
+                    return;
+                }
+                
+                console.error('Error checking news:', error);
+                showStatus('newsTranslateStatus', `❌ 错误: ${error.message}`, 'error');
+                translateBtn.disabled = true;
+            }
+        }
+        
+        async function translateNews() {
+            const token = getToken();
+            if (!token) {
+                showStatus('newsTranslateStatus', '❌ 错误: 需要管理员 Token！', 'error');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('newsTranslateStatus');
+            const progressDiv = document.getElementById('newsTranslateProgress');
+            const translateBtn = document.getElementById('translateNewsBtn');
+            
+            translateBtn.disabled = true;
+            progressDiv.style.display = 'block';
+            showStatus('newsTranslateStatus', '正在翻译所有新闻（包括已有翻译的，强制重新翻译）...', 'info');
+            
+            try {
+                // 使用 force=true 强制重新翻译所有新闻，limit=0 表示翻译所有
+                const response = await fetch(`${API_BASE}/news/translate-news?force=true&limit=0`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                progressDiv.style.display = 'none';
+                
+                showStatus('newsTranslateStatus', 
+                    `✅ 翻译完成！<br>成功: ${data.successCount || 0}<br>跳过: ${data.skipCount || 0}<br>失败: ${data.errorCount || 0}<br><br>💡 请刷新前端页面查看效果`, 
+                    'success');
+                translateBtn.disabled = false;
+                
+                // 重新检查未翻译的新闻
+                setTimeout(() => checkUntranslatedNews(), 3000);
+                
+            } catch (error) {
+                // 过滤浏览器扩展相关的错误
+                const isExtensionError = error.message && (
+                    error.message.includes('content-all.js') ||
+                    error.message.includes('chrome-extension') ||
+                    error.message.includes('moz-extension') ||
+                    error.message.includes('Could not establish connection') ||
+                    error.message.includes('Receiving end does not exist')
+                );
+                
+                if (isExtensionError) {
+                    console.warn('⚠️ 已忽略浏览器扩展相关错误');
+                    return;
+                }
+                
+                console.error('Error translating news:', error);
+                progressDiv.style.display = 'none';
+                showStatus('newsTranslateStatus', `❌ 翻译失败: ${error.message}`, 'error');
+                translateBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
+

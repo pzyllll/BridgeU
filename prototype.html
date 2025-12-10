@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BridgeU - Prototype V19 (Visa AI Features)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Wireframe / Sketch Style */
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #e5e5e5;
+            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .browser-window {
+            background-color: white;
+            border: 3px solid #333;
+            border-radius: 8px;
+            box-shadow: 12px 12px 0px rgba(0,0,0,0.2);
+            height: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .browser-header {
+            border-bottom: 3px solid #333;
+            padding: 10px 16px;
+            background: #f4f4f4;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .traffic-light { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #333; }
+        .url-bar {
+            flex: 1; background: white; border: 2px solid #333; border-radius: 4px;
+            padding: 4px 12px; font-size: 14px; color: #666; margin-left: 16px;
+        }
+        
+        /* Components */
+        .sketch-btn {
+            border: 2px solid #333; background: #fff; transition: all 0.1s;
+            cursor: pointer; font-weight: bold; display: flex; align-items: center;
+            justify-content: center; gap: 6px;
+        }
+        .sketch-btn:hover { background: #f0f0f0; }
+        .sketch-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+        
+        .sketch-card {
+            background-color: white; border: 2px solid #333;
+            box-shadow: 4px 4px 0px rgba(0,0,0,1); transition: all 0.1s;
+        }
+        .sketch-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px rgba(0,0,0,1); }
+        
+        .nav-item {
+            padding: 12px; border-bottom: 2px solid #333; cursor: pointer;
+            transition: background 0.2s; font-size: 14px; display: flex; align-items: center; gap: 8px;
+        }
+        .nav-item:hover { background-color: #f0f0f0; }
+        .nav-item.active { background-color: #333; color: white; }
+        
+        .sketch-input {
+            border: 2px solid #333; background: #fff; padding: 8px;
+            width: 100%; outline: none; font-family: 'Courier New', Courier, monospace;
+        }
+        
+        /* Feature Specific Styles */
+        .mandatory-tag {
+            background-color: #fff; border: 2px solid #333; padding: 4px 12px;
+            font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s;
+        }
+        .mandatory-tag:hover { background-color: #f0f0f0; }
+        .mandatory-tag.active { background-color: #333; color: white; box-shadow: 2px 2px 0px rgba(0,0,0,0.5); }
+
+        /* Language Switcher Styles */
+        .lang-switch-btn {
+            border: 2px solid #333; padding: 4px 8px; font-size: 12px; font-weight: bold; cursor: pointer;
+        }
+        .lang-switch-btn.active { background-color: #333; color: white; }
+        
+        /* Tab Switcher for Login */
+        .login-tab {
+            flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: bold; border-bottom: 2px solid transparent;
+        }
+        .login-tab.active {
+            border-bottom: 4px solid black; background-color: #f9f9f9;
+        }
+
+        /* Scrollbar hidden */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        
+        /* Animations */
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 3s linear infinite; }
+    </style>
+</head>
+<body>
+
+    <div class="browser-window">
+        <!-- Browser Header -->
+        <div class="browser-header">
+            <div class="traffic-light bg-white"></div>
+            <div class="traffic-light bg-white"></div>
+            <div class="traffic-light bg-white"></div>
+            <div class="flex gap-4 ml-4">
+                <i data-lucide="arrow-left" class="w-4 h-4 opacity-50"></i>
+                <i data-lucide="arrow-right" class="w-4 h-4 opacity-50"></i>
+                <i data-lucide="rotate-cw" class="w-4 h-4 cursor-pointer" onclick="navigateTo('home')"></i>
+            </div>
+            <div class="url-bar">https://www.bridgeu.com/community</div>
+        </div>
+
+        <div id="app-container" class="flex flex-1 overflow-hidden">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+
+    <!-- TEMPLATES -->
+
+    <!-- 1. LAYOUT (SIDEBAR) -->
+    <template id="tpl-layout">
+        <aside class="w-64 border-r-2 border-black bg-white flex flex-col">
+            <div class="p-6 border-b-2 border-black bg-gray-50 flex items-center gap-2">
+                <div class="w-8 h-8 bg-black rounded flex items-center justify-center border-2 border-black text-white">
+                    <i data-lucide="globe" class="w-5 h-5"></i>
+                </div>
+                <span class="text-xl font-black tracking-tighter">BridgeU</span>
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto">
+                <div class="p-4 text-xs font-bold text-gray-500 uppercase tracking-widest" id="txt-platform">Platform</div>
+                <div onclick="navigateTo('home')" class="nav-item active" id="nav-home">
+                    <i data-lucide="home" class="w-4 h-4"></i> <span id="txt-community">Community</span>
+                </div>
+                <div onclick="navigateTo('create_post')" class="nav-item" id="nav-post">
+                    <i data-lucide="plus-square" class="w-4 h-4"></i> <span id="txt-post">Post Help</span>
+                </div>
+                <div onclick="navigateTo('chat')" class="nav-item" id="nav-chat">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i> <span id="txt-connect">Connect</span>
+                </div>
+                
+                <div class="mt-auto">
+                    <div class="p-4 border-t-2 border-black">
+                        <div onclick="navigateTo('profile')" class="nav-item" id="nav-profile">
+                            <i data-lucide="user" class="w-4 h-4"></i> <span id="txt-me">Me (Chen)</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <main id="main-area" class="flex-1 bg-white overflow-y-auto p-8 relative">
+            <!-- Page content goes here -->
+        </main>
+    </template>
+
+    <!-- 2. LOGIN PAGE (Updated with Merchant Login) -->
+    <template id="tpl-login">
+        <div class="flex-1 flex items-center justify-center bg-gray-200 w-full h-full relative">
+            
+            <!-- LANGUAGE SWITCHER -->
+            <div class="absolute top-8 right-8 flex border-2 border-black bg-white shadow-sm">
+                <button onclick="switchLoginLang('en')" class="lang-switch-btn active" id="btn-lang-en">EN</button>
+                <button onclick="switchLoginLang('zh')" class="lang-switch-btn border-l-0" id="btn-lang-zh">中文</button>
+            </div>
+
+            <div class="bg-white border-2 border-black w-96 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <div class="text-center p-8 pb-4 bg-gray-50 border-b-2 border-black">
+                    <i data-lucide="globe" class="w-12 h-12 mx-auto mb-4"></i>
+                    <h1 class="text-2xl font-black">BridgeU</h1>
+                    <p class="text-sm text-gray-500 mt-2" id="login-subtitle">Connecting Students & Local Life</p>
+                </div>
+                
+                <!-- Login Type Tabs -->
+                <div class="flex border-b-2 border-black">
+                    <div class="login-tab active" onclick="switchLoginTab('student', this)" id="tab-student">Student</div>
+                    <div class="login-tab" onclick="switchLoginTab('merchant', this)" id="tab-merchant">Merchant</div>
+                </div>
+
+                <!-- Student Form -->
+                <div id="form-student" class="p-8 space-y-4">
+                    <div>
+                        <label class="text-xs font-bold block mb-1 uppercase" id="label-email">Email</label>
+                        <input type="text" class="sketch-input" placeholder="student@cmu.ac.th">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold block mb-1 uppercase" id="label-password">Password</label>
+                        <input type="password" class="sketch-input" placeholder="******">
+                    </div>
+                    <button onclick="navigateTo('home')" class="sketch-btn w-full py-3 bg-black text-white mt-4" id="btn-login">LOGIN</button>
+                    <div class="text-center text-xs mt-4 underline cursor-pointer" id="link-create">Create student account</div>
+                </div>
+
+                <!-- Merchant Form (Hidden by default) -->
+                <div id="form-merchant" class="p-8 space-y-4 hidden">
+                    <div>
+                        <label class="text-xs font-bold block mb-1 uppercase">Business Name</label>
+                        <input type="text" class="sketch-input" placeholder="e.g., Somchai Property">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold block mb-1 uppercase">Email / Phone</label>
+                        <input type="text" class="sketch-input" placeholder="Contact info">
+                    </div>
+                    <div class="p-3 border-2 border-black border-dashed bg-gray-50 text-center cursor-pointer hover:bg-gray-100">
+                        <i data-lucide="upload-cloud" class="w-6 h-6 mx-auto mb-1 text-gray-400"></i>
+                        <span class="text-[10px] font-bold block uppercase">Upload ID / Business License</span>
+                        <span class="text-[8px] text-gray-500 block">(Verification Required)</span>
+                    </div>
+                    <button onclick="alert('Verification Submitted! Pending Approval.'); navigateTo('home')" class="sketch-btn w-full py-3 bg-blue-600 text-white border-blue-900 mt-2">REGISTER & VERIFY</button>
+                    <div class="text-center text-xs mt-4 underline cursor-pointer" onclick="switchLoginTab('student', document.getElementById('tab-student'))">Back to Student Login</div>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- 3. HOME CONTENT (Default Feed) -->
+    <template id="tpl-home-content">
+        <!-- Robot Briefing -->
+        <div class="mb-8 border-2 border-black bg-gray-50 p-4 relative">
+            <div class="absolute top-0 right-0 bg-black text-white text-[10px] font-bold px-2 py-1 flex items-center gap-1">
+                <i data-lucide="bot" class="w-3 h-3"></i> <span id="txt-robot-title">INTELLIGENCE ROBOT</span>
+            </div>
+            <div class="flex gap-4">
+                <div class="w-12 h-12 bg-white border-2 border-black flex items-center justify-center rounded-full mt-1">
+                    <i data-lucide="refresh-cw" class="w-5 h-5 animate-spin-slow"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-sm uppercase tracking-wider mb-1" id="txt-briefing-title">Daily Briefing · Nov 27</h3>
+                    <div class="text-xs text-gray-500 font-mono mb-2">Source: Bangkok Post & CMU Official</div>
+                    <div class="space-y-2" id="briefing-content">
+                        <!-- Content injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <header class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-black uppercase" id="txt-feed-title">Community Feed</h2>
+            <div class="text-xs font-mono border border-black px-2 py-1 rounded-full flex items-center gap-1 bg-yellow-100">
+                <i data-lucide="filter" class="w-3 h-3"></i> Filter Mode Active
+            </div>
+        </header>
+
+        <!-- Tags -->
+        <div class="mb-8">
+            <div class="text-[10px] font-bold uppercase mb-2 text-gray-400 tracking-widest">Survival Tags (Mandatory)</div>
+            <div class="flex flex-wrap gap-2" id="tag-filters">
+                <button class="mandatory-tag active" onclick="filterPosts('all', this)">All</button>
+                <button class="mandatory-tag" onclick="navigateTo('visa-feed')">🛂 #Visa</button>
+                <button class="mandatory-tag" onclick="filterPosts('rent', this)">🏠 #Rent</button>
+                <button class="mandatory-tag" onclick="filterPosts('learning', this)">📚 #Learning</button>
+                <button class="mandatory-tag" onclick="filterPosts('market', this)">🛒 #Market</button>
+            </div>
+        </div>
+
+        <!-- Feed Grid (Vertical Posts) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="posts-grid">
+            <!-- Post 1: Rent -->
+            <div onclick="navigateTo('detail')" class="sketch-card p-4 cursor-pointer post-item" data-tag="rent">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-full border-2 border-black bg-gray-200"></div>
+                        <div>
+                            <div class="font-bold text-sm">Somchai Property</div>
+                            <span class="text-[10px] bg-gray-100 border border-black px-1">Local Business</span>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 bg-black text-white text-xs font-bold">#Rent</span>
+                </div>
+                <h3 class="text-lg font-bold mb-1">Condo for rent near CMU (Nimman)</h3>
+                <p class="text-sm text-gray-600 font-serif line-clamp-2">
+                    Fully furnished, 1 bedroom, free WiFi. 8,000 THB/month. Looking for long-term students.
+                </p>
+                <div class="flex items-center justify-between mt-4 pt-2 border-t-2 border-black border-dashed text-xs font-mono text-gray-500">
+                    <span>2h ago</span>
+                    <div class="flex gap-3 text-black font-bold">
+                        <span class="flex items-center gap-1"><i data-lucide="heart" class="w-3 h-3"></i> 24</span>
+                        <span class="flex items-center gap-1"><i data-lucide="message-square" class="w-3 h-3"></i> 5</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Post 2: Learning -->
+            <div onclick="navigateTo('detail_learning')" class="sketch-card p-4 cursor-pointer post-item" data-tag="learning">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-full border-2 border-black bg-gray-200"></div>
+                        <div>
+                            <div class="font-bold text-sm">Hans (German)</div>
+                            <span class="text-[10px] bg-gray-100 border border-black px-1">Intl Student</span>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 bg-black text-white text-xs font-bold">#Learning</span>
+                </div>
+                <h3 class="text-lg font-bold mb-1">Language Exchange Partner Wanted</h3>
+                <p class="text-sm text-gray-600 font-serif line-clamp-2">I want to practice my Thai or Chinese. I can help you with German or English. Let's meet for coffee!</p>
+                <div class="flex items-center justify-between mt-4 pt-2 border-t-2 border-black border-dashed text-xs font-mono text-gray-500">
+                    <span>5h ago</span>
+                    <div class="flex gap-3 text-black font-bold">
+                        <span class="flex items-center gap-1"><i data-lucide="heart" class="w-3 h-3"></i> 15</span>
+                        <span class="flex items-center gap-1"><i data-lucide="message-square" class="w-3 h-3"></i> 8</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Post 4: Market -->
+            <div class="sketch-card p-4 cursor-pointer post-item" data-tag="market">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-full border-2 border-black bg-gray-200"></div>
+                        <div>
+                            <div class="font-bold text-sm">Sarah (UK)</div>
+                            <span class="text-[10px] bg-gray-100 border border-black px-1">Intl Student</span>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 bg-black text-white text-xs font-bold">#Market</span>
+                </div>
+                <h3 class="text-lg font-bold mb-1">Moving Sale: Fan & Monitor</h3>
+                <p class="text-sm text-gray-600 font-serif line-clamp-2">Leaving Chiang Mai next week. Selling Hatari fan (300 THB) and Dell monitor (2000 THB).</p>
+                <div class="flex items-center justify-between mt-4 pt-2 border-t-2 border-black border-dashed text-xs font-mono text-gray-500">
+                    <span>2d ago</span>
+                    <div class="flex gap-3 text-black font-bold">
+                        <span class="flex items-center gap-1"><i data-lucide="heart" class="w-3 h-3"></i> 5</span>
+                        <span class="flex items-center gap-1"><i data-lucide="message-square" class="w-3 h-3"></i> 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- 3.1 VISA FEED CONTENT (NEW: AI Intelligence for Visa) -->
+    <template id="tpl-visa-feed">
+        <button onclick="navigateTo('home')" class="mb-4 text-sm font-bold flex items-center gap-1 hover:underline">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to All
+        </button>
+        
+        <!-- AI Visa Intelligence Card -->
+        <div class="mb-8 border-2 border-blue-800 bg-blue-50 p-6 relative shadow-md">
+            <div class="absolute top-0 right-0 bg-blue-800 text-white text-[10px] font-bold px-3 py-1 flex items-center gap-1">
+                <i data-lucide="cpu" class="w-3 h-3"></i> AI VISA MONITOR
+            </div>
+            
+            <div class="flex gap-4 mb-4">
+                <div class="w-14 h-14 bg-white border-2 border-blue-800 flex items-center justify-center rounded-full">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-blue-800"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-lg uppercase tracking-wider text-blue-900">AI Trend Summary</h3>
+                    <p class="text-sm font-serif text-blue-900 mt-1 font-bold">
+                        "Recent data indicates stricter enforcement on 90-day reporting deadlines. Online system stability has improved by 20%."
+                    </p>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1">Latest Auto-Crawled Intelligence</div>
+                
+                <!-- Crawled Item 1 -->
+                <div class="bg-white border-2 border-blue-200 p-3">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-bold text-sm text-blue-900">[Official] New LTR Visa Regulations</h4>
+                        <span class="text-[10px] bg-gray-100 border border-gray-300 px-1">Immigration Bureau</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">
+                        <span class="font-bold">AI Summary:</span> New 10-year Long-Term Resident visa now available for 'Wealthy Global Citizens'. Application fee reduced to 50,000 THB.
+                    </p>
+                    <a href="#" class="text-[10px] text-blue-600 underline mt-1 block">Read Original Source -></a>
+                </div>
+
+                <!-- Crawled Item 2 -->
+                <div class="bg-white border-2 border-blue-200 p-3">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-bold text-sm text-blue-900">[Alert] CMU Immigration Office Closed on Dec 5</h4>
+                        <span class="text-[10px] bg-gray-100 border border-gray-300 px-1">CMU International</span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">
+                        <span class="font-bold">AI Summary:</span> Office closed for Father's Day. Please plan visa extensions accordingly.
+                    </p>
+                    <a href="#" class="text-[10px] text-blue-600 underline mt-1 block">Read Original Source -></a>
+                </div>
+            </div>
+        </div>
+
+        <header class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-black uppercase">Visa Community Feed</h2>
+            <span class="px-2 py-1 bg-black text-white text-xs font-bold border-2 border-transparent shadow-sm">#Visa</span>
+        </header>
+
+        <!-- Regular User Posts for Visa -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div onclick="navigateTo('detail')" class="sketch-card p-4 cursor-pointer post-item" data-tag="visa">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-full border-2 border-black bg-gray-200"></div>
+                        <div>
+                            <div class="font-bold text-sm">Li Ming</div>
+                            <span class="text-[10px] bg-gray-100 border border-black px-1">Chinese Student</span>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 bg-black text-white text-xs font-bold">#Visa</span>
+                </div>
+                <h3 class="text-lg font-bold mb-1">TM30 Reporting Question</h3>
+                <p class="text-sm text-gray-600 font-serif line-clamp-2">Does anyone know if I can do TM30 online? The app keeps crashing.</p>
+                <div class="flex items-center justify-between mt-4 pt-2 border-t-2 border-black border-dashed text-xs font-mono text-gray-500">
+                    <span>1d ago</span>
+                    <div class="flex gap-3 text-black font-bold">
+                        <span class="flex items-center gap-1"><i data-lucide="heart" class="w-3 h-3"></i> 8</span>
+                        <span class="flex items-center gap-1"><i data-lucide="message-square" class="w-3 h-3"></i> 15</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 4. DETAIL CONTENT (Removed Translate Button) -->
+    <template id="tpl-detail-content">
+        <button onclick="navigateTo('home')" class="mb-4 text-sm font-bold flex items-center gap-1 hover:underline">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> <span id="btn-back">Back to Feed</span>
+        </button>
+
+        <div class="flex gap-8">
+            <div class="flex-1 bg-white border-2 border-black p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 border-2 border-black rounded-full bg-gray-200"></div>
+                    <div>
+                        <h3 class="font-bold text-lg">Somchai Property</h3>
+                        <span class="text-xs bg-gray-100 border border-black px-1">Local Business</span>
+                    </div>
+                    <button class="ml-auto sketch-btn px-4 py-1 text-xs">Follow</button>
+                </div>
+
+                <!-- Content -->
+                <h1 class="text-2xl font-black mb-4" id="post-title">Condo for rent near CMU (Nimman area)</h1>
+                
+                <div id="post-content-area" class="text-base font-serif leading-relaxed">
+                    <p>Fully furnished, 1 bedroom, free WiFi. 8,000 THB/month. Looking for long-term students. No deposit required for CMU students.</p>
+                </div>
+
+                <div class="border-t-2 border-black pt-6 mt-8">
+                    <h3 class="font-bold mb-4">Comments (5)</h3>
+                    <div class="flex gap-4 mt-6">
+                        <input type="text" class="sketch-input flex-1" placeholder="Write a comment...">
+                        <button class="sketch-btn px-6 bg-black text-white">Post</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-72 space-y-6">
+                <div class="bg-white border-2 border-black p-6 text-center">
+                    <h3 class="font-bold text-lg mb-4">Contact Host</h3>
+                    <button onclick="navigateTo('chat')" class="sketch-btn w-full py-2 bg-black text-white mb-2">Chat Now</button>
+                    <p class="text-[10px] text-gray-500">* Requires Mutual Follow</p>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- 4.1 LEARNING DETAIL CONTENT (New) -->
+    <template id="tpl-detail-learning">
+        <button onclick="navigateTo('home')" class="mb-4 text-sm font-bold flex items-center gap-1 hover:underline">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> <span id="btn-back">Back to Feed</span>
+        </button>
+
+        <div class="flex gap-8">
+            <div class="flex-1 bg-white border-2 border-black p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 border-2 border-black rounded-full bg-gray-200"></div>
+                    <div>
+                        <h3 class="font-bold text-lg">Hans (German)</h3>
+                        <span class="text-xs bg-gray-100 border border-black px-1">Intl Student</span>
+                    </div>
+                    <button class="ml-auto sketch-btn px-4 py-1 text-xs">Follow</button>
+                </div>
+
+                <!-- Content -->
+                <h1 class="text-2xl font-black mb-4">Language Exchange Partner Wanted</h1>
+                
+                <div class="text-base font-serif leading-relaxed">
+                    <p>I want to practice my Thai or Chinese. I can help you with German or English. Let's meet for coffee near CMU!</p>
+                </div>
+
+                <div class="border-t-2 border-black pt-6 mt-8">
+                    <h3 class="font-bold mb-4">Comments (8)</h3>
+                    <div class="flex gap-4 mt-6">
+                        <input type="text" class="sketch-input flex-1" placeholder="Write a comment...">
+                        <button class="sketch-btn px-6 bg-black text-white">Post</button>
+                    </div>
+                    <div class="mt-4">
+                         <div class="flex gap-3 mb-4">
+                            <div class="w-8 h-8 rounded-full border border-black bg-gray-100"></div>
+                            <div>
+                                <div class="text-xs font-bold">Li Ming</div>
+                                <div class="text-sm text-gray-600">I'm interested! I speak Chinese.</div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-72 space-y-6">
+                <div class="bg-white border-2 border-black p-6 text-center">
+                    <h3 class="font-bold text-lg mb-4">Connect with Hans</h3>
+                    <button onclick="navigateTo('chat')" class="sketch-btn w-full py-2 bg-black text-white mb-2">Chat Now</button>
+                    <p class="text-[10px] text-gray-500">* Requires Mutual Follow</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 5. CREATE POST -->
+    <template id="tpl-create-post">
+        <div class="max-w-2xl mx-auto bg-white border-2 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <h2 class="text-2xl font-black uppercase mb-6">Create Post</h2>
+            <div class="mb-6">
+                <label class="text-xs font-bold uppercase block mb-2">Select Tag (Mandatory)</label>
+                <div class="flex flex-wrap gap-2" id="post-tags">
+                    <button class="mandatory-tag" onclick="selectTag(this)">#Visa</button>
+                    <button class="mandatory-tag" onclick="selectTag(this)">#Rent</button>
+                    <button class="mandatory-tag" onclick="selectTag(this)">#Motorbike</button>
+                    <button class="mandatory-tag" onclick="selectTag(this)">#Market</button>
+                </div>
+            </div>
+            <textarea class="w-full border-2 border-black p-4 font-serif text-sm outline-none resize-none mb-4 h-32" 
+                id="post-text"
+                placeholder="Share survival info, sell items, or ask for help..."></textarea>
+
+            <!-- Image Upload Placeholder -->
+            <div class="mb-6 border-2 border-black border-dashed bg-gray-50 h-24 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors relative">
+                <input type="file" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onchange="handleImageUpload(this)">
+                <div class="flex flex-col items-center pointer-events-none" id="upload-placeholder">
+                    <i data-lucide="image-plus" class="w-6 h-6 mb-1 text-gray-400"></i>
+                    <span class="text-xs font-bold text-gray-500 uppercase">Add Photo / Video</span>
+                </div>
+                <div id="image-preview" class="hidden w-full h-full flex items-center justify-center p-2">
+                    <img src="" class="max-h-full object-contain border border-black" />
+                </div>
+            </div>
+
+            <div id="ai-status" class="hidden mb-4 p-3 border-2 text-xs font-bold flex items-center gap-2"></div>
+
+            <button onclick="simulatePublish()" class="sketch-btn w-full py-3 bg-black text-white justify-center" id="publish-btn">
+                Publish Now
+            </button>
+        </div>
+    </template>
+
+    <!-- 6. CHAT -->
+    <template id="tpl-chat">
+        <div class="flex h-full border-2 border-black bg-white">
+            <div class="w-72 border-r-2 border-black p-0">
+                <div class="p-4 border-b-2 border-black font-bold bg-gray-50">Messages</div>
+                <div onclick="loadChat('mutual')" class="p-4 border-b-2 border-black hover:bg-gray-50 cursor-pointer">
+                    <div class="font-bold text-sm">Somchai Property</div>
+                    <div class="text-xs text-gray-500 truncate">When can you visit?</div>
+                </div>
+                <div onclick="loadChat('stranger')" class="p-4 border-b-2 border-black hover:bg-gray-50 cursor-pointer bg-gray-100">
+                    <div class="font-bold text-sm">Hans (German)</div>
+                    <div class="text-[10px] border border-black px-1 inline-block bg-white">STRANGER</div>
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col" id="chat-area">
+                <div class="flex-1 flex items-center justify-center text-gray-400 font-mono text-sm">
+                    Select a conversation
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 7. PROFILE (Updated with Edit Button) -->
+    <template id="tpl-profile">
+        <div class="flex flex-col h-full bg-white">
+            <div class="relative mb-12">
+                <div class="h-32 bg-gray-200 border-b-2 border-black"></div>
+                <div class="absolute -bottom-10 left-4 w-20 h-20 border-2 border-black rounded-full bg-white overflow-hidden shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Chen&backgroundColor=e5e5e5" class="w-full h-full object-cover grayscale" />
+                </div>
+                <div class="absolute top-36 right-4 flex gap-2">
+                    <!-- Added Edit Button Functionality -->
+                    <button onclick="navigateTo('edit_profile')" class="px-4 py-1.5 bg-black text-white border-2 border-black text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:bg-gray-800 cursor-pointer flex items-center gap-1">
+                        <i data-lucide="edit-2" class="w-3 h-3"></i> Edit Profile
+                    </button>
+                </div>
+            </div>
+
+            <div class="px-4 pb-20 overflow-y-auto">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-black">Chen</h2>
+                    <div class="text-xs font-mono text-gray-500 mb-2">@chen_student</div>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <span class="text-[10px] bg-black text-white px-2 py-0.5 font-bold">Chinese Student</span>
+                        <span class="text-[10px] bg-gray-100 border border-black px-2 py-0.5 flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3 h-3"></i> Chiang Mai, Thailand
+                        </span>
+                    </div>
+                    <p class="text-sm font-serif text-gray-800 mb-3">Freshman at CMU. Looking for a quiet condo near Nimman. Love spicy food! 🌶️</p>
+                    
+                    <div class="flex gap-4 py-3 border-y-2 border-black border-dashed mb-4">
+                        <div class="text-center"><span class="font-black text-lg">12</span> <span class="text-[10px] uppercase text-gray-500">Posts</span></div>
+                        <div class="text-center"><span class="font-black text-lg">24</span> <span class="text-[10px] uppercase text-gray-500">Following</span></div>
+                        <div class="text-center"><span class="font-black text-lg">8</span> <span class="text-[10px] uppercase text-gray-500">Followers</span></div>
+                    </div>
+                </div>
+
+                <div class="border-t-2 border-black pt-4">
+                    <h3 class="text-sm font-black uppercase mb-4 flex items-center gap-2">
+                        <i data-lucide="plus-square" class="w-4 h-4"></i> My Posts
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="sketch-card p-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="px-1.5 py-0.5 bg-black text-white text-[10px] font-bold">#Market</span>
+                                <span class="text-[10px] text-gray-400">2d ago</span>
+                            </div>
+                            <h4 class="font-bold text-sm mb-1">Buying second-hand fridge</h4>
+                            <p class="text-xs text-gray-600 line-clamp-1 mb-2">Budget around 2000 THB. Can pick up.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 8. EDIT PROFILE PAGE (New Template) -->
+    <template id="tpl-edit-profile">
+        <div class="max-w-2xl mx-auto bg-white border-2 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black uppercase">Edit Profile</h2>
+                <button onclick="navigateTo('profile')" class="text-sm font-bold underline">Cancel</button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex justify-center mb-6">
+                     <div class="w-20 h-20 rounded-full border-2 border-black bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 relative">
+                        <i data-lucide="camera" class="w-6 h-6 text-gray-400"></i>
+                        <div class="absolute -bottom-1 -right-1 bg-black text-white p-1 rounded-full border border-white">
+                            <i data-lucide="plus" class="w-3 h-3"></i>
+                        </div>
+                     </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold block mb-1 uppercase">Display Name</label>
+                    <input type="text" class="sketch-input" value="Chen">
+                </div>
+                <div>
+                    <label class="text-xs font-bold block mb-1 uppercase">Username</label>
+                    <input type="text" class="sketch-input" value="@chen_student" disabled style="background-color: #f5f5f5; color: #999;">
+                </div>
+                <div>
+                    <label class="text-xs font-bold block mb-1 uppercase">Bio</label>
+                    <textarea class="sketch-input h-24">Freshman at CMU. Looking for a quiet condo near Nimman. Love spicy food! 🌶️</textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-bold block mb-1 uppercase">Location</label>
+                    <input type="text" class="sketch-input" value="Chiang Mai, Thailand">
+                </div>
+                
+                <button onclick="alert('Profile Updated!'); navigateTo('profile')" class="sketch-btn w-full py-3 bg-black text-white justify-center mt-4">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        const app = document.getElementById('app-container');
+        let currentLang = 'en';
+        // Sensitive words list (case insensitive)
+        const SENSITIVE_WORDS = ["scam", "hate", "fake", "drug", "kill", "attack", "stupid", "fuck"];
+
+        const LANG = {
+            en: {
+                subtitle: "Connecting Students & Local Life",
+                email: "EMAIL",
+                password: "PASSWORD",
+                login: "LOGIN",
+                create: "Create an account",
+                community: "Community Feed",
+                postHelp: "Post Help",
+                connect: "Connect",
+                me: "Me (Chen)",
+                robotTitle: "INTELLIGENCE ROBOT",
+                briefingTitle: "Daily Briefing · Nov 27",
+                back: "Back to Feed",
+            },
+            zh: {
+                subtitle: "连接留学生与本地生活",
+                email: "电子邮箱",
+                password: "密码",
+                login: "登录",
+                create: "创建新账户",
+                community: "社区动态",
+                postHelp: "发布求助",
+                connect: "消息互动",
+                me: "个人中心 (Chen)",
+                robotTitle: "全网情报机器人",
+                briefingTitle: "每日简报 · 11月27日",
+                back: "返回列表",
+            }
+        };
+
+        const BRIEFING_CONTENT = {
+            en: `
+                <p class="text-sm font-bold border-l-4 border-blue-500 pl-2 bg-white p-1 mb-2">
+                    🇬🇧 Thailand approves new 10-year LTR visa for high-potential foreigners.
+                </p>
+                <p class="text-sm font-bold border-l-4 border-red-500 pl-2 bg-white p-1">
+                    🇨🇳 泰国批准针对高潜力外国人的新10年LTR签证。
+                </p>
+            `,
+            zh: `
+                <p class="text-sm font-bold border-l-4 border-blue-500 pl-2 bg-white p-1 mb-2">
+                    🇨🇳 泰国批准针对高潜力外国人的新10年LTR签证。
+                </p>
+                <p class="text-sm font-bold border-l-4 border-red-500 pl-2 bg-white p-1">
+                    🇬🇧 Thailand approves new 10-year LTR visa for high-potential foreigners.
+                </p>
+            `
+        };
+
+        function switchLoginLang(lang) {
+            currentLang = lang;
+            document.getElementById('login-subtitle').innerText = LANG[lang].subtitle;
+            document.getElementById('label-email').innerText = LANG[lang].email;
+            document.getElementById('label-password').innerText = LANG[lang].password;
+            document.getElementById('btn-login').innerText = LANG[lang].login;
+            document.getElementById('link-create').innerText = LANG[lang].create;
+
+            if(lang === 'zh') {
+                document.getElementById('btn-lang-zh').classList.add('active');
+                document.getElementById('btn-lang-en').classList.remove('active');
+            } else {
+                document.getElementById('btn-lang-en').classList.add('active');
+                document.getElementById('btn-lang-zh').classList.remove('active');
+            }
+        }
+
+        function switchLoginTab(type, btn) {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+
+            if(type === 'student') {
+                document.getElementById('form-student').classList.remove('hidden');
+                document.getElementById('form-merchant').classList.add('hidden');
+            } else {
+                document.getElementById('form-student').classList.add('hidden');
+                document.getElementById('form-merchant').classList.remove('hidden');
+            }
+        }
+
+        function navigateTo(page) {
+            if (page === 'login') {
+                const tpl = document.getElementById('tpl-login');
+                app.innerHTML = tpl.innerHTML;
+                switchLang(currentLang); 
+            } else {
+                if (!document.getElementById('main-area')) {
+                    const layoutTpl = document.getElementById('tpl-layout');
+                    app.innerHTML = layoutTpl.innerHTML;
+                    
+                    if(currentLang === 'zh') {
+                        document.getElementById('txt-platform').innerText = "平台功能";
+                        document.getElementById('txt-community').innerText = LANG.zh.community;
+                        document.getElementById('txt-post').innerText = LANG.zh.postHelp;
+                        document.getElementById('txt-connect').innerText = LANG.zh.connect;
+                        document.getElementById('txt-me').innerText = LANG.zh.me;
+                    }
+                }
+                
+                const mainArea = document.getElementById('main-area');
+                let tplId = 'tpl-home-content'; 
+                
+                if (page === 'home') tplId = 'tpl-home-content';
+                if (page === 'visa-feed') tplId = 'tpl-visa-feed'; // New logic for Visa feed
+                if (page === 'detail') tplId = 'tpl-detail-content';
+                if (page === 'detail_learning') tplId = 'tpl-detail-learning';
+                if (page === 'create_post') tplId = 'tpl-create-post';
+                if (page === 'chat') tplId = 'tpl-chat';
+                if (page === 'profile') tplId = 'tpl-profile';
+                if (page === 'edit_profile') tplId = 'tpl-edit-profile';
+
+                const contentTpl = document.getElementById(tplId);
+                mainArea.innerHTML = contentTpl.innerHTML;
+                
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                
+                // Fix nav highlight logic
+                let navId = '';
+                if (page === 'home' || page === 'visa-feed' || page === 'detail' || page === 'detail_learning') navId = 'nav-home';
+                else if (page === 'create_post') navId = 'nav-post';
+                else if (page === 'chat') navId = 'nav-chat';
+                else if (page === 'profile' || page === 'edit_profile') navId = 'nav-profile';
+                
+                const el = document.getElementById(navId);
+                if(el) el.classList.add('active');
+
+                if (page === 'home') {
+                    if(currentLang === 'zh') {
+                        document.getElementById('txt-robot-title').innerText = LANG.zh.robotTitle;
+                        document.getElementById('txt-briefing-title').innerText = LANG.zh.briefingTitle;
+                        document.getElementById('txt-feed-title').innerText = LANG.zh.community;
+                        document.getElementById('briefing-content').innerHTML = BRIEFING_CONTENT.zh;
+                    } else {
+                        document.getElementById('briefing-content').innerHTML = BRIEFING_CONTENT.en;
+                    }
+                }
+
+                if (page === 'detail') {
+                    if(currentLang === 'zh') {
+                        document.getElementById('btn-back').innerText = LANG.zh.back;
+                    }
+                }
+            }
+            lucide.createIcons();
+        }
+
+        function switchLang(lang) {
+            currentLang = lang;
+            const elSubtitle = document.getElementById('login-subtitle');
+            if(elSubtitle) {
+                elSubtitle.innerText = LANG[lang].subtitle;
+                document.getElementById('label-email').innerText = LANG[lang].email;
+                document.getElementById('label-password').innerText = LANG[lang].password;
+                document.getElementById('btn-login').innerText = LANG[lang].login;
+                document.getElementById('link-create').innerText = LANG[lang].create;
+            }
+            if(lang === 'zh') {
+                document.getElementById('btn-lang-zh')?.classList.add('active');
+                document.getElementById('btn-lang-en')?.classList.remove('active');
+            } else {
+                document.getElementById('btn-lang-en')?.classList.add('active');
+                document.getElementById('btn-lang-zh')?.classList.remove('active');
+            }
+        }
+
+        // Removed translation logic from here, keeping UI for details only
+
+        window.handleImageUpload = function(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('upload-placeholder').classList.add('hidden');
+                    const previewDiv = document.getElementById('image-preview');
+                    previewDiv.classList.remove('hidden');
+                    previewDiv.querySelector('img').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        window.filterPosts = function(tag, btn) {
+            document.querySelectorAll('#tag-filters .mandatory-tag').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const posts = document.querySelectorAll('.post-item');
+            posts.forEach(post => {
+                if (tag === 'all' || post.dataset.tag === tag) {
+                    post.style.display = 'block';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+        }
+
+        window.selectTag = function(btn) {
+            document.querySelectorAll('#post-tags .mandatory-tag').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        window.simulatePublish = function() {
+            const statusDiv = document.getElementById('ai-status');
+            const btn = document.getElementById('publish-btn');
+            const postContent = document.getElementById('post-text').value.toLowerCase(); // Get content
+            
+            statusDiv.className = "mb-4 p-3 bg-blue-50 border-2 border-blue-200 text-blue-800 text-xs font-bold flex items-center gap-2";
+            statusDiv.innerHTML = `<i data-lucide="bot" class="w-4 h-4 animate-bounce"></i> AI is scanning for scams & hate speech...`;
+            statusDiv.classList.remove('hidden');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+            lucide.createIcons();
+
+            setTimeout(() => {
+                // Check for sensitive words
+                const detectedWord = SENSITIVE_WORDS.find(word => postContent.includes(word));
+                
+                if (!detectedWord) {
+                    statusDiv.className = "mb-4 p-3 bg-green-50 border-2 border-green-500 text-green-800 text-xs font-bold flex items-center gap-2";
+                    statusDiv.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i> Safe Content. Published successfully!`;
+                } else {
+                    statusDiv.className = "mb-4 p-3 bg-red-50 border-2 border-red-500 text-red-800 text-xs font-bold flex items-center gap-2";
+                    statusDiv.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4"></i> Blocked: Content contains prohibited word: "${detectedWord}".`;
+                }
+                btn.innerText = "Publish Now";
+                btn.disabled = false;
+                lucide.createIcons();
+            }, 1500);
+        }
+
+        window.loadChat = function(type) {
+            const area = document.getElementById('chat-area');
+            if (type === 'mutual') {
+                area.innerHTML = `
+                    <div class="p-4 border-b-2 border-black flex items-center gap-2 bg-gray-50">
+                        <div class="w-3 h-3 bg-green-500 rounded-full border border-black"></div>
+                        <span class="font-bold">Somchai Property</span>
+                    </div>
+                    <div class="flex-1 p-4 space-y-4 overflow-y-auto">
+                        <div class="text-center text-xs text-gray-400">Today</div>
+                        <div class="flex justify-end"><div class="bg-black text-white p-3 text-sm max-w-[70%] border-2 border-black">Is the room still available?</div></div>
+                        <div class="flex justify-start"><div class="bg-white text-black p-3 text-sm max-w-[70%] border-2 border-black shadow-sm">Yes! When can you visit?</div></div>
+                    </div>
+                    <div class="p-4 border-t-2 border-black flex gap-2">
+                        <input type="text" class="sketch-input" placeholder="Type message...">
+                        <button class="sketch-btn px-4"><i data-lucide="send" class="w-4 h-4"></i></button>
+                    </div>
+                `;
+            } else {
+                area.innerHTML = `
+                    <div class="p-4 border-b-2 border-black flex items-center gap-2 bg-gray-50">
+                        <div class="w-3 h-3 bg-gray-300 rounded-full border border-black"></div>
+                        <span class="font-bold text-gray-500">Hans (German)</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                        <div class="border-2 border-black border-dashed p-6 bg-gray-50 max-w-xs">
+                            <div class="flex justify-center mb-3 text-red-500"><i data-lucide="alert-circle" class="w-8 h-8"></i></div>
+                            <h3 class="font-black uppercase mb-2">Connection Pending</h3>
+                            <p class="text-xs font-serif text-gray-600 mb-4">To ensure safety, you can only chat after <strong>Mutual Follow</strong>.</p>
+                            <button class="sketch-btn w-full py-2">Request Follow</button>
+                        </div>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        navigateTo('login');
+    </script>
+</body>
+</html>

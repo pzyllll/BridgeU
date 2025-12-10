@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>触发新闻爬取和翻译</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .button.danger {
+            background-color: #f44336;
+        }
+        .button.danger:hover {
+            background-color: #da190b;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .result.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .result.info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-left: 3px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📰 触发新闻爬取和自动翻译</h1>
+        
+        <div class="info-box">
+            <h3>说明</h3>
+            <p>此工具用于触发新闻爬取任务。爬取过程包括：</p>
+            <ol>
+                <li>从多个新闻源爬取最新新闻</li>
+                <li>生成 AI 摘要</li>
+                <li><strong>自动翻译标题和摘要到中文和英文</strong></li>
+                <li>保存到数据库</li>
+            </ol>
+            <p><strong>注意：</strong>爬取和翻译过程可能需要几分钟时间，请耐心等待。</p>
+        </div>
+
+        <div class="step">
+            <strong>步骤 1：</strong> 触发新闻爬取（包含自动翻译）
+        </div>
+        <button class="button" onclick="triggerCrawl()">🚀 开始爬取新闻</button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="text-align: center; margin-top: 10px;">正在爬取新闻并自动翻译，请稍候...</p>
+            <p style="text-align: center; color: #666; font-size: 12px;">这可能需要几分钟时间</p>
+        </div>
+
+        <div class="result" id="result"></div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <h3>后续步骤</h3>
+            <div class="step">
+                <strong>步骤 2：</strong> 爬取完成后，刷新前端页面查看每日简报
+            </div>
+            <div class="step">
+                <strong>步骤 3：</strong> 如果新闻没有翻译，可以运行翻译 API 来翻译现有新闻
+            </div>
+            <button class="button" onclick="translateExisting()">🔄 翻译现有新闻</button>
+        </div>
+    </div>
+
+    <script>
+        async function triggerCrawl() {
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            
+            resultDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            
+            try {
+                console.log('触发新闻爬取...');
+                const response = await fetch('http://localhost:8080/api/news/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ 新闻爬取任务已触发！</h3>
+                        <p><strong>消息：</strong> ${data.message}</p>
+                        <p><strong>耗时：</strong> ${data.costMs} ms</p>
+                        <p style="margin-top: 15px;"><strong>下一步：</strong></p>
+                        <ol>
+                            <li>等待爬取完成（查看后端日志了解进度）</li>
+                            <li>爬取完成后，新闻会自动翻译</li>
+                            <li>刷新前端页面查看每日简报</li>
+                        </ol>
+                        <p style="margin-top: 15px; color: #666; font-size: 12px;">
+                            💡 提示：爬取过程可能需要几分钟，请查看后端控制台日志了解详细进度。
+                        </p>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <h3>❌ 爬取失败</h3>
+                        <p>${data.message || '未知错误'}</p>
+                    `;
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ 请求失败</h3>
+                    <p><strong>错误信息：</strong> ${error.message}</p>
+                    <p style="margin-top: 10px;"><strong>可能的原因：</strong></p>
+                    <ul>
+                        <li>后端服务器未运行（http://localhost:8080）</li>
+                        <li>网络连接问题</li>
+                    </ul>
+                `;
+            }
+        }
+
+        async function translateExisting() {
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            
+            resultDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            
+            try {
+                console.log('翻译现有新闻...');
+                const response = await fetch('http://localhost:8080/api/news/translate-news?limit=0&force=false', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ 翻译完成！</h3>
+                        <p><strong>处理总数：</strong> ${data.totalProcessed}</p>
+                        <p><strong>成功：</strong> ${data.successCount}</p>
+                        <p><strong>跳过：</strong> ${data.skipCount}</p>
+                        <p><strong>错误：</strong> ${data.errorCount}</p>
+                        <p><strong>耗时：</strong> ${data.costMs} ms</p>
+                        <p style="margin-top: 15px;"><strong>下一步：</strong>刷新前端页面查看每日简报</p>
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <h3>❌ 翻译失败</h3>
+                        <p>${data.message || '未知错误'}</p>
+                    `;
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ 请求失败</h3>
+                    <p><strong>错误信息：</strong> ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+
