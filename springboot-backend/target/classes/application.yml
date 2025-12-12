@@ -2,6 +2,15 @@ server:
   port: 8081
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+      file-size-threshold: 0
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/public/,file:${file.upload.base-path}
   datasource:
     url: jdbc:mysql://localhost:3306/global_buddy?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
@@ -33,3 +42,11 @@ jwt:
 dashscope:
   api:
     key: sk-85ccccefc7ce41b088c9694e900392af
+
+# 文件存储配置
+file:
+  upload:
+    base-path: C:/Users/pzy/Documents/java/work/hh/pictures
+    access-path: /pictures/**
+    allowed-extensions: jpg,jpeg,png,gif
+    ensure-dir: true

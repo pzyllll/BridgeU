@@ -98,6 +98,24 @@ const NewPostForm = ({ currentUserId }) => {
       }}>
         <strong>{t('newPost.autoTranslation')}</strong> {t('newPost.autoTranslationDesc')}
       </div>
+      <div style={{
+        marginBottom: '1rem',
+        padding: '0.65rem',
+        background: '#fff7ed',
+        border: '1px solid #fed7aa',
+        borderRadius: '4px',
+        fontSize: '0.8rem',
+        color: '#7c2d12'
+      }}>
+        <strong>内容安全提示：</strong>
+        帖子文字和图片会先经过 AI 实时审核，高风险内容会被自动拦截；
+        边界内容将进入人工审核队列，管理员会做最终判断。
+        <br />
+        <span style={{ fontSize: '0.75rem', color: '#92400e' }}>
+          Content safety notice: Your text and images will be screened by AI and human moderators. High-risk content is blocked automatically; borderline content will be marked as
+          <em> pending review</em> before publication.
+        </span>
+      </div>
       
       <form onSubmit={handleSubmit}>
         {/* Tag Selection */}

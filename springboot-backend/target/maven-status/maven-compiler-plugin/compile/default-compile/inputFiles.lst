@@ -31,6 +31,7 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\PostLikeRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\NewsCrawlerService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\NewsToPostService.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\config\WebMvcConfig.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\controller\NewsController.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\UserFollowRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\NewsRepository.java
@@ -52,5 +53,6 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\model\News.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\AuthRequest.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\CommentResponse.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\ImageModerationService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\AppUserRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\CrawlerService.java

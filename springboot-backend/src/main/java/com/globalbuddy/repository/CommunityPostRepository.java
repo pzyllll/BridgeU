@@ -20,6 +20,8 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, St
     
     // 按用户查询帖子
     List<CommunityPost> findByAuthorIdOrderByCreatedAtDesc(String authorId);
+    // 按用户 + 状态查询帖子
+    List<CommunityPost> findByAuthorIdAndStatusOrderByCreatedAtDesc(String authorId, CommunityPost.Status status);
     
     // 按状态查询帖子（不分页）
     List<CommunityPost> findByStatusOrderByCreatedAtDesc(CommunityPost.Status status);

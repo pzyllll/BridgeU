@@ -131,6 +131,10 @@ export const fetchPostDetail = (postId, lang) => {
   });
 };
 
+// 当前用户被拒绝的帖子列表
+export const fetchMyRejectedPosts = () =>
+  client.get('/api/posts/my/rejected').then((res) => res.data);
+
 // Comment API
 export const addComment = (postId, content, lang, token) => {
   const langToUse = lang || getLanguagePreference();

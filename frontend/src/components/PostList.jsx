@@ -3,7 +3,7 @@ import { fetchPosts } from '../api';
 import { getLanguagePreference } from '../utils/language';
 import { t, getCurrentLanguage, setLanguage } from '../i18n';
 
-const PostList = ({ onPostClick }) => {
+const PostList = ({ onPostClick, selectedTag = 'all' }) => {
   const [posts, setPosts] = useState([]);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -129,6 +129,13 @@ const PostList = ({ onPostClick }) => {
     return '📝';
   };
 
+  const filteredPosts = selectedTag === 'all'
+    ? posts
+    : posts.filter((post) => {
+        const tagList = parseTags(post.tags).map(t => t.toLowerCase());
+        return tagList.includes(selectedTag.toLowerCase());
+      });
+
   return (
     <section style={{ marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -149,7 +156,7 @@ const PostList = ({ onPostClick }) => {
         <p>{t('postList.loading')}</p>
       ) : (
         <div className="grid grid-2">
-          {posts.map((post) => (
+          {filteredPosts.map((post) => (
             <article 
               key={post.id} 
               className="post-card"
@@ -169,6 +176,15 @@ const PostList = ({ onPostClick }) => {
                 </span>
               </div>
               <h3 className="post-title">{post.title}</h3>
+              {post.imageUrl && (
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title || 'post image'}
+                    style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                  />
+                </div>
+              )}
               {post.score != null && (
                 <p style={{ color: '#7c3aed', fontSize: '0.75rem', marginBottom: '4px' }}>
                   {t('postList.semanticScore')}: {post.score.toFixed(2)}

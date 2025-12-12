@@ -16,17 +16,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
-
+import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -64,12 +61,15 @@ public class PostController {
         log.info("Fetching posts with language preference: {}", lang);
         List<CommunityPost> posts = postRepository.findAllByOrderByCreatedAtDesc();
         
-        // Don't filter by original language - show all posts that have translations
-        // The toPostResponse method will handle language selection based on lang parameter
-        // Only filter out posts that have no content at all
+        // 只向前台展示已经通过审核的帖子
+        posts = posts.stream()
+                .filter(post -> post.getStatus() == CommunityPost.Status.APPROVED)
+                .collect(Collectors.toList());
+        
+        // 不按原始语言过滤，翻译由 toPostResponse 处理
+        // 仅过滤掉完全没有内容的帖子
         posts = posts.stream()
                 .filter(post -> {
-                    // Keep posts that have original content or translations
                     boolean hasContent = (post.getBody() != null && !post.getBody().trim().isEmpty()) ||
                                        (post.getContentZh() != null && !post.getContentZh().trim().isEmpty()) ||
                                        (post.getContentEn() != null && !post.getContentEn().trim().isEmpty());
@@ -111,6 +111,33 @@ public class PostController {
         }
         filtered.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
         return filtered.stream().map(PostResponseWithScore::toResponse).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取当前用户被拒绝的帖子列表（用于个人页面显示审核结果）
+     */
+    @GetMapping("/my/rejected")
+    public ResponseEntity<List<Map<String, Object>>> getMyRejectedPosts() {
+        AppUser currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<CommunityPost> posts = postRepository.findByAuthorIdAndStatusOrderByCreatedAtDesc(
+                currentUser.getId(), CommunityPost.Status.REJECTED);
+
+        List<Map<String, Object>> result = posts.stream().map(post -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", post.getId());
+            map.put("title", post.getTitle());
+            map.put("status", post.getStatus().name());
+            map.put("reviewNote", post.getReviewNote());
+            map.put("reviewedAt", post.getReviewedAt());
+            map.put("createdAt", post.getCreatedAt());
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
@@ -426,49 +453,72 @@ public class PostController {
             // Set Chinese title translation
             if (translationResult.getTitleZh() != null && !translationResult.getTitleZh().isEmpty()) {
                 post.setTitleZh(translationResult.getTitleZh());
-            } else if ("zh".equals(detectedLang)) {
-                post.setTitleZh(request.getTitle());
+                log.info("✅ Chinese title translation set for post");
+            }
+            // 回退逻辑：如果翻译失败，检查原标题是否包含中文
+            if (post.getTitleZh() == null || post.getTitleZh().isEmpty()) {
+                if (languageDetectionService.containsChinese(request.getTitle())) {
+                    post.setTitleZh(request.getTitle());
+                    log.info("✅ Post title contains Chinese, using original as titleZh");
+                } else if ("zh".equals(detectedLang)) {
+                    post.setTitleZh(request.getTitle());
+                    log.info("✅ Post detected as Chinese, using original as titleZh");
+                }
             }
             
-            // Set Chinese content translation (with fallback to original if translation fails)
+            // Set Chinese content translation
             if (translationResult.getBodyZh() != null && !translationResult.getBodyZh().isEmpty()) {
                 post.setContentZh(translationResult.getBodyZh());
-                log.info("✅ Chinese translation completed for post: {}", request.getTitle());
-            } else {
-                // Fallback: if detected language is Chinese, use original; otherwise use original as fallback
-                if ("zh".equals(detectedLang)) {
-                    post.setContentZh(request.getBody());
-                } else {
-                    post.setContentZh(request.getBody()); // Fallback to original
-                    log.warn("⚠️ Chinese translation failed, using original content as fallback");
-                }
+                log.info("✅ Chinese content translation completed for post");
+            } else if (languageDetectionService.containsChinese(request.getBody())) {
+                post.setContentZh(request.getBody());
+                log.info("✅ Post body contains Chinese, using original as contentZh");
+            } else if ("zh".equals(detectedLang)) {
+                post.setContentZh(request.getBody());
+                log.info("✅ Post detected as Chinese, using original as contentZh");
             }
 
             // Set English title translation
             if (translationResult.getTitleEn() != null && !translationResult.getTitleEn().isEmpty()) {
                 post.setTitleEn(translationResult.getTitleEn());
-            } else if ("en".equals(detectedLang)) {
-                post.setTitleEn(request.getTitle());
+                log.info("✅ English title translation set for post");
             }
-
-            // Set English content translation (with fallback to original if translation fails)
-            if (translationResult.getBodyEn() != null && !translationResult.getBodyEn().isEmpty()) {
-                post.setContentEn(translationResult.getBodyEn());
-                log.info("✅ English translation completed for post: {}", request.getTitle());
-            } else {
-                // Fallback: if detected language is English, use original; otherwise use original as fallback
+            // 回退逻辑：如果翻译失败，检查原标题是否是英文
+            if (post.getTitleEn() == null || post.getTitleEn().isEmpty()) {
                 if ("en".equals(detectedLang)) {
-                    post.setContentEn(request.getBody());
-                } else {
-                    post.setContentEn(request.getBody()); // Fallback to original
-                    log.warn("⚠️ English translation failed, using original content as fallback");
+                    post.setTitleEn(request.getTitle());
+                    log.info("✅ Post detected as English, using original as titleEn");
                 }
             }
+
+            // Set English content translation
+            if (translationResult.getBodyEn() != null && !translationResult.getBodyEn().isEmpty()) {
+                post.setContentEn(translationResult.getBodyEn());
+                log.info("✅ English content translation completed for post");
+            } else if ("en".equals(detectedLang)) {
+                post.setContentEn(request.getBody());
+                log.info("✅ Post detected as English, using original as contentEn");
+            }
+            
+            // 记录翻译结果
+            log.info("📝 Post translation result: titleZh={}, titleEn={}, contentZh={}, contentEn={}",
+                    post.getTitleZh() != null && !post.getTitleZh().isEmpty(),
+                    post.getTitleEn() != null && !post.getTitleEn().isEmpty(),
+                    post.getContentZh() != null && !post.getContentZh().isEmpty(),
+                    post.getContentEn() != null && !post.getContentEn().isEmpty());
         } catch (Exception e) {
             log.error("❌ Translation failed for post: {} - {}", request.getTitle(), e.getMessage(), e);
-            // Fallback: use original content for both languages
-            post.setContentZh(request.getBody());
-            post.setContentEn(request.getBody());
+            // Fallback: 检查原内容语言并设置相应字段
+            if (languageDetectionService.containsChinese(request.getTitle())) {
+                post.setTitleZh(request.getTitle());
+            }
+            if (languageDetectionService.containsChinese(request.getBody())) {
+                post.setContentZh(request.getBody());
+            }
+            if ("en".equals(detectedLang)) {
+                post.setTitleEn(request.getTitle());
+                post.setContentEn(request.getBody());
+            }
         }
 
         // AI 内容审核与状态决策
@@ -489,26 +539,99 @@ public class PostController {
     }
 
     /**
+     * 检查并创建上传目录
+     */
+    @PostConstruct
+    public void init() {
+        try {
+            Path uploadDir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+            if (!Files.exists(uploadDir)) {
+                log.info("Creating upload directory: {}", uploadDir);
+                Files.createDirectories(uploadDir);
+                log.info("Upload directory created successfully");
+            } else {
+                log.info("Using existing upload directory: {}", uploadDir);
+            }
+            
+            // 测试目录可写性
+            Path testFile = uploadDir.resolve(".test-write-" + System.currentTimeMillis());
+            Files.writeString(testFile, "test");
+            Files.deleteIfExists(testFile);
+            log.info("Upload directory is writable");
+            
+        } catch (Exception e) {
+            log.error("Failed to initialize upload directory: " + uploadBasePath, e);
+            throw new RuntimeException("Failed to initialize upload directory", e);
+        }
+    }
+
+    /**
      * Upload post image
      */
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> uploadImage(@RequestPart("file") MultipartFile file) {
+        log.info("Received file upload request: {}", file.getOriginalFilename());
+        
         if (file == null || file.isEmpty()) {
+            log.warn("Upload failed: File is empty");
             return ResponseEntity.badRequest().body(Map.of("error", "文件不能为空"));
         }
+        
+        // 验证文件扩展名
+        String originalFilename = file.getOriginalFilename();
+        String fileExtension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+        }
+        if (!Arrays.asList("jpg", "jpeg", "png", "gif").contains(fileExtension)) {
+            log.warn("Upload failed: Invalid file extension: {}", fileExtension);
+            return ResponseEntity.badRequest().body(Map.of("error", "不支持的文件类型，仅支持 JPG, PNG, GIF"));
+        }
+        
         try {
-            String sanitized = sanitizeFileName(file.getOriginalFilename());
+            // 准备目录和文件名
+            String sanitized = sanitizeFileName(originalFilename);
             String newName = UUID.randomUUID() + "_" + sanitized;
             Path dir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
-            Files.createDirectories(dir);
+            
+            // 确保目录存在
+            if (!Files.exists(dir)) {
+                log.warn("Upload directory does not exist, creating: {}", dir);
+                Files.createDirectories(dir);
+            }
+            
+            // 检查目录是否可写
+            if (!Files.isWritable(dir)) {
+                log.error("Upload directory is not writable: {}", dir);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "服务器存储目录不可写"));
+            }
+            
+            // 保存文件
             Path target = dir.resolve(newName);
+            log.info("Saving uploaded file to: {}", target);
             file.transferTo(target.toFile());
-            // 返回可供前端使用的相对路径（需有静态映射）
+            
+            // 验证文件是否保存成功
+            if (!Files.exists(target) || Files.size(target) == 0) {
+                log.error("Failed to save uploaded file: {}", target);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "文件保存失败"));
+            }
+            
+            // 返回相对URL
             String url = "/pictures/" + newName;
+            log.info("File uploaded successfully: {}", url);
             return ResponseEntity.ok(Map.of("url", url));
+            
+        } catch (IOException e) {
+            log.error("Failed to upload file: " + originalFilename, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "文件上传失败: " + e.getMessage()));
         } catch (Exception e) {
-            log.error("上传图片失败", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "上传失败: " + e.getMessage()));
+            log.error("Unexpected error during file upload", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "服务器内部错误: " + e.getMessage()));
         }
     }
 
@@ -523,63 +646,99 @@ public class PostController {
         String title = post.getTitle();
         String body = post.getBody();
         
-        log.info("🔄 toPostResponse - Input: postId={}, lang={}, original title={}, titleZh={}, titleEn={}, original body length={}, contentZh length={}, contentEn length={}", 
-                post.getId(), 
-                lang,
-                post.getTitle() != null ? post.getTitle().substring(0, Math.min(50, post.getTitle().length())) : "null",
-                post.getTitleZh() != null ? (post.getTitleZh().isEmpty() ? "EMPTY" : post.getTitleZh().substring(0, Math.min(50, post.getTitleZh().length()))) : "NULL",
-                post.getTitleEn() != null ? (post.getTitleEn().isEmpty() ? "EMPTY" : post.getTitleEn().substring(0, Math.min(50, post.getTitleEn().length()))) : "NULL",
-                body != null ? body.length() : 0,
-                post.getContentZh() != null ? post.getContentZh().length() : 0,
-                post.getContentEn() != null ? post.getContentEn().length() : 0);
+        // Check if original content contains Thai - we should never show Thai on the website
+        boolean originalTitleIsThai = languageDetectionService.hasAnyThai(post.getTitle());
+        boolean originalBodyIsThai = languageDetectionService.hasAnyThai(post.getBody());
+        
+        log.debug("🔄 toPostResponse - Input: postId={}, lang={}, titleZh={}, titleEn={}, originalTitleIsThai={}", 
+                post.getId(), lang,
+                post.getTitleZh() != null && !post.getTitleZh().isEmpty(),
+                post.getTitleEn() != null && !post.getTitleEn().isEmpty(),
+                originalTitleIsThai);
 
         // Return translated title and content based on language preference
+        // IMPORTANT: Never show Thai content on the website
         if ("zh".equals(lang)) {
             // Use Chinese translation if available
             if (post.getTitleZh() != null && !post.getTitleZh().isEmpty()) {
-                String originalTitle = title;
                 title = post.getTitleZh();
-                log.info("✅ Using Chinese title translation for post {}: original='{}' -> translated='{}'", 
-                        post.getId(), 
-                        originalTitle != null ? originalTitle.substring(0, Math.min(100, originalTitle.length())) : "null",
-                        title.substring(0, Math.min(100, title.length())));
+                log.info("✅ Using Chinese title translation for post {}", post.getId());
+            } else if (originalTitleIsThai) {
+                // If original is Thai and no Chinese translation, try English as fallback
+                if (post.getTitleEn() != null && !post.getTitleEn().isEmpty()) {
+                    title = post.getTitleEn();
+                    log.warn("⚠️ Chinese title not available, using English fallback for Thai post: {}", post.getId());
+                } else {
+                    title = "[帖子标题翻译中...]";
+                    log.error("❌ No translation available for Thai post title: {}", post.getId());
+                }
             } else {
-                log.warn("⚠️ Chinese title translation not available for post: {} (original: {}), titleZh is null or empty, using original", 
-                        post.getId(), 
-                        post.getTitle() != null ? post.getTitle().substring(0, Math.min(100, post.getTitle().length())) : "null");
+                log.debug("⚠️ Chinese title not available for post: {}, using original (non-Thai)", post.getId());
             }
+            
             if (post.getContentZh() != null && !post.getContentZh().isEmpty()) {
                 body = post.getContentZh();
-                log.debug("Using Chinese content translation for post: {} (length: {})", post.getId(), body.length());
+                log.debug("Using Chinese content translation for post: {}", post.getId());
+            } else if (originalBodyIsThai) {
+                // If original is Thai and no Chinese translation, try English as fallback
+                if (post.getContentEn() != null && !post.getContentEn().isEmpty()) {
+                    body = post.getContentEn();
+                    log.warn("⚠️ Chinese content not available, using English fallback for Thai post: {}", post.getId());
+                } else {
+                    body = "[帖子内容翻译中...]";
+                    log.error("❌ No translation available for Thai post content: {}", post.getId());
+                }
             } else {
-                // Fallback to original body if translation not available
                 body = post.getBody();
-                log.warn("Chinese content translation not available for post: {} (original length: {}), using original body", post.getId(), post.getBody() != null ? post.getBody().length() : 0);
+                log.debug("Chinese content not available for post: {}, using original (non-Thai)", post.getId());
             }
         } else if ("en".equals(lang)) {
             // Use English translation if available
             if (post.getTitleEn() != null && !post.getTitleEn().isEmpty()) {
                 title = post.getTitleEn();
-                log.info("✅ Using English title translation for post {}: {} -> {}", 
-                        post.getId(),
-                        post.getTitle() != null ? post.getTitle().substring(0, Math.min(50, post.getTitle().length())) : "null",
-                        title.substring(0, Math.min(50, title.length())));
+                log.info("✅ Using English title translation for post {}", post.getId());
+            } else if (originalTitleIsThai) {
+                // If original is Thai and no English translation, try Chinese as fallback
+                if (post.getTitleZh() != null && !post.getTitleZh().isEmpty()) {
+                    title = post.getTitleZh();
+                    log.warn("⚠️ English title not available, using Chinese fallback for Thai post: {}", post.getId());
+                } else {
+                    title = "[Post title translating...]";
+                    log.error("❌ No translation available for Thai post title: {}", post.getId());
+                }
             } else {
-                log.warn("⚠️ English title translation not available for post: {} (original: {}), using original", 
-                        post.getId(), 
-                        post.getTitle() != null ? post.getTitle().substring(0, Math.min(100, post.getTitle().length())) : "null");
+                log.debug("⚠️ English title not available for post: {}, using original (non-Thai)", post.getId());
+            }
+            
+            if (post.getContentEn() != null && !post.getContentEn().isEmpty()) {
+                body = post.getContentEn();
+                log.debug("Using English content translation for post: {}", post.getId());
+            } else if (originalBodyIsThai) {
+                // If original is Thai and no English translation, try Chinese as fallback
+                if (post.getContentZh() != null && !post.getContentZh().isEmpty()) {
+                    body = post.getContentZh();
+                    log.warn("⚠️ English content not available, using Chinese fallback for Thai post: {}", post.getId());
+                } else {
+                    body = "[Post content translating...]";
+                    log.error("❌ No translation available for Thai post content: {}", post.getId());
+                }
+            } else {
+                body = post.getBody();
+                log.debug("English content not available for post: {}, using original (non-Thai)", post.getId());
+            }
+        } else {
+            // Default to English for unknown language preference
+            log.warn("⚠️ Unknown language preference: {}, defaulting to English for post: {}", lang, post.getId());
+            if (post.getTitleEn() != null && !post.getTitleEn().isEmpty()) {
+                title = post.getTitleEn();
+            } else if (originalTitleIsThai && post.getTitleZh() != null && !post.getTitleZh().isEmpty()) {
+                title = post.getTitleZh();
             }
             if (post.getContentEn() != null && !post.getContentEn().isEmpty()) {
                 body = post.getContentEn();
-                log.debug("Using English content translation for post: {} (length: {})", post.getId(), body.length());
-            } else {
-                // Fallback to original body if translation not available
-                body = post.getBody();
-                log.warn("English content translation not available for post: {} (original length: {}), using original body", post.getId(), post.getBody() != null ? post.getBody().length() : 0);
+            } else if (originalBodyIsThai && post.getContentZh() != null && !post.getContentZh().isEmpty()) {
+                body = post.getContentZh();
             }
-        } else {
-            // Fallback to original content
-            log.debug("Using original content for post: {} (lang: {})", post.getId(), lang);
         }
         
         // Ensure body is not null or empty - provide fallback

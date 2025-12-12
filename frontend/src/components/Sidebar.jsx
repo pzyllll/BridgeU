@@ -10,11 +10,6 @@ const Sidebar = ({ currentPage, onNavigate, isAdmin = false, user = null }) => {
         setLang(e.detail.lang);
       }
     };
-
-  const switchLanguage = (newLang) => {
-    setLanguage(newLang);
-    setLang(newLang);
-  };
     
     if (typeof window !== 'undefined') {
       window.addEventListener('languageChanged', handleLanguageChange);
@@ -26,10 +21,14 @@ const Sidebar = ({ currentPage, onNavigate, isAdmin = false, user = null }) => {
     }
   }, []);
 
+  const switchLanguage = (newLang) => {
+    setLanguage(newLang);
+    setLang(newLang);
+  };
+
   const navItems = [
     { id: 'home', label: t('sidebar.communityFeed'), icon: '🏠' },
     { id: 'post', label: t('sidebar.newPost'), icon: '➕' },
-    { id: 'search', label: t('sidebar.semanticSearch'), icon: '🔍' },
     { id: 'assistant', label: t('sidebar.aiAssistant'), icon: '🤖' },
   ];
 
@@ -71,6 +70,48 @@ const Sidebar = ({ currentPage, onNavigate, isAdmin = false, user = null }) => {
         )}
 
         <div style={{ marginTop: 'auto', borderTop: '2px solid #333' }}>
+          {/* Language Switcher */}
+          <div style={{ 
+            padding: '0.75rem', 
+            display: 'flex', 
+            justifyContent: 'center',
+            gap: '0.5rem',
+            borderBottom: '1px solid #e0e0e0'
+          }}>
+            <button
+              onClick={() => switchLanguage('zh')}
+              style={{
+                padding: '0.4rem 0.8rem',
+                border: lang === 'zh' ? '2px solid #333' : '1px solid #ccc',
+                borderRadius: '4px',
+                background: lang === 'zh' ? '#333' : '#fff',
+                color: lang === 'zh' ? '#fff' : '#333',
+                cursor: 'pointer',
+                fontWeight: lang === 'zh' ? 'bold' : 'normal',
+                fontSize: '0.85rem',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              🇨🇳 中文
+            </button>
+            <button
+              onClick={() => switchLanguage('en')}
+              style={{
+                padding: '0.4rem 0.8rem',
+                border: lang === 'en' ? '2px solid #333' : '1px solid #ccc',
+                borderRadius: '4px',
+                background: lang === 'en' ? '#333' : '#fff',
+                color: lang === 'en' ? '#fff' : '#333',
+                cursor: 'pointer',
+                fontWeight: lang === 'en' ? 'bold' : 'normal',
+                fontSize: '0.85rem',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              🇺🇸 EN
+            </button>
+          </div>
+          
           {user && (
             <div style={{ padding: '0.5rem', fontFamily: 'monospace', fontSize: '0.8rem', color: '#666' }}>
               {user.displayName || user.username}

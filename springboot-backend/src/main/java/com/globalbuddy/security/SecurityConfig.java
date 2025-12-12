@@ -122,6 +122,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/nlp/**").permitAll()
                 .requestMatchers("/api/news/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/pictures/**").permitAll()
                 
                 // GET 请求公开（读取）
                 .requestMatchers(HttpMethod.GET, "/api/**").permitAll()

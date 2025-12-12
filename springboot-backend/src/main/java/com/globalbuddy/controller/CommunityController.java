@@ -241,7 +241,8 @@ public class CommunityController {
                 post.getUpdatedAt(),
                 post.getContentZh(),
                 post.getContentEn(),
-                post.getOriginalLanguage()
+                post.getOriginalLanguage(),
+                post.getImageUrl()
         );
     }
 }

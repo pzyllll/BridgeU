@@ -489,36 +489,31 @@ public class AdminController {
                     String translatedBodyZh = rebuildTranslatedContent(body, translationResult.getBodyZh(), originalLang, "zh");
                     String translatedBodyEn = rebuildTranslatedContent(body, translationResult.getBodyEn(), originalLang, "en");
                     
-                    // 设置中文翻译
+                    // 设置中文翻译 - 放宽验证
                     if (translationResult.getTitleZh() != null && !translationResult.getTitleZh().isEmpty()) {
-                        // 验证翻译结果确实包含中文字符，而不是泰语或其他语言
-                        if (languageDetectionService.containsChinese(translationResult.getTitleZh()) && 
-                            !languageDetectionService.containsThai(translationResult.getTitleZh())) {
+                        // 只要翻译结果不是泰语就接受
+                        if (!languageDetectionService.containsThai(translationResult.getTitleZh())) {
                             post.setTitleZh(translationResult.getTitleZh());
                             log.info("✅ Set Chinese title translation for post: {} -> {}", postId, 
                                     translationResult.getTitleZh().substring(0, Math.min(50, translationResult.getTitleZh().length())));
                         } else {
-                            log.warn("⚠️ Translation result is not Chinese (contains Thai or no Chinese): {} for post: {}", 
+                            log.warn("⚠️ Translation result contains Thai characters, rejecting: {} for post: {}", 
                                     translationResult.getTitleZh().substring(0, Math.min(50, translationResult.getTitleZh().length())), postId);
-                            // 如果翻译结果不是中文，尝试重新翻译
-                            if (!"zh".equals(originalLang)) {
-                                log.info("🔄 Retrying translation for post: {} (originalLang: {})", postId, originalLang);
-                                // 不设置 titleZh，让后续逻辑处理
-                            }
                         }
                     }
                     
-                    // 如果 titleZh 仍然为空，且原始语言是中文，且标题确实包含中文
+                    // 如果 titleZh 仍然为空，检查原始标题是否包含中文
                     if (post.getTitleZh() == null || post.getTitleZh().isEmpty()) {
-                        if ("zh".equals(originalLang) && languageDetectionService.containsChinese(title) && 
-                            !languageDetectionService.containsThai(title)) {
+                        // 只要标题包含任何中文字符，就使用原标题作为 titleZh
+                        if (languageDetectionService.containsChinese(title)) {
                             post.setTitleZh(title);
-                            log.info("✅ Post is already in Chinese, using original title");
+                            log.info("✅ Post title contains Chinese, using original as titleZh");
+                        } else if ("zh".equals(originalLang)) {
+                            post.setTitleZh(title);
+                            log.info("✅ Post detected as Chinese, using original as titleZh");
                         } else {
-                            log.warn("⚠️ Chinese title translation is empty for post: {} (originalLang: {}, title contains Chinese: {}, title contains Thai: {})", 
-                                    postId, originalLang, 
-                                    languageDetectionService.containsChinese(title),
-                                    languageDetectionService.containsThai(title));
+                            log.warn("⚠️ TitleZh is null for post: {} (originalLang: {}, containsChinese: {})", 
+                                    postId, originalLang, languageDetectionService.containsChinese(title));
                         }
                     }
                     

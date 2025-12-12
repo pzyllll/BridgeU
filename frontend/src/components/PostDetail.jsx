@@ -33,6 +33,23 @@ const PostDetail = ({ postId, token, currentUserId, onBack }) => {
     setLang(langToSet);
   }, []);
 
+  // Listen for language changes
+  useEffect(() => {
+    const handleLanguageChange = (e) => {
+      if (e && e.detail && e.detail.lang) {
+        console.log('PostDetail: Language changed to:', e.detail.lang);
+        setLang(e.detail.lang);
+      }
+    };
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener('languageChanged', handleLanguageChange);
+      return () => {
+        window.removeEventListener('languageChanged', handleLanguageChange);
+      };
+    }
+  }, []);
+
   useEffect(() => {
     if (postId) {
       loadPostDetail();
@@ -226,6 +243,15 @@ const PostDetail = ({ postId, token, currentUserId, onBack }) => {
       }}>
         {post.title || t('postDetail.noTitle')}
       </h1>
+      {post.imageUrl && (
+        <div style={{ marginBottom: '1.5rem' }}>
+          <img
+            src={post.imageUrl}
+            alt={post.title || 'post image'}
+            style={{ width: '100%', maxHeight: '360px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #e5e7eb' }}
+          />
+        </div>
+      )}
       <div className="post-body" style={{ 
         marginBottom: '0',
         paddingBottom: '1rem',

@@ -21,6 +21,7 @@ import java.util.List;
 public class ContentModerationService {
 
     private final QwenService qwenService;
+    private final ImageModerationService imageModerationService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // 敏感词/违禁词列表（可扩展到数据库或配置文件）
@@ -33,7 +34,8 @@ public class ContentModerationService {
     );
 
     // AI 置信度阈值（0-100），低于等于此值走人工审核
-    private static final double CONFIDENCE_THRESHOLD = 90.0;
+    // 调低阈值，让普通内容更容易自动通过，仅低置信度结果交给人工
+    private static final double CONFIDENCE_THRESHOLD = 70.0;
 
     /**
      * 审核帖子内容
@@ -63,7 +65,7 @@ public class ContentModerationService {
             String aiAnalysis = analyzeContentWithAI(post);
             ParsedResult parsed = parseAiResult(aiAnalysis);
 
-            // 根据规则设置状态
+            // 根据文本审核结果设置初始状态
             CommunityPost.Status status;
             boolean needsManual = false;
 
@@ -76,6 +78,23 @@ public class ContentModerationService {
             } else {
                 status = CommunityPost.Status.PENDING_REVIEW;
                 needsManual = true;
+            }
+
+            // 额外对图片做审核：如果文本安全但图片不安全，则整体拒绝或转人工
+            if (post.getImageUrl() != null && !post.getImageUrl().isEmpty()) {
+                ImageModerationService.ImageModerationResult imgResult =
+                        imageModerationService.moderateImage(post.getImageUrl());
+                if (imgResult.getStatus() == ImageModerationService.ImageStatus.UNSAFE) {
+                    log.warn("Image moderation marked post {} as UNSAFE due to image: {}", post.getId(), imgResult.getReason());
+                    status = CommunityPost.Status.REJECTED;
+                    parsed = new ParsedResult(false, parsed.confidenceScore, "Image unsafe: " + imgResult.getReason(), parsed.rawJson);
+                } else if (imgResult.getStatus() == ImageModerationService.ImageStatus.SUSPICIOUS
+                        && status == CommunityPost.Status.APPROVED) {
+                    // 文本安全，但图片可疑时，转为人工审核
+                    log.warn("Image moderation marked post {} as SUSPICIOUS, set to PENDING_REVIEW", post.getId());
+                    status = CommunityPost.Status.PENDING_REVIEW;
+                    needsManual = true;
+                }
             }
 
             return ModerationResult.builder()
@@ -135,7 +154,31 @@ public class ContentModerationService {
 
     private ParsedResult parseAiResult(String aiJson) {
         try {
-            JsonNode node = objectMapper.readTree(aiJson);
+            // 一些大模型会返回 ```json ... ``` 代码块，这里做一次清洗，提取真正的 JSON 部分
+            String cleaned = aiJson;
+            if (cleaned != null) {
+                cleaned = cleaned.trim();
+                if (cleaned.startsWith("```")) {
+                    // 去掉开头的 ```json / ``` 包装
+                    cleaned = cleaned.replaceFirst("^```[a-zA-Z0-9]*", "");
+                }
+                if (cleaned.endsWith("```")) {
+                    cleaned = cleaned.substring(0, cleaned.lastIndexOf("```"));
+                }
+                cleaned = cleaned.trim();
+                // 有些模型会在前面加上 "json" 之类的标签，例如: json { ... }
+                if (cleaned.toLowerCase().startsWith("json")) {
+                    cleaned = cleaned.substring(4).trim();
+                }
+                // 再做一次简单截取：从第一个 '{' 到最后一个 '}'
+                int firstBrace = cleaned.indexOf('{');
+                int lastBrace = cleaned.lastIndexOf('}');
+                if (firstBrace >= 0 && lastBrace > firstBrace) {
+                    cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+                }
+            }
+
+            JsonNode node = objectMapper.readTree(cleaned);
             boolean isSafe = node.path("is_safe").asBoolean(false);
             double score = node.path("confidence_score").asDouble(0);
             String reason = node.path("reason").asText("未提供理由");

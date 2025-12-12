@@ -168,31 +168,41 @@ public class NewsScheduler {
                             
                             boolean hasTranslation = false;
                             
-                            // Set Chinese translations
+                            // Set Chinese translations - relaxed validation
                             if (translationResult.getTitleZh() != null && !translationResult.getTitleZh().isEmpty()) {
-                                // 验证翻译结果确实包含中文字符，而不是泰语或其他语言
-                                if (languageDetectionService.containsChinese(translationResult.getTitleZh()) && 
-                                    !languageDetectionService.containsThai(translationResult.getTitleZh())) {
+                                // 只要翻译结果不是泰语就接受（翻译API返回的应该是中文）
+                                // 不再严格要求必须包含常见中文词，因为短标题可能不包含
+                                if (!languageDetectionService.containsThai(translationResult.getTitleZh())) {
                                     news.setTitleZh(translationResult.getTitleZh());
                                     log.info("✅ Chinese title translation: {} -> {}", 
                                             titleToTranslate.substring(0, Math.min(30, titleToTranslate.length())),
                                             translationResult.getTitleZh().substring(0, Math.min(30, translationResult.getTitleZh().length())));
                                     hasTranslation = true;
                                 } else {
-                                    log.warn("⚠️ Translation result is not Chinese (contains Thai or no Chinese): {} for news: {}", 
+                                    log.warn("⚠️ Translation result contains Thai characters, rejecting: {} for news: {}", 
                                             translationResult.getTitleZh().substring(0, Math.min(50, translationResult.getTitleZh().length())), news.getTitle());
                                 }
                             }
                             
-                            // 如果 titleZh 仍然为空，且原始语言是中文，且标题确实包含中文
+                            // 如果 titleZh 仍然为空，检查原始标题是否包含中文
                             if (news.getTitleZh() == null || news.getTitleZh().isEmpty()) {
-                                if ("zh".equals(detectedLang) && languageDetectionService.containsChinese(titleToTranslate) && 
-                                    !languageDetectionService.containsThai(titleToTranslate)) {
+                                // 只要标题包含任何中文字符，就使用原标题作为 titleZh
+                                // 这样可以确保中文标题不会丢失
+                                if (languageDetectionService.containsChinese(titleToTranslate)) {
                                     news.setTitleZh(titleToTranslate);
-                                    log.info("✅ News title is already in Chinese, using original");
+                                    log.info("✅ News title contains Chinese, using original as titleZh: {}", 
+                                            titleToTranslate.substring(0, Math.min(50, titleToTranslate.length())));
+                                    hasTranslation = true;
+                                } else if ("zh".equals(detectedLang)) {
+                                    // 如果检测为中文但 containsChinese 返回 false（不太可能），仍然使用原标题
+                                    news.setTitleZh(titleToTranslate);
+                                    log.info("✅ News detected as Chinese, using original as titleZh");
                                     hasTranslation = true;
                                 } else {
-                                    log.warn("⚠️ Chinese title translation failed or empty for news: {} (detectedLang: {})", news.getTitle(), detectedLang);
+                                    log.warn("⚠️ Chinese title translation failed for news: {} (detectedLang: {}, containsChinese: {})", 
+                                            news.getTitle().substring(0, Math.min(50, news.getTitle().length())), 
+                                            detectedLang, 
+                                            languageDetectionService.containsChinese(titleToTranslate));
                                 }
                             }
                             
@@ -200,12 +210,17 @@ public class NewsScheduler {
                                 news.setSummaryZh(translationResult.getBodyZh());
                                 log.info("✅ Chinese summary translation completed (length: {})", translationResult.getBodyZh().length());
                                 hasTranslation = true;
+                            } else if (languageDetectionService.containsChinese(summaryToTranslate)) {
+                                // 如果摘要包含中文，使用原摘要
+                                news.setSummaryZh(summaryToTranslate);
+                                log.info("✅ News summary contains Chinese, using original as summaryZh");
+                                hasTranslation = true;
                             } else if ("zh".equals(detectedLang)) {
                                 news.setSummaryZh(summaryToTranslate);
-                                log.info("✅ News summary is already in Chinese, using original");
+                                log.info("✅ News detected as Chinese, using original summary");
                                 hasTranslation = true;
                             } else {
-                                log.warn("⚠️ Chinese summary translation failed or empty for news: {}", news.getTitle());
+                                log.warn("⚠️ Chinese summary translation failed for news: {}", news.getTitle());
                             }
                             
                             // Set English translations

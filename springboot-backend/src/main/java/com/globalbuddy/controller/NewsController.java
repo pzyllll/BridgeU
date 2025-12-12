@@ -3,6 +3,7 @@ package com.globalbuddy.controller;
 import com.globalbuddy.dto.NewsBriefDTO;
 import com.globalbuddy.model.News;
 import com.globalbuddy.repository.NewsRepository;
+import com.globalbuddy.service.LanguageDetectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ import java.util.Map;
 public class NewsController {
 
     private final NewsRepository newsRepository;
+    private final LanguageDetectionService languageDetectionService;
 
     /**
      * Get today's news briefing
@@ -118,6 +120,7 @@ public class NewsController {
 
     /**
      * Convert News entity to NewsBriefDTO
+     * Ensures NO Thai content is displayed on the website
      * 
      * @param news News entity
      * @param lang Language preference (zh/en)
@@ -126,55 +129,102 @@ public class NewsController {
     private NewsBriefDTO convertToDTO(News news, String lang) {
         String title = news.getTitle();
         String summary = news.getSummary();
+        
+        // Check if original content contains Thai
+        boolean originalTitleIsThai = languageDetectionService.hasAnyThai(news.getTitle());
+        boolean originalSummaryIsThai = languageDetectionService.hasAnyThai(news.getSummary());
 
-        log.debug("Converting news {} to DTO with lang: {}, hasTitleZh: {}, hasTitleEn: {}, hasSummaryZh: {}, hasSummaryEn: {}", 
+        log.debug("Converting news {} to DTO with lang: {}, hasTitleZh: {}, hasTitleEn: {}, hasSummaryZh: {}, hasSummaryEn: {}, originalTitleIsThai: {}", 
                 news.getId(), lang, 
                 news.getTitleZh() != null && !news.getTitleZh().isEmpty(),
                 news.getTitleEn() != null && !news.getTitleEn().isEmpty(),
                 news.getSummaryZh() != null && !news.getSummaryZh().isEmpty(),
-                news.getSummaryEn() != null && !news.getSummaryEn().isEmpty());
+                news.getSummaryEn() != null && !news.getSummaryEn().isEmpty(),
+                originalTitleIsThai);
 
         // Return translated title and summary based on language preference
+        // IMPORTANT: Never show Thai content on the website
         if ("zh".equals(lang)) {
             // Use Chinese translation if available
             if (news.getTitleZh() != null && !news.getTitleZh().isEmpty()) {
                 title = news.getTitleZh();
-                log.info("✅ Using Chinese title translation for news {}: {} -> {}", news.getId(), 
-                        news.getTitle().substring(0, Math.min(50, news.getTitle().length())),
-                        title.substring(0, Math.min(50, title.length())));
+                log.info("✅ Using Chinese title translation for news {}", news.getId());
+            } else if (originalTitleIsThai) {
+                // If original is Thai and no Chinese translation, try English as fallback
+                if (news.getTitleEn() != null && !news.getTitleEn().isEmpty()) {
+                    title = news.getTitleEn();
+                    log.warn("⚠️ Chinese title not available, using English fallback for Thai news: {}", news.getId());
+                } else {
+                    // Last resort: use a placeholder instead of Thai
+                    title = "[新闻标题翻译中...]";
+                    log.error("❌ No translation available for Thai news title: {}", news.getId());
+                }
             } else {
-                log.warn("⚠️ Chinese title translation not available for news: {} (original: {}), using original", 
-                        news.getId(), news.getTitle().substring(0, Math.min(100, news.getTitle().length())));
+                log.debug("⚠️ Chinese title translation not available for news: {}, using original (non-Thai)", news.getId());
             }
+            
             if (news.getSummaryZh() != null && !news.getSummaryZh().isEmpty()) {
                 summary = news.getSummaryZh();
-                log.info("✅ Using Chinese summary translation for news {} (length: {})", news.getId(), summary.length());
+                log.info("✅ Using Chinese summary translation for news {}", news.getId());
+            } else if (originalSummaryIsThai) {
+                // If original is Thai and no Chinese translation, try English as fallback
+                if (news.getSummaryEn() != null && !news.getSummaryEn().isEmpty()) {
+                    summary = news.getSummaryEn();
+                    log.warn("⚠️ Chinese summary not available, using English fallback for Thai news: {}", news.getId());
+                } else {
+                    summary = "[新闻内容翻译中...]";
+                    log.error("❌ No translation available for Thai news summary: {}", news.getId());
+                }
             } else {
-                log.warn("⚠️ Chinese summary translation not available for news: {} (original length: {}), using original", 
-                        news.getId(), news.getSummary() != null ? news.getSummary().length() : 0);
+                log.debug("⚠️ Chinese summary translation not available for news: {}, using original (non-Thai)", news.getId());
             }
         } else if ("en".equals(lang)) {
             // Use English translation if available
             if (news.getTitleEn() != null && !news.getTitleEn().isEmpty()) {
                 title = news.getTitleEn();
-                log.info("✅ Using English title translation for news {}: {} -> {}", news.getId(),
-                        news.getTitle().substring(0, Math.min(50, news.getTitle().length())),
-                        title.substring(0, Math.min(50, title.length())));
+                log.info("✅ Using English title translation for news {}", news.getId());
+            } else if (originalTitleIsThai) {
+                // If original is Thai and no English translation, try Chinese as fallback
+                if (news.getTitleZh() != null && !news.getTitleZh().isEmpty()) {
+                    title = news.getTitleZh();
+                    log.warn("⚠️ English title not available, using Chinese fallback for Thai news: {}", news.getId());
+                } else {
+                    title = "[News title translating...]";
+                    log.error("❌ No translation available for Thai news title: {}", news.getId());
+                }
             } else {
-                log.warn("⚠️ English title translation not available for news: {} (original: {}), using original", 
-                        news.getId(), news.getTitle().substring(0, Math.min(100, news.getTitle().length())));
+                log.debug("⚠️ English title translation not available for news: {}, using original (non-Thai)", news.getId());
+            }
+            
+            if (news.getSummaryEn() != null && !news.getSummaryEn().isEmpty()) {
+                summary = news.getSummaryEn();
+                log.info("✅ Using English summary translation for news {}", news.getId());
+            } else if (originalSummaryIsThai) {
+                // If original is Thai and no English translation, try Chinese as fallback
+                if (news.getSummaryZh() != null && !news.getSummaryZh().isEmpty()) {
+                    summary = news.getSummaryZh();
+                    log.warn("⚠️ English summary not available, using Chinese fallback for Thai news: {}", news.getId());
+                } else {
+                    summary = "[News content translating...]";
+                    log.error("❌ No translation available for Thai news summary: {}", news.getId());
+                }
+            } else {
+                log.debug("⚠️ English summary translation not available for news: {}, using original (non-Thai)", news.getId());
+            }
+        } else {
+            // Default to English for unknown language preference
+            log.warn("⚠️ Unknown language preference: {}, defaulting to English for news: {}", lang, news.getId());
+            if (news.getTitleEn() != null && !news.getTitleEn().isEmpty()) {
+                title = news.getTitleEn();
+            } else if (originalTitleIsThai && news.getTitleZh() != null && !news.getTitleZh().isEmpty()) {
+                title = news.getTitleZh();
             }
             if (news.getSummaryEn() != null && !news.getSummaryEn().isEmpty()) {
                 summary = news.getSummaryEn();
-                log.info("✅ Using English summary translation for news {} (length: {})", news.getId(), summary.length());
-            } else {
-                log.warn("⚠️ English summary translation not available for news: {} (original length: {}), using original", 
-                        news.getId(), news.getSummary() != null ? news.getSummary().length() : 0);
+            } else if (originalSummaryIsThai && news.getSummaryZh() != null && !news.getSummaryZh().isEmpty()) {
+                summary = news.getSummaryZh();
             }
-        } else {
-            log.warn("⚠️ Unknown language preference: {}, using original content for news: {}", lang, news.getId());
         }
-        // If lang is neither zh nor en, use original content
 
         return NewsBriefDTO.builder()
                 .id(news.getId())

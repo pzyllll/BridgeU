@@ -88,36 +88,33 @@ public class PostMigrationService {
                 // Set Chinese title translation (always update if force retranslate, or if missing)
                 if (forceRetranslate || post.getTitleZh() == null || post.getTitleZh().isEmpty()) {
                     if (translationResult.getTitleZh() != null && !translationResult.getTitleZh().isEmpty()) {
-                        if (!translationResult.getTitleZh().equals(post.getTitle()) || "zh".equals(detectedLang)) {
-                            post.setTitleZh(translationResult.getTitleZh());
-                        } else {
-                            post.setTitleZh(post.getTitle());
-                        }
+                        post.setTitleZh(translationResult.getTitleZh());
+                        log.info("✅ Set titleZh from translation for post {}", post.getId());
+                    } else if (languageDetectionService.containsChinese(post.getTitle())) {
+                        // 如果标题包含中文，使用原标题
+                        post.setTitleZh(post.getTitle());
+                        log.info("✅ Post {} title contains Chinese, using original as titleZh", post.getId());
                     } else if ("zh".equals(detectedLang)) {
                         post.setTitleZh(post.getTitle());
+                        log.info("✅ Post {} detected as Chinese, using original as titleZh", post.getId());
                     }
                 }
                 
                 // Set Chinese content translation (always update if force retranslate, or if missing)
                 if (forceRetranslate || post.getContentZh() == null || post.getContentZh().isEmpty()) {
                     if (translationResult.getBodyZh() != null && !translationResult.getBodyZh().isEmpty()) {
-                        // TranslationService now ensures the result is different from original
                         post.setContentZh(translationResult.getBodyZh());
-                        log.info("✅ {} Chinese translation for post: {} (length: {} -> {})", 
-                                forceRetranslate ? "Updated" : "Added", 
-                                post.getTitle(),
-                                post.getBody() != null ? post.getBody().length() : 0,
-                                translationResult.getBodyZh().length());
+                        log.info("✅ Set contentZh from translation for post {}", post.getId());
+                    } else if (languageDetectionService.containsChinese(post.getBody())) {
+                        // 如果内容包含中文，使用原内容
+                        post.setContentZh(post.getBody());
+                        log.info("✅ Post {} body contains Chinese, using original as contentZh", post.getId());
+                    } else if ("zh".equals(detectedLang)) {
+                        post.setContentZh(post.getBody());
+                        log.info("✅ Post {} detected as Chinese, using original as contentZh", post.getId());
                     } else {
-                        // Only use original as fallback if source language is Chinese
-                        if ("zh".equals(detectedLang)) {
-                            post.setContentZh(post.getBody());
-                            log.info("✅ Post is already in Chinese, using original");
-                        } else {
-                            // Don't set if translation failed - leave it null/empty
-                            log.error("❌ Chinese translation failed for post {} (detected lang: {}), leaving contentZh empty", 
-                                    post.getId(), detectedLang);
-                        }
+                        log.warn("⚠️ Chinese content translation failed for post {} (detected lang: {})", 
+                                post.getId(), detectedLang);
                     }
                 }
                 

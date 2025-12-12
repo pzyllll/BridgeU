@@ -551,32 +551,33 @@ public class NewsAdminController {
                     
                     boolean hasTranslation = false;
                     
-                    // Set Chinese translations
+                    // Set Chinese translations - relaxed validation
                     if (translationResult.getTitleZh() != null && !translationResult.getTitleZh().isEmpty()) {
-                        // 验证翻译结果确实包含中文字符，而不是泰语或其他语言
-                        if (languageDetectionService.containsChinese(translationResult.getTitleZh()) && 
-                            !languageDetectionService.containsThai(translationResult.getTitleZh())) {
+                        // 只要翻译结果不是泰语就接受
+                        if (!languageDetectionService.containsThai(translationResult.getTitleZh())) {
                             news.setTitleZh(translationResult.getTitleZh());
                             log.info("✅ Set titleZh for news {}: {}", news.getId(), translationResult.getTitleZh().substring(0, Math.min(50, translationResult.getTitleZh().length())));
                             hasTranslation = true;
                         } else {
-                            log.warn("⚠️ Translation result is not Chinese (contains Thai or no Chinese): {} for news: {}", 
+                            log.warn("⚠️ Translation result contains Thai characters, rejecting: {} for news: {}", 
                                     translationResult.getTitleZh().substring(0, Math.min(50, translationResult.getTitleZh().length())), news.getId());
                         }
                     }
                     
-                    // 如果 titleZh 仍然为空，且原始语言是中文，且标题确实包含中文
+                    // 如果 titleZh 仍然为空，检查原始标题是否包含中文
                     if (news.getTitleZh() == null || news.getTitleZh().isEmpty()) {
-                        if ("zh".equals(detectedLang) && languageDetectionService.containsChinese(titleToTranslate) && 
-                            !languageDetectionService.containsThai(titleToTranslate)) {
+                        // 只要标题包含任何中文字符，就使用原标题作为 titleZh
+                        if (languageDetectionService.containsChinese(titleToTranslate)) {
                             news.setTitleZh(titleToTranslate);
-                            log.info("✅ News {} is already in Chinese, using original title", news.getId());
+                            log.info("✅ News {} title contains Chinese, using original as titleZh", news.getId());
+                            hasTranslation = true;
+                        } else if ("zh".equals(detectedLang)) {
+                            news.setTitleZh(titleToTranslate);
+                            log.info("✅ News {} detected as Chinese, using original as titleZh", news.getId());
                             hasTranslation = true;
                         } else {
-                            log.warn("⚠️ TitleZh is null or empty for news {} (detectedLang: {}, title contains Chinese: {}, title contains Thai: {})", 
-                                    news.getId(), detectedLang, 
-                                    languageDetectionService.containsChinese(titleToTranslate),
-                                    languageDetectionService.containsThai(titleToTranslate));
+                            log.warn("⚠️ TitleZh is null for news {} (detectedLang: {}, containsChinese: {})", 
+                                    news.getId(), detectedLang, languageDetectionService.containsChinese(titleToTranslate));
                         }
                     }
                     
@@ -584,12 +585,17 @@ public class NewsAdminController {
                         news.setSummaryZh(translationResult.getBodyZh());
                         log.info("✅ Set summaryZh for news {} (length: {})", news.getId(), translationResult.getBodyZh().length());
                         hasTranslation = true;
+                    } else if (languageDetectionService.containsChinese(summaryToTranslate)) {
+                        // 如果摘要包含中文，使用原摘要
+                        news.setSummaryZh(summaryToTranslate);
+                        log.info("✅ News {} summary contains Chinese, using original as summaryZh", news.getId());
+                        hasTranslation = true;
                     } else if ("zh".equals(detectedLang)) {
                         news.setSummaryZh(summaryToTranslate);
-                        log.info("✅ News {} summary is already in Chinese, using original", news.getId());
+                        log.info("✅ News {} detected as Chinese, using original summary", news.getId());
                         hasTranslation = true;
                     } else {
-                        log.warn("⚠️ SummaryZh is null or empty for news {} (detectedLang: {})", news.getId(), detectedLang);
+                        log.warn("⚠️ SummaryZh is null for news {} (detectedLang: {})", news.getId(), detectedLang);
                     }
                     
                     // Set English translations
@@ -659,13 +665,14 @@ public class NewsAdminController {
     }
     
     /**
-     * Check if news item already has translations
+     * Check if news item already has COMPLETE translations (both Chinese AND English)
+     * Returns true only if both titleZh and titleEn are present
      */
     private boolean hasNewsTranslations(News news) {
-        return (news.getTitleZh() != null && !news.getTitleZh().isEmpty()) ||
-               (news.getTitleEn() != null && !news.getTitleEn().isEmpty()) ||
-               (news.getSummaryZh() != null && !news.getSummaryZh().isEmpty()) ||
-               (news.getSummaryEn() != null && !news.getSummaryEn().isEmpty());
+        // 必须同时有中文和英文标题翻译才算完整
+        boolean hasTitleZh = news.getTitleZh() != null && !news.getTitleZh().isEmpty();
+        boolean hasTitleEn = news.getTitleEn() != null && !news.getTitleEn().isEmpty();
+        return hasTitleZh && hasTitleEn;
     }
 
 }
