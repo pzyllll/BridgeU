@@ -80,6 +80,13 @@ public class News {
     private String source;
 
     /**
+     * Cover image URL
+     * Extracted from og:image or twitter:image meta tags
+     */
+    @Column(name = "cover_image_url", length = 1000)
+    private String coverImageUrl;
+
+    /**
      * Publish date
      */
     private Date publishDate;

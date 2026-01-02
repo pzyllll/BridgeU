@@ -48,7 +48,7 @@ public class QwenService {
 
         QwenParam param = QwenParam.builder()
                 .apiKey(apiKey)
-                .model("qwen-max-2025-01-25") // Updated model version
+                .model("qwen3-max")
                 .messages(messages)
                 .resultFormat(QwenParam.ResultFormat.MESSAGE)
                 // 当前 SDK 版本不支持 maxTokens(...)，使用默认长度配置
@@ -82,7 +82,7 @@ public class QwenService {
 
         QwenParam param = QwenParam.builder()
                 .apiKey(apiKey)
-                .model("qwen-max-2025-01-25") // Updated model version
+                .model("qwen3-max")
                 .messages(messages)
                 .resultFormat(QwenParam.ResultFormat.MESSAGE)
                 // 当前 SDK 版本不支持 maxTokens(...)，使用默认长度配置

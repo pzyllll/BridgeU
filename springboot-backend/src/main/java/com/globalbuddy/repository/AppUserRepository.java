@@ -30,6 +30,16 @@ public interface AppUserRepository extends JpaRepository<AppUser, String> {
      * 检查邮箱是否存在
      */
     boolean existsByEmail(String email);
+
+    /**
+     * 根据手机号查找用户
+     */
+    Optional<AppUser> findByPhone(String phone);
+
+    /**
+     * 检查手机号是否存在
+     */
+    boolean existsByPhone(String phone);
     
     /**
      * 根据角色查找用户

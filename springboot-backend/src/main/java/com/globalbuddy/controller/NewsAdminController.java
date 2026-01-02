@@ -6,10 +6,12 @@ import com.globalbuddy.scheduler.NewsScheduler;
 import com.globalbuddy.service.AiSummaryService;
 import com.globalbuddy.service.LanguageDetectionService;
 import com.globalbuddy.service.NewsCrawlerService;
-import com.globalbuddy.service.NewsToPostService;
+// import com.globalbuddy.service.NewsToPostService; // DISABLED: News to posts conversion is no longer needed
 import com.globalbuddy.service.PostMigrationService;
 import com.globalbuddy.service.RssFeedService;
 import com.globalbuddy.service.TranslationService;
+import com.globalbuddy.service.GoogleTrendsRssService;
+import com.globalbuddy.service.NewsApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +34,15 @@ public class NewsAdminController {
 
     private final NewsScheduler newsScheduler;
     private final AiSummaryService aiSummaryService;
-    private final NewsToPostService newsToPostService;
+    // private final NewsToPostService newsToPostService; // DISABLED: News to posts conversion is no longer needed
     private final NewsCrawlerService newsCrawlerService;
     private final RssFeedService rssFeedService;
     private final PostMigrationService postMigrationService;
     private final TranslationService translationService;
     private final LanguageDetectionService languageDetectionService;
     private final NewsRepository newsRepository;
+    private final GoogleTrendsRssService googleTrendsRssService;
+    private final NewsApiService newsApiService;
 
     /**
      * Manually trigger news refresh task:
@@ -196,94 +200,97 @@ public class NewsAdminController {
      * POST /api/news/crawl-and-convert
      * Body (optional): {"limit": 10}  // Maximum number of news items to convert
      */
-    @PostMapping("/crawl-and-convert")
-    public ResponseEntity<Map<String, Object>> crawlAndConvertToPosts(
-            @RequestBody(required = false) Map<String, Object> request) {
-        log.info("Received crawl and convert to posts request");
-        Map<String, Object> resp = new HashMap<>();
-        
-        try {
-            long start = System.currentTimeMillis();
-            
-            // Step 1: Crawl news first (including all Thai news websites and Chiang Mai University)
-            log.info("Step 1: Starting to crawl news (all Thai news websites + Chiang Mai University)...");
-            newsScheduler.manualTrigger();
-            
-            // Step 2: Convert to posts
-            int limit = 10;
-            if (request != null && request.containsKey("limit")) {
-                Object limitObj = request.get("limit");
-                if (limitObj instanceof Number) {
-                    limit = ((Number) limitObj).intValue();
-                }
-            }
-            
-            log.info("Step 2: Starting to convert news to posts, limit: {}", limit);
-            NewsToPostService.ConversionResult result = newsToPostService.convertNewsToPosts(limit);
-            
-            long cost = System.currentTimeMillis() - start;
-            
-            resp.put("success", true);
-            resp.put("message", "Crawl and conversion completed");
-            resp.put("crawlCostMs", cost);
-            resp.put("conversionResult", Map.of(
-                    "totalProcessed", result.getTotalProcessed(),
-                    "successCount", result.getSuccessCount(),
-                    "skipCount", result.getSkipCount(),
-                    "errorCount", result.getErrorCount()
-            ));
-            
-            return ResponseEntity.ok(resp);
-            
-        } catch (Exception e) {
-            log.error("Failed to crawl and convert to posts: {}", e.getMessage(), e);
-            resp.put("success", false);
-            resp.put("message", "Failed to crawl and convert to posts: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(resp);
-        }
-    }
+    // DISABLED: News to posts conversion is no longer needed
+    // @PostMapping("/crawl-and-convert")
+    // public ResponseEntity<Map<String, Object>> crawlAndConvertToPosts(
+    //         @RequestBody(required = false) Map<String, Object> request) {
+    //     log.info("Received crawl and convert to posts request");
+    //     Map<String, Object> resp = new HashMap<>();
+    //     
+    //     try {
+    //         long start = System.currentTimeMillis();
+    //         
+    //         // Step 1: Crawl news first (including all Thai news websites and Chiang Mai University)
+    //         log.info("Step 1: Starting to crawl news (all Thai news websites + Chiang Mai University)...");
+    //         newsScheduler.manualTrigger();
+    //         
+    //         // Step 2: Convert to posts
+    //         int limit = 10;
+    //         if (request != null && request.containsKey("limit")) {
+    //             Object limitObj = request.get("limit");
+    //             if (limitObj instanceof Number) {
+    //                 limit = ((Number) limitObj).intValue();
+    //             }
+    //         }
+    //         
+    //         log.info("Step 2: Starting to convert news to posts, limit: {}", limit);
+    //         NewsToPostService.ConversionResult result = newsToPostService.convertNewsToPosts(limit);
+    //         
+    //         long cost = System.currentTimeMillis() - start;
+    //         
+    //         resp.put("success", true);
+    //         resp.put("message", "Crawl and conversion completed");
+    //         resp.put("crawlCostMs", cost);
+    //         resp.put("conversionResult", Map.of(
+    //                 "totalProcessed", result.getTotalProcessed(),
+    //                 "successCount", result.getSuccessCount(),
+    //                 "skipCount", result.getSkipCount(),
+    //                 "errorCount", result.getErrorCount()
+    //         ));
+    //         
+    //         return ResponseEntity.ok(resp);
+    //         
+    //     } catch (Exception e) {
+    //         log.error("Failed to crawl and convert to posts: {}", e.getMessage(), e);
+    //         resp.put("success", false);
+    //         resp.put("message", "Failed to crawl and convert to posts: " + e.getMessage());
+    //         return ResponseEntity.internalServerError().body(resp);
+    //     }
+    // }
 
     /**
      * Only convert already crawled news to posts (without re-crawling)
      * 
+     * DISABLED: News to posts conversion is no longer needed
+     * 
      * POST /api/news/convert-to-posts
      * Body (optional): {"limit": 10}
      */
-    @PostMapping("/convert-to-posts")
-    public ResponseEntity<Map<String, Object>> convertToPosts(
-            @RequestBody(required = false) Map<String, Object> request) {
-        log.info("Received convert news to posts request");
-        Map<String, Object> resp = new HashMap<>();
-        
-        try {
-            int limit = 10;
-            if (request != null && request.containsKey("limit")) {
-                Object limitObj = request.get("limit");
-                if (limitObj instanceof Number) {
-                    limit = ((Number) limitObj).intValue();
-                }
-            }
-            
-            NewsToPostService.ConversionResult result = newsToPostService.convertNewsToPosts(limit);
-            
-            resp.put("success", true);
-            resp.put("message", "Conversion completed");
-            resp.put("result", Map.of(
-                    "totalProcessed", result.getTotalProcessed(),
-                    "successCount", result.getSuccessCount(),
-                    "skipCount", result.getSkipCount(),
-                    "errorCount", result.getErrorCount()
-            ));
-            
-            return ResponseEntity.ok(resp);
-            
-        } catch (Exception e) {
-            log.error("Failed to convert news to posts: {}", e.getMessage(), e);
-            resp.put("success", false);
-            resp.put("message", "Conversion failed: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(resp);
-        }
-    }
+    // @PostMapping("/convert-to-posts")
+    // public ResponseEntity<Map<String, Object>> convertToPosts(
+    //         @RequestBody(required = false) Map<String, Object> request) {
+    //     log.info("Received convert news to posts request");
+    //     Map<String, Object> resp = new HashMap<>();
+    //     
+    //     try {
+    //         int limit = 10;
+    //         if (request != null && request.containsKey("limit")) {
+    //             Object limitObj = request.get("limit");
+    //             if (limitObj instanceof Number) {
+    //                 limit = ((Number) limitObj).intValue();
+    //             }
+    //         }
+    //         
+    //         NewsToPostService.ConversionResult result = newsToPostService.convertNewsToPosts(limit);
+    //         
+    //         resp.put("success", true);
+    //         resp.put("message", "Conversion completed");
+    //         resp.put("result", Map.of(
+    //                 "totalProcessed", result.getTotalProcessed(),
+    //                 "successCount", result.getSuccessCount(),
+    //                 "skipCount", result.getSkipCount(),
+    //                 "errorCount", result.getErrorCount()
+    //         ));
+    //         
+    //         return ResponseEntity.ok(resp);
+    //         
+    //     } catch (Exception e) {
+    //         log.error("Failed to convert news to posts: {}", e.getMessage(), e);
+    //         resp.put("success", false);
+    //         resp.put("message", "Conversion failed: " + e.getMessage());
+    //         return ResponseEntity.internalServerError().body(resp);
+    //     }
+    // }
 
     /**
      * Test RSS feed
@@ -337,6 +344,134 @@ public class NewsAdminController {
             
         } catch (Exception e) {
             log.error("RSS feed test failed: {}", e.getMessage(), e);
+            resp.put("success", false);
+            resp.put("message", "Test failed: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(resp);
+        }
+    }
+
+    /**
+     * Test all configured RSS feeds
+     * Used to verify which RSS feeds are accessible and working
+     * 
+     * POST /api/news/test-all-rss
+     */
+    @PostMapping("/test-all-rss")
+    public ResponseEntity<Map<String, Object>> testAllRss() {
+        log.info("Received test all RSS feeds request");
+        Map<String, Object> resp = new HashMap<>();
+        
+        try {
+            long start = System.currentTimeMillis();
+            
+            // Get all configured RSS feeds from NewsCrawlerService
+            List<com.globalbuddy.service.RssFeedService.RssFeedConfig> rssFeeds = new ArrayList<>();
+            
+            // Add all Thai news website RSS feeds
+            rssFeeds.addAll(newsCrawlerService.getAllThaiRssFeedConfigs());
+            
+            // Add all Chiang Mai University related RSS feeds
+            rssFeeds.addAll(newsCrawlerService.getChiangMaiUniversityRssFeedConfigs());
+            
+            // Test each RSS feed
+            List<Map<String, Object>> testResults = new ArrayList<>();
+            int successCount = 0;
+            int failCount = 0;
+            int totalNewsCount = 0;
+            
+            for (com.globalbuddy.service.RssFeedService.RssFeedConfig config : rssFeeds) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("source", config.getSource());
+                result.put("url", config.getUrl());
+                
+                try {
+                    long feedStart = System.currentTimeMillis();
+                    List<com.globalbuddy.model.News> newsList = rssFeedService.fetchNewsFromRss(
+                        config.getUrl(), config.getSource(), 3); // Test with 3 items
+                    long feedCost = System.currentTimeMillis() - feedStart;
+                    
+                    result.put("success", true);
+                    result.put("count", newsList.size());
+                    result.put("costMs", feedCost);
+                    result.put("message", "Successfully fetched " + newsList.size() + " news items");
+                    
+                    successCount++;
+                    totalNewsCount += newsList.size();
+                    
+                    // Add sample news titles
+                    List<String> sampleTitles = new ArrayList<>();
+                    for (int i = 0; i < Math.min(3, newsList.size()); i++) {
+                        sampleTitles.add(newsList.get(i).getTitle());
+                    }
+                    result.put("sampleTitles", sampleTitles);
+                    
+                } catch (Exception e) {
+                    result.put("success", false);
+                    result.put("count", 0);
+                    result.put("error", e.getClass().getSimpleName());
+                    result.put("message", e.getMessage());
+                    failCount++;
+                }
+                
+                testResults.add(result);
+            }
+            
+            long totalCost = System.currentTimeMillis() - start;
+            
+            resp.put("success", true);
+            resp.put("message", "RSS feed test completed");
+            resp.put("totalFeeds", rssFeeds.size());
+            resp.put("successCount", successCount);
+            resp.put("failCount", failCount);
+            resp.put("totalNewsCount", totalNewsCount);
+            resp.put("totalCostMs", totalCost);
+            resp.put("results", testResults);
+            
+            log.info("RSS feed test completed: {}/{} successful, {} news items fetched in {} ms",
+                    successCount, rssFeeds.size(), totalNewsCount, totalCost);
+            
+            return ResponseEntity.ok(resp);
+            
+        } catch (Exception e) {
+            log.error("Test all RSS feeds failed: {}", e.getMessage(), e);
+            resp.put("success", false);
+            resp.put("message", "Test failed: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(resp);
+        }
+    }
+
+    /**
+     * Test Google Trends RSS feed
+     * Used to test and verify if Google Trends RSS is working properly
+     * 
+     * POST /api/news/test-google-trends
+     * Body: {"geoCode": "TH"} (optional, "TH" for Thailand, "US" for USA, null for global)
+     */
+    @PostMapping("/test-google-trends")
+    public ResponseEntity<Map<String, Object>> testGoogleTrends(@RequestBody(required = false) Map<String, String> request) {
+        log.info("Received Google Trends RSS test request");
+        Map<String, Object> resp = new HashMap<>();
+        
+        try {
+            String geoCode = request != null ? request.get("geoCode") : "TH";
+            int maxItems = request != null && request.containsKey("maxItems") 
+                    ? Integer.parseInt(request.get("maxItems")) : 20;
+            
+            long start = System.currentTimeMillis();
+            List<String> keywords = googleTrendsRssService.fetchTrendingKeywords(geoCode, maxItems);
+            long cost = System.currentTimeMillis() - start;
+            
+            resp.put("success", true);
+            resp.put("message", "Google Trends RSS test completed");
+            resp.put("geoCode", geoCode != null ? geoCode : "global");
+            resp.put("count", keywords.size());
+            resp.put("costMs", cost);
+            resp.put("keywords", keywords);
+            
+            return ResponseEntity.ok(resp);
+            
+        } catch (Exception e) {
+            log.error("Google Trends RSS test failed: {}", e.getMessage(), e);
             resp.put("success", false);
             resp.put("message", "Test failed: " + e.getMessage());
             return ResponseEntity.internalServerError().body(resp);
@@ -673,6 +808,131 @@ public class NewsAdminController {
         boolean hasTitleZh = news.getTitleZh() != null && !news.getTitleZh().isEmpty();
         boolean hasTitleEn = news.getTitleEn() != null && !news.getTitleEn().isEmpty();
         return hasTitleZh && hasTitleEn;
+    }
+
+    /**
+     * Test NewsAPI.org service
+     * Used to test and verify if NewsAPI.org is working properly
+     * 
+     * POST /api/news/test-newsapi
+     * Body (optional): {"maxItems": 30}  // Maximum number of articles to fetch (default 30)
+     */
+    @PostMapping("/test-newsapi")
+    public ResponseEntity<Map<String, Object>> testNewsApi(@RequestBody(required = false) Map<String, Object> request) {
+        log.info("Received NewsAPI.org test request");
+        Map<String, Object> resp = new HashMap<>();
+        
+        try {
+            int maxItems = 30;
+            if (request != null && request.containsKey("maxItems")) {
+                Object maxItemsObj = request.get("maxItems");
+                if (maxItemsObj instanceof Number) {
+                    maxItems = ((Number) maxItemsObj).intValue();
+                }
+            }
+            
+            long start = System.currentTimeMillis();
+            List<News> newsList = newsApiService.fetchThailandHeadlines(maxItems);
+            long cost = System.currentTimeMillis() - start;
+            
+            // Build response
+            List<Map<String, Object>> newsData = new ArrayList<>();
+            for (News news : newsList) {
+                Map<String, Object> newsMap = new HashMap<>();
+                newsMap.put("title", news.getTitle());
+                newsMap.put("url", news.getOriginalUrl());
+                newsMap.put("source", news.getSource());
+                newsMap.put("summary", news.getSummary());
+                newsMap.put("publishDate", news.getPublishDate());
+                newsData.add(newsMap);
+            }
+            
+            resp.put("success", true);
+            resp.put("message", "NewsAPI.org test completed");
+            resp.put("country", "th");
+            resp.put("count", newsList.size());
+            resp.put("maxItems", maxItems);
+            resp.put("costMs", cost);
+            resp.put("news", newsData);
+            
+            log.info("NewsAPI.org test completed: {} articles fetched in {} ms", newsList.size(), cost);
+            
+            return ResponseEntity.ok(resp);
+            
+        } catch (Exception e) {
+            log.error("NewsAPI.org test failed: {}", e.getMessage(), e);
+            resp.put("success", false);
+            resp.put("message", "Test failed: " + e.getMessage());
+            resp.put("error", e.getClass().getSimpleName());
+            return ResponseEntity.internalServerError().body(resp);
+        }
+    }
+
+    /**
+     * Get source statistics from crawled news
+     * Shows how many news items come from each source
+     * 
+     * POST /api/news/source-statistics
+     * Body (optional): {"crawl": true}  // If true, crawl news first, then show statistics
+     */
+    @PostMapping("/source-statistics")
+    public ResponseEntity<Map<String, Object>> getSourceStatistics(@RequestBody(required = false) Map<String, Object> request) {
+        log.info("Received source statistics request");
+        Map<String, Object> resp = new HashMap<>();
+        
+        try {
+            boolean shouldCrawl = request != null && Boolean.TRUE.equals(request.get("crawl"));
+            
+            List<News> newsList;
+            if (shouldCrawl) {
+                log.info("Crawling news first, then showing statistics...");
+                long start = System.currentTimeMillis();
+                newsList = newsCrawlerService.crawlAllThaiNews();
+                long cost = System.currentTimeMillis() - start;
+                resp.put("crawlCostMs", cost);
+                resp.put("crawledCount", newsList.size());
+            } else {
+                // Get from database
+                newsList = newsRepository.findAll();
+            }
+            
+            // Get source statistics
+            java.util.Map<String, Long> sourceStats = newsCrawlerService.getSourceStatistics(newsList);
+            
+            // Build response
+            List<Map<String, Object>> sourceData = new ArrayList<>();
+            long totalCount = 0;
+            
+            // Sort by count (descending)
+            sourceStats.entrySet().stream()
+                    .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
+                    .forEach(entry -> {
+                        Map<String, Object> sourceMap = new HashMap<>();
+                        sourceMap.put("source", entry.getKey());
+                        sourceMap.put("count", entry.getValue());
+                        sourceData.add(sourceMap);
+                    });
+            
+            totalCount = sourceStats.values().stream().mapToLong(Long::longValue).sum();
+            
+            resp.put("success", true);
+            resp.put("message", "Source statistics retrieved");
+            resp.put("totalNews", newsList.size());
+            resp.put("uniqueSources", sourceStats.size());
+            resp.put("totalArticles", totalCount);
+            resp.put("sources", sourceData);
+            
+            log.info("Source statistics: {} unique sources, {} total articles", sourceStats.size(), totalCount);
+            
+            return ResponseEntity.ok(resp);
+            
+        } catch (Exception e) {
+            log.error("Failed to get source statistics: {}", e.getMessage(), e);
+            resp.put("success", false);
+            resp.put("message", "Failed to get source statistics: " + e.getMessage());
+            resp.put("error", e.getClass().getSimpleName());
+            return ResponseEntity.internalServerError().body(resp);
+        }
     }
 
 }

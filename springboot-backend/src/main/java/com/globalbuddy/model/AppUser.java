@@ -69,6 +69,12 @@ public class AppUser implements UserDetails {
     @Column(name = "display_name", nullable = false)
     private String displayName;
 
+    /**
+     * User avatar URL
+     */
+    @Column(name = "avatar", length = 500)
+    private String avatar;
+
     @Column(name = "business_name", length = 255)
     private String businessName;
 

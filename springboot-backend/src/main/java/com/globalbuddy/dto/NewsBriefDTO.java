@@ -63,6 +63,11 @@ public class NewsBriefDTO {
     private String source;
 
     /**
+     * 封面图片 URL
+     */
+    private String coverImageUrl;
+
+    /**
      * 发布时间
      */
     private Date publishDate;

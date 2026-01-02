@@ -4,12 +4,29 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
 import java.io.IOException;
+import java.util.Locale;
+
+/**
+ * 全局 Web 配置
+ * - CORS、静态资源
+ * - 语言解析：第一次根据浏览器语言，之后记住用户选择（Cookie）
+ */
+
+import com.globalbuddy.config.CustomCookieLocaleResolver;
 
 @Slf4j
 @Configuration
@@ -32,6 +49,23 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer.defaultContentType(MediaType.APPLICATION_JSON);
+    }
+
+    @Bean("localeResolver")
+    @Primary
+    public LocaleResolver localeResolver() {
+        CustomCookieLocaleResolver resolver = new CustomCookieLocaleResolver();
+        resolver.setCookieName("LOCALE_PREFERENCE");
+        resolver.setCookieMaxAge(60 * 60 * 24 * 365); // 记住一年
+        resolver.setDefaultLocale(Locale.ENGLISH);
+        return resolver;
+    }
+
+    @Bean
+    public LocaleChangeInterceptor localeChangeInterceptor() {
+        LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
+        interceptor.setParamName("lang");
+        return interceptor;
     }
 
     @Override
@@ -61,6 +95,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                     }
                 });
         log.info("Resource handlers registered: {}", registry.hasMappingForPattern("/pictures/**"));
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(localeChangeInterceptor());
     }
 
     @Bean

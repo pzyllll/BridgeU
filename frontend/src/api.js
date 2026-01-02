@@ -7,7 +7,7 @@ console.log('API baseURL:', baseURL || '(使用 Vite 代理)');
 
 const client = axios.create({
   baseURL: baseURL,
-  timeout: 10000,
+  timeout: 30000, // 增加到 30 秒，给后端更多响应时间
 });
 
 // 添加请求拦截器用于调试
@@ -85,6 +85,48 @@ client.interceptors.response.use(
       });
     }
     
+    // 如果是超时错误，提供更友好的错误信息
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      console.error('⏱️ Timeout Error Details:', {
+        '请求URL': error.config?.url,
+        '超时时间': error.config?.timeout + 'ms',
+        '建议': [
+          '1. 检查后端服务器是否运行正常',
+          '2. 检查后端服务器响应时间',
+          '3. 检查网络连接',
+          '4. 如果后端正在处理大量数据，可能需要优化查询'
+        ]
+      });
+      
+      // 为超时错误添加更友好的消息
+      error.userMessage = error.config?.url?.includes('/api/posts') 
+        ? '加载帖子列表超时，请检查网络连接或稍后重试'
+        : '请求超时，请稍后重试';
+    }
+    
+    // 处理 401 未授权错误
+    if (error.response?.status === 401) {
+      console.warn('🔒 401 Unauthorized - Token may be invalid or expired');
+      
+      // 清除无效的 token
+      const token = localStorage.getItem('token');
+      if (token) {
+        console.log('🗑️ Clearing invalid token from localStorage');
+        localStorage.removeItem('token');
+        
+        // 触发自定义事件，通知应用需要重新登录
+        window.dispatchEvent(new CustomEvent('auth:unauthorized', {
+          detail: { url: error.config?.url }
+        }));
+      }
+      
+      // 为 401 错误添加用户友好的消息
+      error.userMessage = error.config?.url?.includes('/api/posts/my/rejected')
+        ? '需要登录才能查看被拒绝的帖子。请先登录。'
+        : '登录已过期，请重新登录';
+      error.isAuthError = true;
+    }
+    
     return Promise.reject(error);
   }
 );
@@ -94,7 +136,11 @@ export const fetchPosts = (params = {}) => {
   // Use the lang from params if provided, otherwise get from localStorage
   const lang = params.lang !== undefined ? params.lang : getLanguagePreference();
   console.log('fetchPosts called with params:', params, 'final lang:', lang);
-  return client.get('/api/posts', { params: { ...params, lang } }).then((res) => res.data);
+  // 为帖子列表请求设置更长的超时时间（60秒），因为可能需要加载大量数据
+  return client.get('/api/posts', { 
+    params: { ...params, lang },
+    timeout: 60000 // 60秒超时
+  }).then((res) => res.data);
 };
 export const searchAll = (params = {}) => client.get('/api/search', { params }).then((res) => res.data);
 export const askQuestion = (payload) => client.post('/api/nlp/qa', payload).then((res) => res.data);
@@ -121,6 +167,11 @@ export const fetchDailyBriefing = (params = {}) => {
   return client.get('/api/news/daily-briefing', { params: { ...params, lang } }).then((res) => res.data);
 };
 
+// Get available news sources for filtering
+export const fetchNewsSources = () => {
+  return client.get('/api/news/sources').then((res) => res.data);
+};
+
 // Post Detail API
 export const fetchPostDetail = (postId, lang) => {
   const langToUse = lang || getLanguagePreference();
@@ -143,6 +194,40 @@ export const addComment = (postId, content, lang, token) => {
     { content },
     {
       params: { lang: langToUse },
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    }
+  ).then((res) => res.data);
+};
+
+// Get comment summary API
+export const getCommentSummary = (postId, lang) => {
+  const langToUse = lang || getLanguagePreference();
+  return client.get(`/api/posts/${postId}/comments/summary`, {
+    params: { lang: langToUse }
+  }).then((res) => res.data);
+};
+
+// Delete comment API
+export const deleteComment = (postId, commentId, token) => {
+  return client.delete(
+    `/api/posts/${postId}/comments/${commentId}`,
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    }
+  ).then((res) => res.data);
+};
+
+// Submit report API
+export const submitReport = (targetType, targetId, reasons, description, token) => {
+  return client.post(
+    '/api/reports',
+    {
+      targetType,
+      targetId,
+      reasons,
+      description
+    },
+    {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     }
   ).then((res) => res.data);
@@ -179,5 +264,123 @@ export const getPostAuthorName = async (authorId) => {
     console.error('Failed to get author name:', error);
     return 'Unknown';
   }
+};
+
+// Auth API functions
+// Send verification code (email) for registration
+// （手机短信验证码改由 Firebase 负责，这里只给邮箱用）
+export const sendVerificationCode = (identifier, type) => {
+  // type: 'email' or 'phone'
+  // 发送邮件可能需要更长时间，设置 60 秒超时
+  return client.post('/api/auth/send-verification-code', {
+    identifier,
+    type
+  }, {
+    timeout: 60000 // 60 秒超时
+  }).then((res) => res.data);
+};
+
+// Verify verification code（邮箱或电话，取决于后端实现）
+export const verifyCode = (identifier, code, type, purpose = 'REGISTER') => {
+  return client.post('/api/auth/verify-code', {
+    identifier,
+    code,
+    type,
+    purpose
+  }).then((res) => res.data);
+};
+
+// Register with verification（主要用于邮箱注册）
+export const registerWithVerification = (payload) => {
+  return client.post('/api/auth/register', payload).then((res) => res.data);
+};
+
+// Register with phone (Firebase 已验证手机号后调用)
+export const registerWithPhone = (payload) => {
+  return client.post('/api/auth/register/phone', payload).then((res) => res.data);
+};
+
+// Forgot password - send code（目前仅支持邮箱）
+export const sendPasswordResetCode = (identifier, type) => {
+  // 发送邮件可能需要更长时间，设置 60 秒超时
+  return client.post('/api/auth/forgot-password/send-code', {
+    identifier,
+    type
+  }, {
+    timeout: 60000 // 60 秒超时
+  }).then((res) => res.data);
+};
+
+// Reset password with verification code (for email)
+export const resetPassword = (identifier, code, newPassword, type) => {
+  return client.post('/api/auth/forgot-password/reset', {
+    identifier,
+    code,
+    newPassword,
+    type
+  }).then((res) => res.data);
+};
+
+// Reset password with phone (Firebase verified)
+export const resetPasswordWithPhone = (phone, newPassword) => {
+  return client.post('/api/auth/forgot-password/reset/phone', {
+    phone,
+    newPassword
+  }).then((res) => res.data);
+};
+
+// ========== Private Messaging APIs ==========
+
+// Get all conversations for current user
+export const getConversations = (token) => {
+  return client.get('/api/messages/conversations', {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
+};
+
+// Create or get conversation with a user
+export const createOrGetConversation = (userId, token) => {
+  return client.post('/api/messages/conversations', {
+    userId
+  }, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
+};
+
+// Get messages in a conversation
+export const getConversationMessages = (conversationId, token) => {
+  return client.get(`/api/messages/conversations/${conversationId}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
+};
+
+// Send a message in a conversation
+export const sendMessage = (conversationId, content, token) => {
+  return client.post(`/api/messages/conversations/${conversationId}/messages`, {
+    content
+  }, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
+};
+
+// Mark a message as read
+export const markMessageAsRead = (messageId, token) => {
+  return client.put(`/api/messages/${messageId}/read`, {}, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
+};
+
+// Mark all messages in a conversation as read
+export const markConversationAsRead = (conversationId, token) => {
+  return client.put(`/api/messages/conversations/${conversationId}/read`, {}, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
+};
+
+// Delete a conversation (soft delete)
+export const deleteConversation = (conversationId, token) => {
+  return client.delete(`/api/messages/conversations/${conversationId}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
 };
 

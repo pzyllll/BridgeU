@@ -21,9 +21,12 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * News Crawler Service
@@ -39,6 +42,8 @@ public class NewsCrawlerService {
     private static final String BANGKOK_POST_BASE_URL = "https://www.bangkokpost.com";
     
     private final RssFeedService rssFeedService;
+    private final GoogleTrendsRssService googleTrendsRssService;
+    private final NewsApiService newsApiService;
 
     /**
      * Crawl all configured Thai news websites (using RSS)
@@ -49,64 +54,293 @@ public class NewsCrawlerService {
         List<News> allNews = new ArrayList<>();
         
         try {
-            log.info("Starting to fetch news from all configured Thai news website RSS feeds...");
+            log.info("Starting to fetch news from Google News RSS (Thailand)...");
             
-            // Configure all Thai news website RSS feeds
-            List<RssFeedService.RssFeedConfig> rssFeeds = new ArrayList<>();
+            // ========== 终极解决方案：使用 Google News RSS ==========
+            // 优势：
+            // 1. 极度稳定：Google 的服务器几乎不会挂 (504)
+            // 2. 格式统一：标准的 Atom/RSS 格式，不会有乱七八糟的 XML 错误
+            // 3. 内容全：包含了 Matichon, Thairath, Khaosod 等所有主要泰国媒体的内容
+            // 4. 一个 URL 搞定：不需要循环遍历多个容易挂掉的 URL
             
-            // 1. Thai Rath (ไทยรัฐ) - One of Thailand's largest news websites
-            rssFeeds.add(new RssFeedService.RssFeedConfig(
-                "https://www.thairath.co.th/rss",
-                "Thai Rath (ไทยรัฐ)"
-            ));
+            // Google News RSS URL for Thailand (泰语版)
+            // ceid=TH:th: 泰国地区，泰语版
+            // gl=TH: 地理位置泰国
+            String googleNewsRssUrl = "https://news.google.com/rss?ceid=TH:th&hl=th&gl=TH";
             
-            // 2. Matichon (มติชน) - Established authoritative media
-            rssFeeds.add(new RssFeedService.RssFeedConfig(
-                "https://www.matichon.co.th/feed",
-                "Matichon (มติชน)"
-            ));
+            // Step 1: Fetch trending keywords from Google Trends RSS (定方向)
+            // Note: Google Trends RSS may be unavailable, so we handle failures gracefully
+            log.info("Step 1: Fetching trending keywords from Google Trends RSS (Thailand)...");
+            List<String> trendingKeywords = new ArrayList<>();
+            try {
+                trendingKeywords = googleTrendsRssService.fetchThailandTrendingKeywords(20);
+                if (!trendingKeywords.isEmpty()) {
+                    log.info("✅ Fetched {} trending keywords from Google Trends: {}", 
+                            trendingKeywords.size(), trendingKeywords);
+                } else {
+                    log.warn("⚠️ No trending keywords fetched from Google Trends (service may be unavailable). Continuing without trending keywords.");
+                }
+            } catch (Exception e) {
+                log.warn("⚠️ Failed to fetch trending keywords from Google Trends: {}. Continuing without trending keywords.", e.getMessage());
+                trendingKeywords = new ArrayList<>(); // Ensure it's not null
+            }
             
-            // 3. Khaosod (ข่าวสด) - Popular content covering society/entertainment/politics
-            rssFeeds.add(new RssFeedService.RssFeedConfig(
-                "https://www.khaosod.co.th/feed",
-                "Khaosod (ข่าวสด)"
-            ));
+            // Step 2: Fetch news from Google News RSS (取内容)
+            // 这是我们的主要新闻源，非常稳定可靠
+            log.info("Step 2: Fetching news from Google News RSS (Thailand)...");
+            try {
+                // 从 Google News RSS 获取最多 100 条新闻（Google News 会返回很多新闻）
+                List<News> googleNews = rssFeedService.fetchNewsFromRss(googleNewsRssUrl, "Google News (Thailand)", 100);
+                if (!googleNews.isEmpty()) {
+                    log.info("✅ Successfully fetched {} news items from Google News RSS", googleNews.size());
+                    allNews.addAll(googleNews);
+                } else {
+                    log.warn("⚠️ No news items fetched from Google News RSS");
+                }
+            } catch (Exception e) {
+                log.error("❌ Failed to fetch news from Google News RSS: {}", e.getMessage(), e);
+            }
             
-            // 4. Post Today - Focus on finance, business, market news
-            rssFeeds.add(new RssFeedService.RssFeedConfig(
-                "https://www.posttoday.com/rss",
-                "Post Today"
-            ));
+            // Step 2.3: Fetch news from Google News RSS with international student keywords (专门针对留学生)
+            // 这个 RSS 链接使用了搜索功能，包含以下关键词：
+            // - นักศึกษาต่างชาติ (外国大学生)
+            // - นักเรียนต่างชาติ (外国学生)
+            // - ทุนการศึกษา (奖学金)
+            // - นักศึกษาจีน (中国留学生)
+            // when:30d - 只看最近 30 天的新闻（保证时效性）
+            log.info("Step 2.3: Fetching news from Google News RSS (International Students in Thailand)...");
+            try {
+                String internationalStudentRssUrl = "https://news.google.com/rss/search?q=(%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%97%E0%B8%B8%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%88%E0%B8%B5%E0%B8%99)+when:30d&ceid=TH:th&hl=th&gl=TH";
+                List<News> studentNews = rssFeedService.fetchNewsFromRss(internationalStudentRssUrl, "Google News (International Students)", 50);
+                if (!studentNews.isEmpty()) {
+                    log.info("✅ Successfully fetched {} news items from Google News RSS (International Students)", studentNews.size());
+                    allNews.addAll(studentNews);
+                    log.info("Total news items after adding International Students news: {}", allNews.size());
+                } else {
+                    log.warn("⚠️ No news items fetched from Google News RSS (International Students)");
+                }
+            } catch (Exception e) {
+                log.warn("⚠️ Failed to fetch news from Google News RSS (International Students): {}. Continuing without this source.", e.getMessage());
+            }
             
-            // 5. Bangkok Post (English) - Thailand's mainstream English newspaper
-            rssFeeds.add(new RssFeedService.RssFeedConfig(
-                "https://www.bangkokpost.com/rss.xml",
-                "Bangkok Post"
-            ));
+            // Step 2.5: Fetch news from NewsAPI.org (Thailand) as supplement (可选补充)
+            log.info("Step 2.5: Fetching news from NewsAPI.org (Thailand) as supplement...");
+            try {
+                List<News> newsApiNews = newsApiService.fetchThailandHeadlines(30); // Fetch up to 30 articles
+                if (!newsApiNews.isEmpty()) {
+                    log.info("✅ Fetched {} news items from NewsAPI.org (Thailand)", newsApiNews.size());
+                    allNews.addAll(newsApiNews);
+                    log.info("Total news items after adding NewsAPI.org: {}", allNews.size());
+                } else {
+                    log.warn("⚠️ No news items fetched from NewsAPI.org (service may be unavailable or rate limited).");
+                }
+            } catch (Exception e) {
+                log.warn("⚠️ Failed to fetch news from NewsAPI.org: {}. Continuing without NewsAPI.org news.", e.getMessage());
+            }
             
-            // 6. The Nation Thailand (English) - Former Nation Multimedia
-            rssFeeds.add(new RssFeedService.RssFeedConfig(
-                "https://www.nationthailand.com/rss",
-                "The Nation Thailand"
-            ));
+            // Step 3: Prioritize news based on trending keywords (混合策略)
+            // Only prioritize if we have both trending keywords and news items
+            if (!trendingKeywords.isEmpty() && !allNews.isEmpty()) {
+                log.info("Step 3: Prioritizing news based on {} trending keywords...", trendingKeywords.size());
+                allNews = googleTrendsRssService.prioritizeNewsByTrends(allNews, trendingKeywords);
+                log.info("News prioritized: {} items total (trending items appear first)", allNews.size());
+            } else if (trendingKeywords.isEmpty()) {
+                log.info("Step 3: Skipping prioritization (no trending keywords available). News will be returned in original order.");
+            }
             
-            // 7. Prachachat (ประชาชาติธุรกิจ) - Focus on economy, finance, business news
-            rssFeeds.add(new RssFeedService.RssFeedConfig(
-                "https://www.prachachat.net/feed",
-                "Prachachat (ประชาชาติธุรกิจ)"
-            ));
+            // Step 4: Statistics and filtering by source
+            log.info("Step 4: Analyzing news sources...");
+            Map<String, Long> sourceStatistics = getSourceStatistics(allNews);
+            logSourceStatistics(sourceStatistics);
             
-            // Fetch news from all RSS feeds
-            log.info("Configured {} RSS feeds, starting to fetch...", rssFeeds.size());
-            allNews = rssFeedService.fetchNewsFromMultipleRss(rssFeeds, 15); // Maximum 15 items per feed
+            // Apply source filtering (if needed)
+            // You can configure which sources to include/exclude here
+            List<String> allowedSources = getAllowedSources(); // Empty list means all sources are allowed
+            List<String> excludedSources = getExcludedSources(); // Sources to exclude
             
-            log.info("Successfully fetched {} news items from all Thai news website RSS feeds", allNews.size());
+            if (!allowedSources.isEmpty() || !excludedSources.isEmpty()) {
+                int beforeFilter = allNews.size();
+                allNews = filterNewsBySource(allNews, allowedSources, excludedSources);
+                int afterFilter = allNews.size();
+                if (beforeFilter != afterFilter) {
+                    log.info("✅ Filtered news by source: {} -> {} items (removed {} items)", 
+                            beforeFilter, afterFilter, beforeFilter - afterFilter);
+                }
+            }
+            
+            log.info("✅ Total news items fetched: {}", allNews.size());
             
         } catch (Exception e) {
-            log.error("Failed to fetch news from Thai news website RSS feeds: {}", e.getMessage(), e);
+            log.error("Failed to fetch news from Thai news sources: {}", e.getMessage(), e);
         }
         
         return allNews;
+    }
+
+    /**
+     * Get all configured Thai news website RSS feed configurations
+     * Used for testing and debugging
+     * 
+     * @return List of RSS feed configurations
+     */
+    public List<RssFeedService.RssFeedConfig> getAllThaiRssFeedConfigs() {
+        List<RssFeedService.RssFeedConfig> rssFeeds = new ArrayList<>();
+        
+        // 使用 Google News RSS 作为主要新闻源（终极解决方案）
+        // 优势：极度稳定、格式统一、内容全面（包含所有主要泰国媒体）
+        rssFeeds.add(new RssFeedService.RssFeedConfig(
+            "https://news.google.com/rss?ceid=TH:th&hl=th&gl=TH",
+            "Google News (Thailand)"
+        ));
+        
+        // 专门针对泰国留学生的 Google News RSS（使用搜索功能）
+        // 关键词：外国大学生、外国学生、奖学金、中国留学生
+        // 时间范围：最近 30 天
+        rssFeeds.add(new RssFeedService.RssFeedConfig(
+            "https://news.google.com/rss/search?q=(%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%97%E0%B8%B8%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%88%E0%B8%B5%E0%B8%99)+when:30d&ceid=TH:th&hl=th&gl=TH",
+            "Google News (International Students)"
+        ));
+        
+        // 注意：之前的各个媒体网站RSS源已全部移除，因为它们无法正常工作
+        // （XML解析失败、404错误、504超时等）
+        // Google News RSS 已经包含了这些媒体的内容，无需单独配置
+        
+        return rssFeeds;
+    }
+
+    /**
+     * Get all configured Chiang Mai University related RSS feed configurations
+     * Used for testing and debugging
+     * 
+     * @return List of RSS feed configurations
+     */
+    public List<RssFeedService.RssFeedConfig> getChiangMaiUniversityRssFeedConfigs() {
+        // 清迈大学相关的RSS源大多不可访问，已移除
+        // 如需添加可访问的源，请先通过测试确认其可用性
+        List<RssFeedService.RssFeedConfig> rssFeeds = new ArrayList<>();
+        return rssFeeds;
+    }
+
+    /**
+     * Get source statistics from news list
+     * Counts how many news items come from each source
+     * 
+     * @param newsList List of news items
+     * @return Map of source name to count
+     */
+    public Map<String, Long> getSourceStatistics(List<News> newsList) {
+        if (newsList == null || newsList.isEmpty()) {
+            return new HashMap<>();
+        }
+        
+        return newsList.stream()
+                .filter(news -> news.getSource() != null && !news.getSource().isEmpty())
+                .collect(Collectors.groupingBy(
+                    News::getSource,
+                    Collectors.counting()
+                ));
+    }
+
+    /**
+     * Log source statistics in a readable format
+     * 
+     * @param sourceStatistics Map of source name to count
+     */
+    private void logSourceStatistics(Map<String, Long> sourceStatistics) {
+        if (sourceStatistics.isEmpty()) {
+            log.info("📊 Source statistics: No sources found");
+            return;
+        }
+        
+        log.info("📊 Source statistics ({} unique sources):", sourceStatistics.size());
+        
+        // Sort by count (descending) for better readability
+        sourceStatistics.entrySet().stream()
+                .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
+                .forEach(entry -> {
+                    log.info("  - {}: {} articles", entry.getKey(), entry.getValue());
+                });
+        
+        // Calculate total
+        long total = sourceStatistics.values().stream().mapToLong(Long::longValue).sum();
+        log.info("  Total: {} articles", total);
+    }
+
+    /**
+     * Get list of allowed sources (whitelist)
+     * If empty, all sources are allowed (unless excluded)
+     * 
+     * @return List of allowed source names (can be partial matches)
+     */
+    private List<String> getAllowedSources() {
+        // Configure allowed sources here
+        // Examples:
+        // return Arrays.asList("Bangkok Post", "The Nation", "Matichon");
+        // Empty list means all sources are allowed
+        return new ArrayList<>();
+    }
+
+    /**
+     * Get list of excluded sources (blacklist)
+     * Sources matching these patterns will be filtered out
+     * 
+     * @return List of excluded source patterns (can be partial matches)
+     */
+    private List<String> getExcludedSources() {
+        // Configure excluded sources here
+        // Examples:
+        // return Arrays.asList("Spam Source", "Low Quality");
+        // Empty list means no sources are excluded
+        return new ArrayList<>();
+    }
+
+    /**
+     * Filter news list by source (whitelist and blacklist)
+     * 
+     * @param newsList Original news list
+     * @param allowedSources List of allowed source patterns (empty = allow all)
+     * @param excludedSources List of excluded source patterns (empty = exclude none)
+     * @return Filtered news list
+     */
+    public List<News> filterNewsBySource(List<News> newsList, List<String> allowedSources, List<String> excludedSources) {
+        if (newsList == null || newsList.isEmpty()) {
+            return newsList;
+        }
+        
+        return newsList.stream()
+                .filter(news -> {
+                    String source = news.getSource();
+                    if (source == null || source.isEmpty()) {
+                        // If source is empty, only include if no whitelist is set
+                        return allowedSources.isEmpty();
+                    }
+                    
+                    // Check blacklist first (excluded sources)
+                    for (String excluded : excludedSources) {
+                        if (source.contains(excluded)) {
+                            log.debug("Excluding news from source: {} (matched exclusion pattern: {})", source, excluded);
+                            return false;
+                        }
+                    }
+                    
+                    // Check whitelist (allowed sources)
+                    if (allowedSources.isEmpty()) {
+                        // No whitelist = all sources allowed (unless excluded)
+                        return true;
+                    }
+                    
+                    // Check if source matches any allowed pattern
+                    for (String allowed : allowedSources) {
+                        if (source.contains(allowed)) {
+                            return true;
+                        }
+                    }
+                    
+                    // Source not in whitelist
+                    log.debug("Excluding news from source: {} (not in whitelist)", source);
+                    return false;
+                })
+                .collect(Collectors.toList());
     }
 
     /**
@@ -319,23 +553,11 @@ public class NewsCrawlerService {
                 log.info("从 RSS 订阅源成功获取 {} 条新闻", rssNews.size());
                 newsList.addAll(rssNews);
             } else {
-                log.warn("RSS 订阅源未获取到新闻，尝试使用 HTML 爬取...");
-                
-                // RSS 失败时，回退到 HTML 爬取
-                // 1. 从清迈大学校友会网站抓取
-                log.info("开始从清迈大学校友会网站抓取新闻...");
-                List<News> cmuacNews = crawlCmuac();
-                newsList.addAll(cmuacNews);
-                
-                // 2. 从中国驻清迈总领馆网站抓取
-                log.info("开始从中国驻清迈总领馆网站抓取新闻...");
-                List<News> consulateNews = crawlConsulate();
-                newsList.addAll(consulateNews);
-                
-                // 3. 从泰国电子签证网站抓取（如果有新闻）
-                log.info("开始从泰国电子签证网站抓取新闻...");
-                List<News> visaNews = crawlThailandVisa();
-                newsList.addAll(visaNews);
+                log.warn("RSS 订阅源未获取到新闻");
+                // 注意：以下 HTML 爬取源已移除，因为它们无法正常工作：
+                // 1. 清迈大学校友会 (CMUAC) - 无法找到有效链接
+                // 2. 中国驻清迈总领馆 - SSL 证书问题
+                // 3. 泰国电子签证 - 无法找到有效链接
             }
             
             log.info("成功获取 {} 条清迈大学相关新闻", newsList.size());
@@ -359,62 +581,10 @@ public class NewsCrawlerService {
             // 配置 RSS 订阅源列表
             List<RssFeedService.RssFeedConfig> rssFeeds = new ArrayList<>();
             
-            // 1. 中国驻清迈总领馆 RSS（尝试多个可能的 URL）
-            String[] consulateRssUrls = {
-                "https://chiangmai.china-consulate.gov.cn/rss.xml",
-                "https://chiangmai.china-consulate.gov.cn/feed",
-                "https://chiangmai.china-consulate.gov.cn/xwdt/rss.xml"
-            };
-            for (String rssUrl : consulateRssUrls) {
-                try {
-                    List<News> testNews = rssFeedService.fetchNewsFromRss(rssUrl, "中国驻清迈总领馆", 1);
-                    if (!testNews.isEmpty()) {
-                        rssFeeds.add(new RssFeedService.RssFeedConfig(rssUrl, "中国驻清迈总领馆"));
-                        log.info("找到可用的中国驻清迈总领馆 RSS: {}", rssUrl);
-                        break;
-                    }
-                } catch (Exception e) {
-                    // 继续尝试下一个 URL
-                }
-            }
-            
-            // 2. 清迈大学校友会 RSS（尝试多个可能的 URL）
-            String[] cmuacRssUrls = {
-                "https://cmuac.com/feed",
-                "https://cmuac.com/rss",
-                "https://cmuac.com/rss.xml"
-            };
-            for (String rssUrl : cmuacRssUrls) {
-                try {
-                    List<News> testNews = rssFeedService.fetchNewsFromRss(rssUrl, "清迈大学校友会 (CMUAC)", 1);
-                    if (!testNews.isEmpty()) {
-                        rssFeeds.add(new RssFeedService.RssFeedConfig(rssUrl, "清迈大学校友会 (CMUAC)"));
-                        log.info("找到可用的清迈大学校友会 RSS: {}", rssUrl);
-                        break;
-                    }
-                } catch (Exception e) {
-                    // 继续尝试下一个 URL
-                }
-            }
-            
-            // 3. 泰国电子签证 RSS（如果存在）
-            String[] visaRssUrls = {
-                "https://www.thaievisa.go.th/feed",
-                "https://www.thaievisa.go.th/rss",
-                "https://www.thaievisa.go.th/rss.xml"
-            };
-            for (String rssUrl : visaRssUrls) {
-                try {
-                    List<News> testNews = rssFeedService.fetchNewsFromRss(rssUrl, "泰国电子签证", 1);
-                    if (!testNews.isEmpty()) {
-                        rssFeeds.add(new RssFeedService.RssFeedConfig(rssUrl, "泰国电子签证"));
-                        log.info("找到可用的泰国电子签证 RSS: {}", rssUrl);
-                        break;
-                    }
-                } catch (Exception e) {
-                    // 继续尝试下一个 URL
-                }
-            }
+            // 注意：以下新闻源已移除，因为它们无法正常工作：
+            // 1. 中国驻清迈总领馆 - RSS全部失败，HTML爬取也失败（SSL证书问题）
+            // 2. 清迈大学校友会 (CMUAC) - RSS全部404或超时，HTML爬取也没有找到链接
+            // 3. 泰国电子签证 - RSS解析失败，HTML爬取也没有找到链接
             
             // 从所有 RSS 订阅源获取新闻
             if (!rssFeeds.isEmpty()) {
@@ -434,8 +604,10 @@ public class NewsCrawlerService {
     /**
      * 爬取清迈大学校友会网站 (cmuac.com)
      * 
+     * @deprecated 此方法已废弃 - 该网站无法获取有效新闻（RSS返回404，HTML爬取无有效链接）
      * @return 新闻对象列表
      */
+    @Deprecated
     private List<News> crawlCmuac() {
         List<News> newsList = new ArrayList<>();
         Set<String> seenUrls = new HashSet<>();
@@ -578,8 +750,10 @@ public class NewsCrawlerService {
     /**
      * 爬取中国驻清迈总领馆网站
      * 
+     * @deprecated 此方法已废弃 - 该网站无法获取有效新闻（RSS全部失败，HTML爬取SSL证书问题）
      * @return 新闻对象列表
      */
+    @Deprecated
     private List<News> crawlConsulate() {
         List<News> newsList = new ArrayList<>();
         Set<String> seenUrls = new HashSet<>();
@@ -762,8 +936,10 @@ public class NewsCrawlerService {
     /**
      * 爬取泰国电子签证网站
      * 
+     * @deprecated 此方法已废弃 - 该网站无法获取有效新闻（RSS解析失败，HTML爬取无有效链接）
      * @return 新闻对象列表
      */
+    @Deprecated
     private List<News> crawlThailandVisa() {
         List<News> newsList = new ArrayList<>();
         Set<String> seenUrls = new HashSet<>();

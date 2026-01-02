@@ -5,7 +5,8 @@ import com.globalbuddy.repository.NewsRepository;
 import com.globalbuddy.service.AiSummaryService;
 import com.globalbuddy.service.LanguageDetectionService;
 import com.globalbuddy.service.NewsCrawlerService;
-import com.globalbuddy.service.NewsToPostService;
+import com.globalbuddy.service.NewsRelevanceService;
+// import com.globalbuddy.service.NewsToPostService; // DISABLED: News to posts conversion is no longer needed
 import com.globalbuddy.service.TranslationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,10 @@ public class NewsScheduler {
     private final NewsCrawlerService newsCrawlerService;
     private final AiSummaryService aiSummaryService;
     private final NewsRepository newsRepository;
-    private final NewsToPostService newsToPostService;
+    // private final NewsToPostService newsToPostService; // DISABLED: News to posts conversion is no longer needed
     private final LanguageDetectionService languageDetectionService;
     private final TranslationService translationService;
+    private final NewsRelevanceService newsRelevanceService;
 
     /**
      * Scheduled task: Execute every day at 8:00 AM
@@ -63,12 +65,50 @@ public class NewsScheduler {
             
             log.info("Successfully crawled {} news items, starting processing...", newsList.size());
 
-            // Step 2: Iterate through news, generate AI summaries and save
+            // Step 1.5: Filter news by relevance (筛选对留学生有帮助的新闻)
+            log.info("Step 1.5: Filtering news by relevance to international students...");
+            List<News> relevantNewsList = new ArrayList<>();
+            int filteredCount = 0;
+            
+            for (News news : newsList) {
+                try {
+                    NewsRelevanceService.RelevanceResult relevanceResult = newsRelevanceService.checkRelevance(news);
+                    
+                    if (relevanceResult.isRelevant()) {
+                        relevantNewsList.add(news);
+                        log.info("✅ News is relevant (confidence: {:.2f}, category: {}): {}", 
+                                relevanceResult.getConfidence(), 
+                                relevanceResult.getCategory(),
+                                news.getTitle());
+                    } else {
+                        filteredCount++;
+                        log.info("❌ News filtered out (confidence: {:.2f}, reason: {}): {}", 
+                                relevanceResult.getConfidence(),
+                                relevanceResult.getReason(),
+                                news.getTitle());
+                    }
+                } catch (Exception e) {
+                    log.error("Failed to check relevance for news: {} - {}", news.getTitle(), e.getMessage(), e);
+                    // 如果检测失败，默认保留（避免误删重要新闻）
+                    relevantNewsList.add(news);
+                    log.warn("Relevance check failed, keeping news by default: {}", news.getTitle());
+                }
+            }
+            
+            log.info("Relevance filtering completed: {} relevant out of {} total (filtered {} irrelevant)", 
+                    relevantNewsList.size(), newsList.size(), filteredCount);
+            
+            if (relevantNewsList.isEmpty()) {
+                log.warn("No relevant news found after filtering, task ended.");
+                return;
+            }
+
+            // Step 2: Iterate through relevant news, generate AI summaries and save
             int successCount = 0;
             int skipCount = 0;
             int errorCount = 0;
 
-            for (News news : newsList) {
+            for (News news : relevantNewsList) {
                 try {
                     // Check if already exists (deduplicate by original URL)
                     if (news.getOriginalUrl() != null && 
@@ -169,6 +209,9 @@ public class NewsScheduler {
                             boolean hasTranslation = false;
                             
                             // Set Chinese translations - relaxed validation
+                            // 注意：只要原标题或摘要中包含泰文，就绝不直接使用原标题/原摘要作为中文结果，避免把泰文当成中文展示
+                            boolean originalTitleHasThai = languageDetectionService.hasAnyThai(titleToTranslate);
+                            boolean originalSummaryHasThai = languageDetectionService.hasAnyThai(summaryToTranslate);
                             if (translationResult.getTitleZh() != null && !translationResult.getTitleZh().isEmpty()) {
                                 // 只要翻译结果不是泰语就接受（翻译API返回的应该是中文）
                                 // 不再严格要求必须包含常见中文词，因为短标题可能不包含
@@ -186,6 +229,10 @@ public class NewsScheduler {
                             
                             // 如果 titleZh 仍然为空，检查原始标题是否包含中文
                             if (news.getTitleZh() == null || news.getTitleZh().isEmpty()) {
+                                // 如果标题中存在泰文字母，则不要使用原标题作为中文，避免直接显示泰文
+                                if (originalTitleHasThai) {
+                                    log.warn("⚠️ Title contains Thai characters but no valid Chinese translation, keeping titleZh empty for news: {}", news.getId());
+                                } else
                                 // 只要标题包含任何中文字符，就使用原标题作为 titleZh
                                 // 这样可以确保中文标题不会丢失
                                 if (languageDetectionService.containsChinese(titleToTranslate)) {
@@ -210,7 +257,7 @@ public class NewsScheduler {
                                 news.setSummaryZh(translationResult.getBodyZh());
                                 log.info("✅ Chinese summary translation completed (length: {})", translationResult.getBodyZh().length());
                                 hasTranslation = true;
-                            } else if (languageDetectionService.containsChinese(summaryToTranslate)) {
+                            } else if (!originalSummaryHasThai && languageDetectionService.containsChinese(summaryToTranslate)) {
                                 // 如果摘要包含中文，使用原摘要
                                 news.setSummaryZh(summaryToTranslate);
                                 log.info("✅ News summary contains Chinese, using original as summaryZh");
@@ -304,13 +351,14 @@ public class NewsScheduler {
             log.info("Statistics - Success: {}, Skipped: {}, Failed: {}", successCount, skipCount, errorCount);
             
             // Step 4: Automatically convert news to posts and push to homepage
-            log.info("Step 4: Starting to convert news to posts...");
-            try {
-                NewsToPostService.ConversionResult conversionResult = newsToPostService.convertNewsToPosts(20);
-                log.info("News to posts conversion completed: {}", conversionResult);
-            } catch (Exception e) {
-                log.error("Failed to automatically convert news to posts: {}", e.getMessage(), e);
-            }
+            // DISABLED: News to posts conversion is no longer needed
+            // log.info("Step 4: Starting to convert news to posts...");
+            // try {
+            //     NewsToPostService.ConversionResult conversionResult = newsToPostService.convertNewsToPosts(20);
+            //     log.info("News to posts conversion completed: {}", conversionResult);
+            // } catch (Exception e) {
+            //     log.error("Failed to automatically convert news to posts: {}", e.getMessage(), e);
+            // }
 
         } catch (Exception e) {
             log.error("Scheduled task execution failed: {}", e.getMessage(), e);

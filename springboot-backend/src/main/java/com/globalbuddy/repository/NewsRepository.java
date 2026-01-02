@@ -66,5 +66,42 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     Page<News> findTodayNews(@Param("startOfDay") Date startOfDay, 
                              @Param("endOfDay") Date endOfDay, 
                              Pageable pageable);
+
+    /**
+     * Query news by source and date range
+     * Supports partial matching (LIKE) to handle sources like "Google News (Thailand) - Bangkok Post"
+     * 
+     * @param source Source website name (can be partial match, e.g., "Bangkok Post")
+     * @param startDate Start date
+     * @param endDate End date
+     * @param pageable Pagination parameters
+     * @return Paginated news list
+     */
+    @Query("SELECT n FROM News n WHERE n.source LIKE CONCAT('%', :source, '%') AND n.createTime >= :startDate AND n.createTime <= :endDate ORDER BY n.createTime DESC")
+    Page<News> findBySourceAndCreateTimeBetween(@Param("source") String source,
+                                                 @Param("startDate") Date startDate,
+                                                 @Param("endDate") Date endDate,
+                                                 Pageable pageable);
+
+    /**
+     * Query news by date range only (no source filter)
+     * 
+     * @param startDate Start date
+     * @param endDate End date
+     * @param pageable Pagination parameters
+     * @return Paginated news list
+     */
+    @Query("SELECT n FROM News n WHERE n.createTime >= :startDate AND n.createTime <= :endDate ORDER BY n.createTime DESC")
+    Page<News> findByCreateTimeBetweenOrdered(@Param("startDate") Date startDate,
+                                               @Param("endDate") Date endDate,
+                                               Pageable pageable);
+
+    /**
+     * Get distinct news sources
+     * 
+     * @return List of distinct source names
+     */
+    @Query("SELECT DISTINCT n.source FROM News n WHERE n.source IS NOT NULL ORDER BY n.source")
+    List<String> findDistinctSources();
 }
 

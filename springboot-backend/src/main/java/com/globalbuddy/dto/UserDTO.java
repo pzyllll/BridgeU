@@ -22,6 +22,7 @@ public class UserDTO {
     private String username;
     private String email;
     private String displayName;
+    private String avatar;
     private String role;
     private String nationality;
     private String studyingInCountry;
@@ -45,6 +46,7 @@ public class UserDTO {
             .username(user.getUsername())
             .email(user.getEmail())
             .displayName(user.getDisplayName())
+            .avatar(user.getAvatar())
             .role(user.getRole().name())
             .nationality(user.getNationality())
             .studyingInCountry(user.getStudyingInCountry())

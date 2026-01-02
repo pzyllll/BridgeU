@@ -26,6 +26,11 @@ public class TranslationService {
     private String apiKey;
 
     private final Generation gen = new Generation();
+    private final LanguageDetectionService languageDetectionService;
+    
+    public TranslationService(LanguageDetectionService languageDetectionService) {
+        this.languageDetectionService = languageDetectionService;
+    }
 
     /**
      * Translate text to Chinese
@@ -42,6 +47,13 @@ public class TranslationService {
         // If already Chinese, return as is
         if ("zh".equals(sourceLang)) {
             return text;
+        }
+        
+        // 🔍 泰语强制检测：如果文本中包含泰语字母，强制设置源语言为泰语
+        boolean hasThaiChars = languageDetectionService.hasAnyThai(text);
+        if (hasThaiChars) {
+            log.info("🇹🇭 检测到泰语字母，强制设置源语言为泰语 (原检测语言: {})", sourceLang);
+            sourceLang = "th";
         }
 
         try {
@@ -68,6 +80,13 @@ public class TranslationService {
         // If already English, return as is
         if ("en".equals(sourceLang)) {
             return text;
+        }
+        
+        // 🔍 泰语强制检测：如果文本中包含泰语字母，强制设置源语言为泰语
+        boolean hasThaiChars = languageDetectionService.hasAnyThai(text);
+        if (hasThaiChars) {
+            log.info("🇹🇭 检测到泰语字母，强制设置源语言为泰语 (原检测语言: {})", sourceLang);
+            sourceLang = "th";
         }
 
         try {
@@ -129,7 +148,8 @@ public class TranslationService {
 
         QwenParam param = QwenParam.builder()
                 .apiKey(apiKey)
-                .model("qwen-max-2025-01-25") // Updated model version
+                // 使用 qwen3-max 模型进行翻译
+                .model("qwen3-max")
                 .messages(messages)
                 .resultFormat(QwenParam.ResultFormat.MESSAGE)
                 .temperature(0.3f) // Lower temperature for more accurate translation
@@ -159,6 +179,16 @@ public class TranslationService {
         
         if (titleToTranslate.trim().isEmpty() && bodyToTranslate.trim().isEmpty()) {
             return result;
+        }
+        
+        // 🔍 泰语强制检测：在翻译之前检查是否有泰语字母
+        String combinedText = titleToTranslate + " " + bodyToTranslate;
+        boolean hasThaiChars = languageDetectionService.hasAnyThai(combinedText);
+        
+        if (hasThaiChars) {
+            // 如果检测到泰语字母，强制设置源语言为泰语
+            log.info("🇹🇭 检测到泰语字母，强制设置源语言为泰语 (原检测语言: {})", sourceLang);
+            sourceLang = "th";
         }
 
         // Translate to Chinese

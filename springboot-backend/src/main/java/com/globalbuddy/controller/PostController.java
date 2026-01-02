@@ -3,6 +3,7 @@ package com.globalbuddy.controller;
 import com.globalbuddy.dto.*;
 import com.globalbuddy.model.*;
 import com.globalbuddy.repository.*;
+import com.globalbuddy.service.AiSummaryService;
 import com.globalbuddy.service.ContentModerationService;
 import com.globalbuddy.service.LanguageDetectionService;
 import com.globalbuddy.service.SemanticService;
@@ -31,9 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Slf4j
 @RestController
@@ -51,28 +51,57 @@ public class PostController {
     private final PostLikeRepository postLikeRepository;
     private final UserFollowRepository userFollowRepository;
     private final ContentModerationService contentModerationService;
+    private final AiSummaryService aiSummaryService;
     @Value("${file.upload.base-path:C:/Users/pzy/Documents/java/work/hh/pictures}")
     private String uploadBasePath;
 
     @GetMapping
-    public List<PostResponse> listPosts(
+    public List<PostListResponse> listPosts(
             @RequestParam(required = false) String q,
-            @RequestParam(required = false, defaultValue = "en") String lang) {
-        log.info("Fetching posts with language preference: {}", lang);
+            @RequestParam(required = false, defaultValue = "en") String lang,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
+        log.info("Fetching posts with language preference: {}, page: {}, size: {}", lang, page, size);
         List<CommunityPost> posts = postRepository.findAllByOrderByCreatedAtDesc();
         
-        // 只向前台展示已经通过审核的帖子
+        // 1) 只向前台展示已经通过审核的帖子
+        // 2) 过滤掉从新闻自动转换来的帖子（category = "News & Information" 或 tags 中包含 "News"）
+        //    现在新闻只在每日简报里展示，不再出现在社区列表
         posts = posts.stream()
                 .filter(post -> post.getStatus() == CommunityPost.Status.APPROVED)
-                .collect(Collectors.toList());
-        
-        // 不按原始语言过滤，翻译由 toPostResponse 处理
-        // 仅过滤掉完全没有内容的帖子
-        posts = posts.stream()
                 .filter(post -> {
+                    // 过滤掉系统自动生成的新闻贴（旧数据安全兜底）
+                    AppUser author = post.getAuthor();
+                    if (author != null && author.getEmail() != null &&
+                            "system@globalbuddy.com".equalsIgnoreCase(author.getEmail().trim())) {
+                        log.debug("Filtering out system-generated news post {} by author email", post.getId());
+                        return false;
+                    }
+
+                    String category = post.getCategory();
+                    if (category != null && "News & Information".equalsIgnoreCase(category.trim())) {
+                        log.debug("Filtering out news-based post {} by category", post.getId());
+                        return false;
+                    }
+                    // tags 里包含 "News" 也视为新闻帖子
+                    if (post.getTags() != null) {
+                        boolean hasNewsTag = post.getTags().stream()
+                                .filter(Objects::nonNull)
+                                .map(String::trim)
+                                .anyMatch(tag -> tag.equalsIgnoreCase("News"));
+                        if (hasNewsTag) {
+                            log.debug("Filtering out news-based post {} by tag", post.getId());
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .filter(post -> {
+                    // 不按原始语言过滤，翻译由 toPostResponse 处理
+                    // 仅过滤掉完全没有内容的帖子
                     boolean hasContent = (post.getBody() != null && !post.getBody().trim().isEmpty()) ||
-                                       (post.getContentZh() != null && !post.getContentZh().trim().isEmpty()) ||
-                                       (post.getContentEn() != null && !post.getContentEn().trim().isEmpty());
+                                         (post.getContentZh() != null && !post.getContentZh().trim().isEmpty()) ||
+                                         (post.getContentEn() != null && !post.getContentEn().trim().isEmpty());
                     if (!hasContent) {
                         log.debug("Filtering out post {} - no content available", post.getId());
                     }
@@ -81,12 +110,41 @@ public class PostController {
                 .collect(Collectors.toList());
         
         log.info("Total posts available: {} (requested language: {})", posts.size(), lang);
-        List<PostResponse> responses = new ArrayList<>();
+        List<PostListResponse> responses = new ArrayList<>();
         int zhTranslatedCount = 0;
         int enTranslatedCount = 0;
         for (CommunityPost post : posts) {
-            PostResponse response = toPostResponse(post, lang);
+            PostResponse postResponse = toPostResponse(post, lang);
+            
+            // Get statistics
+            long likeCount = postLikeRepository.countByPost(post);
+            long commentCount = commentRepository.countByPost(post);
+            
+            // Get author name
+            AppUser author = post.getAuthor();
+            String authorName = author != null ? (author.getDisplayName() != null ? author.getDisplayName() : author.getUsername()) : "Unknown";
+            
+            PostListResponse response = PostListResponse.builder()
+                    .id(postResponse.getId())
+                    .communityId(postResponse.getCommunityId())
+                    .authorId(postResponse.getAuthorId())
+                    .authorName(authorName)
+                    .title(postResponse.getTitle())
+                    .body(postResponse.getBody())
+                    .tags(postResponse.getTags())
+                    .category(postResponse.getCategory())
+                    .createdAt(postResponse.getCreatedAt())
+                    .updatedAt(postResponse.getUpdatedAt())
+                    .contentZh(postResponse.getContentZh())
+                    .contentEn(postResponse.getContentEn())
+                    .originalLanguage(postResponse.getOriginalLanguage())
+                    .imageUrl(postResponse.getImageUrl())
+                    .likeCount(likeCount)
+                    .commentCount(commentCount)
+                    .build();
+            
             responses.add(response);
+            
             // Count how many posts have translations
             if ("zh".equals(lang) && post.getContentZh() != null && !post.getContentZh().isEmpty()) {
                 zhTranslatedCount++;
@@ -99,18 +157,33 @@ public class PostController {
         } else if ("en".equals(lang)) {
             log.info("Posts with English translation: {}/{}", enTranslatedCount, posts.size());
         }
-        if (!StringUtils.hasText(q)) {
-            return responses;
-        }
-        List<PostResponseWithScore> filtered = new ArrayList<>();
-        for (PostResponse response : responses) {
-            double score = semanticService.calculateScore(q, response.getTitle() + " " + response.getBody());
-            if (score > 0) {
-                filtered.add(new PostResponseWithScore(response, score));
+        
+        // Apply search filter if query provided
+        if (StringUtils.hasText(q)) {
+            List<PostListResponse> filtered = new ArrayList<>();
+            for (PostListResponse response : responses) {
+                double score = semanticService.calculateScore(q, response.getTitle() + " " + response.getBody());
+                if (score > 0) {
+                    response.setScore(score);
+                    filtered.add(response);
+                }
             }
+            filtered.sort((a, b) -> {
+                if (a.getScore() != null && b.getScore() != null) {
+                    return Double.compare(b.getScore(), a.getScore());
+                }
+                return 0;
+            });
+            responses = filtered;
         }
-        filtered.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
-        return filtered.stream().map(PostResponseWithScore::toResponse).collect(Collectors.toList());
+        
+        // Apply pagination
+        int start = page * size;
+        int end = Math.min(start + size, responses.size());
+        if (start >= responses.size()) {
+            return new ArrayList<>();
+        }
+        return responses.subList(start, end);
     }
 
     /**
@@ -279,6 +352,121 @@ public class PostController {
         
         Comment saved = commentRepository.save(comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(toCommentResponse(saved, lang));
+    }
+    
+    /**
+     * Delete a comment
+     * DELETE /api/posts/{postId}/comments/{commentId}
+     */
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<Map<String, Object>> deleteComment(
+            @PathVariable String postId,
+            @PathVariable String commentId) {
+        
+        AppUser currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
+        if (!commentOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        Comment comment = commentOpt.get();
+        
+        // Check if the comment belongs to the current user
+        if (!comment.getAuthor().getId().equals(currentUser.getId())) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "You can only delete your own comments");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
+        
+        // Verify the comment belongs to the post
+        if (!comment.getPost().getId().equals(postId)) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        commentRepository.delete(comment);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Comment deleted successfully");
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Generate AI summary of all comments for a post
+     */
+    @GetMapping("/{postId}/comments/summary")
+    public ResponseEntity<Map<String, Object>> getCommentSummary(
+            @PathVariable String postId,
+            @RequestParam(required = false, defaultValue = "en") String lang) {
+        
+        log.info("Generating comment summary for post: {}, lang: {}", postId, lang);
+        
+        Optional<CommunityPost> postOpt = postRepository.findById(postId);
+        if (!postOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        CommunityPost post = postOpt.get();
+        
+        // Get all comments for this post
+        List<Comment> comments = commentRepository.findByPostOrderByCreatedAtDesc(post);
+        
+        if (comments.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("summary", lang.equals("zh") ? "暂无评论可总结" : "No comments to summarize");
+            response.put("commentCount", 0);
+            return ResponseEntity.ok(response);
+        }
+        
+        // Extract comment contents based on language preference
+        List<String> commentContents = new ArrayList<>();
+        for (Comment comment : comments) {
+            String content = null;
+            if ("zh".equals(lang)) {
+                content = comment.getContentZh() != null && !comment.getContentZh().isEmpty() 
+                    ? comment.getContentZh() 
+                    : comment.getContent();
+            } else {
+                content = comment.getContentEn() != null && !comment.getContentEn().isEmpty() 
+                    ? comment.getContentEn() 
+                    : comment.getContent();
+            }
+            if (content != null && !content.trim().isEmpty()) {
+                commentContents.add(content);
+            }
+        }
+        
+        if (commentContents.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("summary", lang.equals("zh") ? "暂无有效评论可总结" : "No valid comments to summarize");
+            response.put("commentCount", 0);
+            return ResponseEntity.ok(response);
+        }
+        
+        try {
+            // Generate summary using AI
+            String summary = aiSummaryService.generateCommentSummary(commentContents, lang);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("summary", summary);
+            response.put("commentCount", commentContents.size());
+            
+            log.info("Comment summary generated successfully for {} comments", commentContents.size());
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Failed to generate comment summary: {}", e.getMessage(), e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", lang.equals("zh") ? "生成评论总结失败" : "Failed to generate comment summary");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
     
     /**
@@ -642,7 +830,7 @@ public class PostController {
         return original.replaceAll("[^a-zA-Z0-9\\.\\-_]", "_");
     }
 
-    private PostResponse toPostResponse(CommunityPost post, String lang) {
+    public PostResponse toPostResponse(CommunityPost post, String lang) {
         String title = post.getTitle();
         String body = post.getBody();
         

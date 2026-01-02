@@ -77,9 +77,10 @@ public class AiSummaryService {
                     .build());
 
             // Build Qwen parameters
-            QwenParam param = QwenParam.builder()
-                    .apiKey(apiKey)
-                    .model("qwen-max-2025-01-25") // Updated model version
+        QwenParam param = QwenParam.builder()
+                .apiKey(apiKey)
+                // 使用 qwen3-max 模型生成摘要
+                .model("qwen3-max")
                     .messages(messages)
                     .resultFormat(QwenParam.ResultFormat.MESSAGE)
                     .temperature(0.3f) // Lower temperature value to make output more deterministic and concise
@@ -133,6 +134,91 @@ public class AiSummaryService {
             }
         }
         return summaries;
+    }
+
+    /**
+     * Generate comment summary
+     * Summarizes all comments for a post using AI
+     * 
+     * @param comments List of comment contents to summarize
+     * @param lang Target language for summary (zh/en)
+     * @return AI-generated summary text in the specified language
+     * @throws IllegalStateException If API Key is not configured
+     */
+    public String generateCommentSummary(List<String> comments, String lang) {
+        // Check if API Key is configured
+        if (apiKey == null || apiKey.isEmpty()) {
+            log.error("DashScope API Key not configured");
+            throw new IllegalStateException("Please configure dashscope.api.key");
+        }
+
+        // Check if comments list is empty
+        if (comments == null || comments.isEmpty()) {
+            log.warn("Comments list is empty, cannot generate summary");
+            return lang.equals("zh") ? "暂无评论可总结" : "No comments to summarize";
+        }
+
+        // Filter out empty comments and combine them
+        List<String> validComments = comments.stream()
+                .filter(c -> c != null && !c.trim().isEmpty())
+                .collect(java.util.stream.Collectors.toList());
+
+        if (validComments.isEmpty()) {
+            log.warn("No valid comments found");
+            return lang.equals("zh") ? "暂无有效评论可总结" : "No valid comments to summarize";
+        }
+
+        // Combine all comments into a single text
+        StringBuilder combinedText = new StringBuilder();
+        for (int i = 0; i < validComments.size(); i++) {
+            combinedText.append("评论").append(i + 1).append(": ").append(validComments.get(i)).append("\n");
+        }
+
+        String combinedContent = combinedText.toString();
+        log.info("Generating comment summary for {} comments, content length: {}", validComments.size(), combinedContent.length());
+
+        try {
+            // Determine language instruction for summary
+            String languageInstruction = lang.equals("zh") ? "请用中文" : "Please use English";
+            
+            // Construct prompt
+            String prompt = String.format(
+                "%s总结以下所有评论的主要内容、观点和关键信息。总结应该简洁明了，不超过200字，突出评论中的核心观点和常见主题：\n\n%s",
+                languageInstruction,
+                combinedContent
+            );
+
+            // Build message list
+            List<Message> messages = new ArrayList<>();
+            messages.add(Message.builder()
+                    .role(Role.USER.getValue())
+                    .content(prompt)
+                    .build());
+
+            // Build Qwen parameters
+        QwenParam param = QwenParam.builder()
+                .apiKey(apiKey)
+                .model("qwen3-max")
+                    .messages(messages)
+                    .resultFormat(QwenParam.ResultFormat.MESSAGE)
+                    .temperature(0.3f)
+                    .build();
+
+            log.info("Calling DashScope API for comment summary...");
+            String summary = gen.call(param).getOutput().getChoices().get(0).getMessage().getContent();
+            log.info("Comment summary generated successfully, length: {}", summary != null ? summary.length() : 0);
+            
+            if (summary == null || summary.isEmpty()) {
+                log.error("DashScope API returned empty summary content");
+                return lang.equals("zh") ? "无法生成评论总结" : "Failed to generate comment summary";
+            }
+
+            return summary.trim();
+
+        } catch (Exception e) {
+            log.error("Failed to generate comment summary: {}", e.getMessage(), e);
+            return lang.equals("zh") ? "生成评论总结时出错: " + e.getMessage() : "Error generating comment summary: " + e.getMessage();
+        }
     }
 }
 
