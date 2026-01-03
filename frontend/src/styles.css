@@ -1,18 +1,36 @@
-/* BridgeU UI Refresh - 温柔温馨 + 国际感 */
+/* BridgeU UI Refresh - 现代商务风格 */
 :root {
-  --color-primary: #FF9F89;
-  --color-primary-dark: #F88466;
-  --color-accent: #9DBAD5;
-  --color-bg: #FDFBF7;
+  /* 主色调：国际橙（更鲜亮） */
+  --color-primary: #FF6B35;
+  --color-primary-dark: #E85A2B;
+  --color-primary-light: #FF8C5A;
+  --color-accent: #4A90E2;
+  
+  /* 背景色：灰白系 */
+  --color-bg: #F5F7FA;
   --color-card: #FFFFFF;
-  --color-text: #4A4A4A;
-  --color-muted: #7A7A7A;
-  --color-border: #E9E4DA;
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.06);
-  --shadow-hover: 0 14px 40px rgba(0, 0, 0, 0.08);
+  
+  /* 文字颜色：深炭灰系 */
+  --color-text: #1A1A1A;
+  --color-text-secondary: #333333;
+  --color-text-body: #666666;
+  --color-text-muted: #999999;
+  
+  /* 边框和分割线 */
+  --color-border: #E5E5E5;
+  --color-divider: #E5E5E5;
+  
+  /* 弥散阴影 */
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
+  
+  /* 圆角 */
   --radius-lg: 16px;
   --radius-md: 12px;
+  --radius-sm: 8px;
   --radius-pill: 999px;
+  
   font-family: 'Inter', 'Nunito', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -24,7 +42,7 @@ body, #root {
   padding: 0;
   overflow-x: hidden;
   background: var(--color-bg);
-  color: var(--color-text);
+  color: var(--color-text-body);
   font-family: 'Inter', 'Nunito', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
   letter-spacing: 0.2px;
@@ -46,8 +64,8 @@ body:has(.login-container),
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* 默认背景，登录页面时会覆盖 */
-  background: linear-gradient(135deg, rgba(255,159,137,0.12), rgba(157,186,213,0.10));
+  /* 默认背景：灰白色 */
+  background: var(--color-bg);
 }
 
 /* 当显示登录页面时，覆盖浏览器窗口背景为紫色渐变 */
@@ -99,9 +117,9 @@ body:has(.login-container),
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
-  padding-left: 280px; /* 260px sidebar + 20px gap */
-  gap: 20px;
+  padding: 0;
+  padding-left: 260px; /* 侧边栏宽度，通栏设计 */
+  gap: 0;
 }
 
 /* 当显示登录页面时，app-container 应该全宽且无内边距 */
@@ -123,12 +141,9 @@ body:has(.login-container),
 .sidebar {
   width: 260px;
   background: #fff;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  padding: 16px;
+  padding: 24px 16px;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--color-border);
   position: fixed;
   top: 0;
   left: 0;
@@ -136,6 +151,8 @@ body:has(.login-container),
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 1000;
+  border-right: 1px solid var(--color-divider);
+  box-shadow: none;
 }
 
 .sidebar-logo {

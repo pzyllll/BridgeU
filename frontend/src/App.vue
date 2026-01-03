@@ -125,6 +125,7 @@
                 @back="selectedUserId = null"
                 @post-click="handlePostClickFromProfile"
                 @send-message="handleSendMessageFromProfile"
+                :on-view-user-profile="handleViewUserProfile"
               />
             </div>
             <div v-else style="display: flex; height: calc(100vh - 2rem); gap: 1rem;">
@@ -158,7 +159,8 @@
 
           <!-- Profile -->
           <template v-else-if="currentPage === 'profile'">
-            <MyProfile 
+            <MyProfile
+              :on-view-user-profile="handleViewUserProfile"
               v-if="!showMyPostsList"
               :user-id="user?.id"
               :token="token"
@@ -496,8 +498,28 @@ const handleSendMessageFromProfile = async (userId) => {
 };
 
 const handleViewUserProfile = (userId) => {
+  console.log('App.vue: handleViewUserProfile called with userId:', userId);
+  if (!userId) {
+    console.warn('App.vue: handleViewUserProfile called with null/undefined userId');
+    return;
+  }
+  
+  // Set the selected user ID
   selectedUserId.value = userId;
-  // Stay on messages page but show user profile
+  
+  // Navigate to messages page to show user profile
+  if (currentPage.value !== 'messages') {
+    console.log('App.vue: Navigating to messages page');
+    currentPage.value = 'messages';
+  } else {
+    // If already on messages page, force re-render
+    console.log('App.vue: Already on messages page, forcing re-render');
+    const tempId = selectedUserId.value;
+    selectedUserId.value = null;
+    setTimeout(() => {
+      selectedUserId.value = tempId;
+    }, 0);
+  }
 };
 
 const handleSelectConversation = (conversation) => {

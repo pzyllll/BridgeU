@@ -664,9 +664,52 @@ public class UserController {
         }
 
         try {
+            // Get followers count (users who follow this user)
+            long followersCount = userFollowRepository.countByFollowing(currentUser);
+            
+            // Get mutual follows count (users who both follow this user and are followed by this user)
+            long mutualFollowsCount = 0;
+            List<UserFollow> userFollowingList = userFollowRepository.findAll().stream()
+                    .filter(follow -> follow.getFollower().getId().equals(currentUser.getId()))
+                    .collect(Collectors.toList());
+            List<UserFollow> userFollowersList = userFollowRepository.findAll().stream()
+                    .filter(follow -> follow.getFollowing().getId().equals(currentUser.getId()))
+                    .collect(Collectors.toList());
+            
+            for (UserFollow following : userFollowingList) {
+                AppUser followedUser = following.getFollowing();
+                boolean isMutual = userFollowersList.stream()
+                        .anyMatch(f -> f.getFollower().getId().equals(followedUser.getId()));
+                if (isMutual) {
+                    mutualFollowsCount++;
+                }
+            }
+
+            UserDTO userDTO = UserDTO.fromEntity(currentUser);
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("id", userDTO.getId());
+            userData.put("username", userDTO.getUsername());
+            userData.put("email", userDTO.getEmail());
+            userData.put("displayName", userDTO.getDisplayName());
+            userData.put("avatar", userDTO.getAvatar());
+            userData.put("role", userDTO.getRole());
+            userData.put("nationality", userDTO.getNationality());
+            userData.put("studyingInCountry", userDTO.getStudyingInCountry());
+            userData.put("institution", userDTO.getInstitution());
+            userData.put("languages", userDTO.getLanguages());
+            userData.put("interests", userDTO.getInterests());
+            userData.put("preferredLanguage", userDTO.getPreferredLanguage());
+            userData.put("createdAt", userDTO.getCreatedAt());
+            userData.put("phone", userDTO.getPhone());
+            userData.put("businessName", userDTO.getBusinessName());
+            userData.put("merchantStatus", userDTO.getMerchantStatus());
+            userData.put("merchantDocType", userDTO.getMerchantDocType());
+            userData.put("followersCount", followersCount);
+            userData.put("mutualFollowsCount", mutualFollowsCount);
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("data", UserDTO.fromEntity(currentUser));
+            response.put("data", userData);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Failed to get my profile: {}", e.getMessage(), e);

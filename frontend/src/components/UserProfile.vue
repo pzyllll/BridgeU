@@ -240,6 +240,17 @@ const handleSendMessage = () => {
   }
 };
 
+const handleViewUserProfile = (userId) => {
+  // Close the modals first
+  showFollowersModal.value = false;
+  showMutualFollowsModal.value = false;
+  // Emit event to parent to navigate to user profile
+  // The parent (App.vue) should handle this navigation
+  if (props.onViewUserProfile) {
+    props.onViewUserProfile(userId);
+  }
+};
+
 const getTagEmoji = (tags) => {
   if (!tags || !Array.isArray(tags)) return '📝';
   const tagList = tags.map(t => t.toLowerCase());
@@ -408,6 +419,15 @@ onMounted(() => {
 .stat-item {
   display: flex;
   flex-direction: column;
+}
+
+.stat-item.clickable {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.stat-item.clickable:hover {
+  opacity: 0.7;
 }
 
 .stat-value {

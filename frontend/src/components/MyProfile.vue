@@ -46,6 +46,14 @@
               <span class="stat-value">{{ myPostsCount }}</span>
               <span class="stat-label">{{ t('myProfile.posts') }}</span>
             </div>
+            <div class="stat-item clickable" @click="showFollowersModal = true">
+              <span class="stat-value">{{ profile.followersCount || 0 }}</span>
+              <span class="stat-label">{{ t('myProfile.followers') }}</span>
+            </div>
+            <div class="stat-item clickable" @click="showMutualFollowsModal = true">
+              <span class="stat-value">{{ profile.mutualFollowsCount || 0 }}</span>
+              <span class="stat-label">{{ t('myProfile.mutualFollows') }}</span>
+            </div>
           </div>
           <div class="profile-actions">
             <button 
@@ -166,6 +174,26 @@
         </div>
       </div>
     </div>
+
+    <!-- User List Modals -->
+    <UserListModal
+      :show="showFollowersModal"
+      :userId="profile?.id || userId"
+      type="followers"
+      :token="token"
+      :currentUserId="userId"
+      @close="showFollowersModal = false"
+      @user-click="handleViewUserProfile"
+    />
+    <UserListModal
+      :show="showMutualFollowsModal"
+      :userId="profile?.id || userId"
+      type="mutual-follows"
+      :token="token"
+      :currentUserId="userId"
+      @close="showMutualFollowsModal = false"
+      @user-click="handleViewUserProfile"
+    />
   </div>
 </template>
 
@@ -173,6 +201,7 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { getCurrentLanguage, t, setLanguage } from '../i18n';
+import UserListModal from './UserListModal.vue';
 
 const props = defineProps({
   userId: {
@@ -199,6 +228,8 @@ const selectedFile = ref(null);
 const avatarPreview = ref(null);
 const uploading = ref(false);
 const fileInput = ref(null);
+const showFollowersModal = ref(false);
+const showMutualFollowsModal = ref(false);
 
 const editForm = ref({
   displayName: '',
@@ -207,6 +238,16 @@ const editForm = ref({
 });
 
 const myPostsCount = computed(() => myPosts.value?.length || 0);
+
+const handleViewUserProfile = (userId) => {
+  // Close the modals first
+  showFollowersModal.value = false;
+  showMutualFollowsModal.value = false;
+  // Emit event to parent to navigate to user profile
+  if (props.onViewUserProfile) {
+    props.onViewUserProfile(userId);
+  }
+};
 
 const loadProfile = async () => {
   loading.value = true;

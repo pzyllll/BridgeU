@@ -30,7 +30,10 @@
             class="user-item"
             @click="handleUserClick(user.id)"
           >
-            <div class="user-avatar" :style="{ backgroundImage: user.avatar ? `url(${user.avatar})` : '' }">
+            <div 
+              class="user-avatar" 
+              :style="{ backgroundImage: user.avatar ? `url(${user.avatar})` : '' }"
+            >
               {{ !user.avatar ? (user.displayName || user.username || 'U')[0].toUpperCase() : '' }}
             </div>
             <div class="user-info">
@@ -53,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { getFollowers, getUserMutualFollows, followUser, unfollowUser } from '../api';
 import { t } from '../i18n';
 
@@ -150,10 +153,17 @@ const handleClose = () => {
 };
 
 const handleUserClick = (userId) => {
+  console.log('UserListModal: handleUserClick called with userId:', userId);
+  // Trigger the user click event first (before closing modal)
   if (props.onUserClick) {
+    console.log('UserListModal: Calling onUserClick prop');
     props.onUserClick(userId);
   }
   emit('user-click', userId);
+  // Close the modal after a short delay to allow navigation
+  setTimeout(() => {
+    handleClose();
+  }, 100);
 };
 
 const handleToggleFollow = async (user) => {
@@ -315,6 +325,16 @@ watch(() => props.show, (newVal) => {
   flex-shrink: 0;
   background-size: cover;
   background-position: center;
+}
+
+.user-avatar {
+  cursor: pointer;
+}
+
+.user-avatar:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+  transition: all 0.2s;
 }
 
 .user-info {
