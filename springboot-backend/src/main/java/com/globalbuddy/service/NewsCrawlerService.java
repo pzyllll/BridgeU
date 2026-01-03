@@ -188,15 +188,15 @@ public class NewsCrawlerService {
         
         // 使用 Google News RSS 作为主要新闻源（终极解决方案）
         // 优势：极度稳定、格式统一、内容全面（包含所有主要泰国媒体）
-        rssFeeds.add(new RssFeedService.RssFeedConfig(
+            rssFeeds.add(new RssFeedService.RssFeedConfig(
             "https://news.google.com/rss?ceid=TH:th&hl=th&gl=TH",
             "Google News (Thailand)"
-        ));
-        
+            ));
+            
         // 专门针对泰国留学生的 Google News RSS（使用搜索功能）
         // 关键词：外国大学生、外国学生、奖学金、中国留学生
         // 时间范围：最近 30 天
-        rssFeeds.add(new RssFeedService.RssFeedConfig(
+            rssFeeds.add(new RssFeedService.RssFeedConfig(
             "https://news.google.com/rss/search?q=(%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%97%E0%B8%B8%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%88%E0%B8%B5%E0%B8%99)+when:30d&ceid=TH:th&hl=th&gl=TH",
             "Google News (International Students)"
         ));

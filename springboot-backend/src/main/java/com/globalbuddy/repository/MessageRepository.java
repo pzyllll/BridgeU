@@ -11,5 +11,6 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, String> {
     List<Message> findByConversationOrderByCreatedAtAsc(Conversation conversation);
     long countByConversationAndIsReadFalseAndReceiver(Conversation conversation, com.globalbuddy.model.AppUser receiver);
+    long countByConversationAndSender(Conversation conversation, com.globalbuddy.model.AppUser sender);
 }
 

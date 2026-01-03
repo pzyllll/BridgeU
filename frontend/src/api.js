@@ -57,6 +57,11 @@ client.interceptors.response.use(
       return Promise.reject(error);
     }
     
+    // Skip logging for expected errors (e.g., "Already following" in toggleFollow)
+    if (error.isExpectedError) {
+      return Promise.reject(error);
+    }
+    
     const errorDetails = {
       message: error.message,
       code: error.code,
@@ -244,15 +249,123 @@ export const toggleLike = (postId, token) => {
   ).then((res) => res.data);
 };
 
-// Follow API
-export const toggleFollow = (userId, token) => {
+// Search users API
+export const searchUsers = (query, limit = 20, token) => {
+  return client.get(
+    `/api/users/search`,
+    {
+      params: { q: query, limit },
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    }
+  ).then((res) => res.data);
+};
+
+// Follow user API
+export const followUser = (userId, token) => {
   return client.post(
-    `/api/posts/users/${userId}/follow`,
+    `/api/users/${userId}/follow`,
     {},
     {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     }
   ).then((res) => res.data);
+};
+
+// Unfollow user API
+export const unfollowUser = (userId, token) => {
+  return client.delete(
+    `/api/users/${userId}/follow`,
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    }
+  ).then((res) => res.data);
+};
+
+// Follow API (legacy, kept for compatibility)
+// This function toggles follow status. If isCurrentlyFollowing is provided, it uses that to determine action.
+// Otherwise, it tries to follow first, and if already following, it unfollows.
+export const toggleFollow = async (userId, token, isCurrentlyFollowing = null) => {
+  // If we know the current state, use it directly
+  if (isCurrentlyFollowing !== null) {
+    if (isCurrentlyFollowing) {
+      // Unfollow
+      const unfollowResponse = await client.delete(
+        `/api/users/${userId}/follow`,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        }
+      );
+      return unfollowResponse.data;
+    } else {
+      // Follow
+      const followResponse = await client.post(
+        `/api/users/${userId}/follow`,
+        {},
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        }
+      );
+      return followResponse.data;
+    }
+  }
+  
+  // Otherwise, try to follow first, and if already following, unfollow
+  try {
+    // Try to follow first
+    const followResponse = await client.post(
+      `/api/users/${userId}/follow`,
+      {},
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      }
+    );
+    
+    if (followResponse.data.success) {
+      return { following: true, success: true };
+    }
+    
+    // If follow failed, check if it's because already following
+    if (followResponse.data.message && followResponse.data.message.includes('Already following')) {
+      // Try to unfollow
+      const unfollowResponse = await client.delete(
+        `/api/users/${userId}/follow`,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        }
+      );
+      
+      if (unfollowResponse.data.success) {
+        return { following: false, success: true };
+      }
+    }
+    
+    return followResponse.data;
+  } catch (err) {
+    // If follow returns 400 with "Already following", try to unfollow
+    // Mark this as an expected error to avoid logging
+    if (err.response?.status === 400 && 
+        (err.response?.data?.message?.includes('Already following') || 
+         err.response?.data?.message?.includes('already following'))) {
+      // Mark as expected error to suppress logging
+      err.isExpectedError = true;
+      
+      try {
+        const unfollowResponse = await client.delete(
+          `/api/users/${userId}/follow`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
+          }
+        );
+        
+        if (unfollowResponse.data.success) {
+          return { following: false, success: true };
+        }
+      } catch (unfollowErr) {
+        throw unfollowErr;
+      }
+    }
+    throw err;
+  }
 };
 
 // Get post author name (helper function)
@@ -329,6 +442,22 @@ export const resetPasswordWithPhone = (phone, newPassword) => {
   }).then((res) => res.data);
 };
 
+// ========== User Follow APIs ==========
+
+// Get followers list for a user
+export const getFollowers = (userId, token) => {
+  return client.get(`/api/users/${userId}/followers`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
+};
+
+// Get mutual follows list for a user
+export const getUserMutualFollows = (userId, token) => {
+  return client.get(`/api/users/${userId}/mutual-follows`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  }).then((res) => res.data);
+};
+
 // ========== Private Messaging APIs ==========
 
 // Get all conversations for current user
@@ -344,14 +473,31 @@ export const createOrGetConversation = (userId, token) => {
     userId
   }, {
     headers: token ? { Authorization: `Bearer ${token}` } : {}
-  }).then((res) => res.data);
+  }).then((res) => res.data)
+    .catch((err) => {
+      // Re-throw the error so it can be handled by the caller
+      throw err;
+    });
 };
 
 // Get messages in a conversation
 export const getConversationMessages = (conversationId, token) => {
   return client.get(`/api/messages/conversations/${conversationId}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {}
-  }).then((res) => res.data);
+  }).then((res) => {
+    // Debug: Log the full response to see what backend is actually returning
+    console.log('🔍 getConversationMessages - Full response:', {
+      status: res.status,
+      statusText: res.statusText,
+      data: res.data,
+      dataKeys: res.data ? Object.keys(res.data) : [],
+      hasIsMutualFollow: res.data && 'isMutualFollow' in res.data,
+      hasCanSendMore: res.data && 'canSendMore' in res.data,
+      isMutualFollowValue: res.data?.isMutualFollow,
+      canSendMoreValue: res.data?.canSendMore
+    });
+    return res.data;
+  });
 };
 
 // Send a message in a conversation

@@ -17,6 +17,7 @@ public class PostDetailResponse {
     private String authorName;
     private String authorDisplayName;
     private String authorId;
+    private String authorAvatar;
     private long likeCount;
     private boolean isLiked;
     private long commentCount;

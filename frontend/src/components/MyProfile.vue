@@ -82,13 +82,41 @@
 
         <div class="form-group">
           <label>{{ t('myProfile.avatar') }}</label>
-          <input 
-            type="text" 
-            v-model="editForm.avatar" 
-            :placeholder="t('myProfile.avatarPlaceholder')"
-            class="form-input"
-          />
-          <small class="form-hint">{{ t('myProfile.avatarHint') }}</small>
+          <div class="avatar-upload-section">
+            <div class="avatar-preview-container">
+              <div 
+                class="avatar-preview" 
+                :style="{ backgroundImage: avatarPreview ? `url(${avatarPreview})` : (profile?.avatar ? `url(${profile.avatar})` : '') }"
+              >
+                {{ !avatarPreview && !profile?.avatar ? (profile?.displayName || profile?.username || 'U')[0].toUpperCase() : '' }}
+              </div>
+              <div v-if="uploading" class="upload-overlay">
+                <div class="spinner-small"></div>
+                <p>{{ t('myProfile.uploading') }}</p>
+              </div>
+            </div>
+            <div class="avatar-upload-controls">
+              <input 
+                type="file" 
+                ref="fileInput"
+                @change="handleFileSelect"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                class="file-input"
+                id="avatar-upload"
+              />
+              <label for="avatar-upload" class="btn btn-secondary">
+                {{ t('myProfile.selectImage') }}
+              </label>
+              <button 
+                v-if="selectedFile || avatarPreview" 
+                class="btn btn-link" 
+                @click="clearAvatarSelection"
+              >
+                {{ t('myProfile.clear') }}
+              </button>
+              <small class="form-hint">{{ t('myProfile.avatarUploadHint') }}</small>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -167,6 +195,10 @@ const isEditing = ref(false);
 const saving = ref(false);
 const showMyPosts = ref(false);
 const lang = ref(getCurrentLanguage());
+const selectedFile = ref(null);
+const avatarPreview = ref(null);
+const uploading = ref(false);
+const fileInput = ref(null);
 
 const editForm = ref({
   displayName: '',
@@ -254,11 +286,48 @@ const startEditing = () => {
 
 const startEditAvatar = () => {
   isEditing.value = true;
-  // Focus on avatar input
+  // Focus on file input
   setTimeout(() => {
-    const avatarInput = document.querySelector('.form-input[type="text"]');
-    if (avatarInput) avatarInput.focus();
+    if (fileInput.value) {
+      fileInput.value.click();
+    }
   }, 100);
+};
+
+const handleFileSelect = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  // 验证文件类型
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert(t('myProfile.invalidFileType'));
+    return;
+  }
+  
+  // 验证文件大小（5MB）
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert(t('myProfile.fileTooLarge'));
+    return;
+  }
+  
+  selectedFile.value = file;
+  
+  // 创建预览
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    avatarPreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+const clearAvatarSelection = () => {
+  selectedFile.value = null;
+  avatarPreview.value = null;
+  if (fileInput.value) {
+    fileInput.value.value = '';
+  }
 };
 
 const cancelEditing = () => {
@@ -271,19 +340,80 @@ const cancelEditing = () => {
       preferredLanguage: profile.value.preferredLanguage || 'en'
     };
   }
+  // Clear file selection
+  clearAvatarSelection();
+};
+
+const uploadAvatar = async () => {
+  if (!selectedFile.value) {
+    return null; // 没有选择新文件，返回null表示不更新头像
+  }
+  
+  uploading.value = true;
+  
+  try {
+    const formData = new FormData();
+    formData.append('file', selectedFile.value);
+    
+    const response = await axios.post(`/api/users/me/avatar`, formData, {
+      headers: {
+        Authorization: `Bearer ${props.token}`
+        // 不要手动设置 Content-Type，让 axios 自动处理 FormData 的 boundary
+      }
+    });
+    
+    if (response.data.success) {
+      console.log('Avatar uploaded successfully:', response.data.url);
+      return response.data.url;
+    } else {
+      throw new Error(response.data.message || t('myProfile.uploadFailed'));
+    }
+  } catch (err) {
+    console.error('Failed to upload avatar:', err);
+    alert(err.response?.data?.message || err.message || t('myProfile.uploadFailed'));
+    throw err;
+  } finally {
+    uploading.value = false;
+  }
 };
 
 const saveProfile = async () => {
   saving.value = true;
   
   try {
-    const response = await axios.put(`/api/users/me`, editForm.value, {
+    // 如果选择了新头像，先上传
+    let avatarUrl = null;
+    if (selectedFile.value) {
+      try {
+        avatarUrl = await uploadAvatar();
+      } catch (err) {
+        // 上传失败，不继续保存
+        saving.value = false;
+        return;
+      }
+    }
+    
+    // 准备更新数据
+    const updateData = {
+      displayName: editForm.value.displayName,
+      preferredLanguage: editForm.value.preferredLanguage
+    };
+    
+    // 如果有新头像URL，添加到更新数据中
+    if (avatarUrl) {
+      updateData.avatar = avatarUrl;
+    }
+    
+    const response = await axios.put(`/api/users/me`, updateData, {
       headers: { Authorization: `Bearer ${props.token}` }
     });
     
     if (response.data.success) {
       // Update local profile
       profile.value = response.data.data;
+      
+      // 清除文件选择
+      clearAvatarSelection();
       
       // Update language if changed
       if (editForm.value.preferredLanguage !== lang.value) {
@@ -611,6 +741,85 @@ onMounted(() => {
   color: #409eff;
   text-decoration: underline;
   padding: 8px 0;
+}
+
+.btn-secondary {
+  background: #909399;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #a6a9ad;
+}
+
+.avatar-upload-section {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.avatar-preview-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #dcdfe6;
+}
+
+.upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+.spinner-small {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 8px;
+}
+
+.avatar-upload-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-input {
+  display: none;
+}
+
+.avatar-upload-controls label {
+  display: inline-block;
+  cursor: pointer;
+  margin-bottom: 0;
 }
 
 .posts-section {

@@ -76,6 +76,7 @@
             <PostList
               :key="`posts-${lang}`"
               @post-click="(postId) => handleNavigate('postDetail', postId)"
+              @author-click="handleViewUserProfile"
               :selected-tag="selectedTag"
             />
           </template>
@@ -109,13 +110,24 @@
               :token="token"
               :current-user-id="user?.id"
               @back="handleNavigate('home')"
+              @author-click="handleViewUserProfile"
             />
             <div v-else class="card">{{ lang === 'zh' ? '帖子未找到' : 'Post not found' }}</div>
           </template>
 
           <!-- Messages Page -->
           <template v-else-if="currentPage === 'messages'">
-            <div style="display: flex; height: calc(100vh - 2rem); gap: 1rem;">
+            <div v-if="selectedUserId" style="height: calc(100vh - 2rem); overflow-y: auto;">
+              <UserProfile
+                :user-id="selectedUserId"
+                :token="token"
+                :current-user-id="user?.id"
+                @back="selectedUserId = null"
+                @post-click="handlePostClickFromProfile"
+                @send-message="handleSendMessageFromProfile"
+              />
+            </div>
+            <div v-else style="display: flex; height: calc(100vh - 2rem); gap: 1rem;">
               <!-- Conversation List -->
               <div style="flex: 0 0 350px; border: 2px solid #ddd; border-radius: 8px; overflow: hidden;">
                 <ConversationList
@@ -123,6 +135,7 @@
                   :selected-conversation-id="selectedConversationId"
                   @select-conversation="handleSelectConversation"
                   @back="handleBackToCommunity"
+                  @view-user-profile="handleViewUserProfile"
                 />
               </div>
               <!-- Chat Window -->
@@ -134,6 +147,7 @@
                   :current-user-id="user?.id"
                   :other-user="selectedConversation.otherUser"
                   @message-sent="handleMessageSent"
+                  @view-user-profile="handleViewUserProfile"
                 />
                 <div v-else style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">
                   <p>{{ lang === 'zh' ? '请选择一个会话开始聊天' : 'Select a conversation to start chatting' }}</p>
@@ -418,11 +432,72 @@ const handlePostClickFromProfile = (postId) => {
   currentPage.value = 'postDetail';
 };
 
-const handleSendMessageFromProfile = (userId) => {
-  // Navigate to messages page and create/select conversation
+const handleSendMessageFromProfile = async (userId) => {
+  // Navigate to messages page
   handleNavigate('messages');
-  // The conversation will be created when user selects it from the list
-  // or we can auto-create it here if needed
+  
+  // Create or get conversation with the user
+  try {
+    const { createOrGetConversation, followUser } = await import('./api');
+    
+    // First, try to create conversation
+    let response;
+    try {
+      response = await createOrGetConversation(userId, token.value);
+    } catch (err) {
+      // If it fails with "must follow", try to follow first
+      if (err.response?.status === 400 && 
+          (err.response?.data?.message?.includes('follow') || 
+           err.response?.data?.message?.includes('Follow'))) {
+        // User needs to follow first, try to follow automatically
+        try {
+          const followResponse = await followUser(userId, token.value);
+          if (followResponse && followResponse.success) {
+            // Wait a bit for the follow to be saved
+            await new Promise(resolve => setTimeout(resolve, 300));
+            // Now try to create conversation again
+            response = await createOrGetConversation(userId, token.value);
+          } else {
+            throw new Error(followResponse?.message || 'Failed to follow user');
+          }
+        } catch (followErr) {
+          // If follow fails, show the follow error
+          console.error('Failed to follow user:', followErr);
+          const followErrorMsg = followErr.response?.data?.message || followErr.message || 'Failed to follow user';
+          alert(followErrorMsg);
+          return;
+        }
+      } else {
+        // Other error, re-throw
+        throw err;
+      }
+    }
+    
+    if (response && response.success) {
+      // Set the selected conversation
+      selectedConversationId.value = response.conversationId;
+      // Wait a bit for the conversation list to update
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } else {
+      const errorMsg = response?.message || 'Failed to start conversation';
+      alert(errorMsg);
+    }
+  } catch (err) {
+    console.error('Failed to create conversation:', err);
+    const errorMsg = err.response?.data?.message || err.message || 'Failed to start conversation';
+    
+    // Show user-friendly error message
+    if (errorMsg.includes('follow') || errorMsg.includes('Follow')) {
+      alert('Please follow this user first to start a conversation.');
+    } else {
+      alert(errorMsg);
+    }
+  }
+};
+
+const handleViewUserProfile = (userId) => {
+  selectedUserId.value = userId;
+  // Stay on messages page but show user profile
 };
 
 const handleSelectConversation = (conversation) => {

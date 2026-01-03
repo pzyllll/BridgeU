@@ -152,14 +152,16 @@ public class MessageController {
 
             AppUser otherUser = otherUserOpt.get();
 
-            // Check if users are mutual follows
+            // Check follow status
             boolean currentFollowsOther = userFollowRepository.existsByFollowerAndFollowing(currentUser, otherUser);
             boolean otherFollowsCurrent = userFollowRepository.existsByFollowerAndFollowing(otherUser, currentUser);
+            boolean isMutualFollow = currentFollowsOther && otherFollowsCurrent;
             
-            if (!currentFollowsOther || !otherFollowsCurrent) {
+            // Allow conversation if current user follows the other user (even if not mutual)
+            if (!currentFollowsOther) {
                 Map<String, Object> error = new HashMap<>();
                 error.put("success", false);
-                error.put("message", "You can only message users you mutually follow");
+                error.put("message", "You must follow this user to start a conversation");
                 return ResponseEntity.badRequest().body(error);
             }
 
@@ -186,6 +188,8 @@ public class MessageController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("conversationId", conversation.getId());
+            // Explicitly convert to Boolean to ensure JSON serialization is correct
+            response.put("isMutualFollow", Boolean.valueOf(isMutualFollow));
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -243,6 +247,36 @@ public class MessageController {
             AppUser otherUser = conversation.getUser1().getId().equals(currentUser.getId()) 
                     ? conversation.getUser2() : conversation.getUser1();
 
+            // Check follow status - verify both directions in user_follows table
+            boolean currentFollowsOther = userFollowRepository.existsByFollowerAndFollowing(currentUser, otherUser);
+            boolean otherFollowsCurrent = userFollowRepository.existsByFollowerAndFollowing(otherUser, currentUser);
+            boolean isMutualFollow = currentFollowsOther && otherFollowsCurrent;
+            
+            // Log detailed follow status for debugging
+            log.info("GetMessages - Follow status check: ConversationId={}, CurrentUser={}, OtherUser={}, CurrentFollowsOther={}, OtherFollowsCurrent={}, IsMutualFollow={}", 
+                    conversationId, currentUser.getId(), otherUser.getId(), currentFollowsOther, otherFollowsCurrent, isMutualFollow);
+            
+            // Verify the follow records exist in database
+            if (!currentFollowsOther && !otherFollowsCurrent) {
+                log.warn("GetMessages - No follow relationship found in user_follows table between {} and {}", 
+                        currentUser.getId(), otherUser.getId());
+            } else if (currentFollowsOther && !otherFollowsCurrent) {
+                log.info("GetMessages - One-way follow: {} follows {} but not vice versa", 
+                        currentUser.getId(), otherUser.getId());
+            } else if (!currentFollowsOther && otherFollowsCurrent) {
+                log.info("GetMessages - One-way follow: {} follows {} but not vice versa", 
+                        otherUser.getId(), currentUser.getId());
+            } else {
+                log.info("GetMessages - Mutual follow confirmed in user_follows table");
+            }
+            
+            // Count messages sent by current user
+            long messagesSentByCurrentUser = messageRepository.countByConversationAndSender(conversation, currentUser);
+            boolean canSendMore = isMutualFollow || messagesSentByCurrentUser < 1;
+            
+            log.info("Message send permission - Conversation: {}, MessagesSentByCurrentUser: {}, CanSendMore: {}", 
+                    conversationId, messagesSentByCurrentUser, canSendMore);
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("conversationId", conversation.getId());
@@ -252,6 +286,14 @@ public class MessageController {
                     "displayName", otherUser.getDisplayName()
             ));
             response.put("messages", messageList);
+            // Explicitly convert to Boolean to ensure JSON serialization is correct
+            response.put("isMutualFollow", Boolean.valueOf(isMutualFollow));
+            response.put("canSendMore", Boolean.valueOf(canSendMore));
+            
+            // Log the response values being sent
+            log.info("GetMessages - Response values: isMutualFollow={}, canSendMore={}", 
+                    isMutualFollow, canSendMore);
+            
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -305,6 +347,30 @@ public class MessageController {
             AppUser receiver = conversation.getUser1().getId().equals(currentUser.getId()) 
                     ? conversation.getUser2() : conversation.getUser1();
 
+            // Check follow status - verify both directions in user_follows table
+            boolean currentFollowsOther = userFollowRepository.existsByFollowerAndFollowing(currentUser, receiver);
+            boolean otherFollowsCurrent = userFollowRepository.existsByFollowerAndFollowing(receiver, currentUser);
+            boolean isMutualFollow = currentFollowsOther && otherFollowsCurrent;
+            
+            // Log detailed follow status for debugging
+            log.info("SendMessage - Follow status check: ConversationId={}, CurrentUser={}, Receiver={}, CurrentFollowsOther={}, OtherFollowsCurrent={}, IsMutualFollow={}", 
+                    conversationId, currentUser.getId(), receiver.getId(), currentFollowsOther, otherFollowsCurrent, isMutualFollow);
+            
+            // If not mutual follow, check if current user has already sent a message
+            if (!isMutualFollow) {
+                long messageCount = messageRepository.countByConversationAndSender(conversation, currentUser);
+                log.info("SendMessage - Not mutual follow: MessageCount={}, CanSend={}", messageCount, messageCount < 1);
+                if (messageCount >= 1) {
+                    Map<String, Object> error = new HashMap<>();
+                    error.put("success", false);
+                    error.put("message", "You can only send one message until the other user follows you back");
+                    error.put("code", "SINGLE_MESSAGE_LIMIT");
+                    return ResponseEntity.badRequest().body(error);
+                }
+            } else {
+                log.info("SendMessage - Mutual follow confirmed, allowing unlimited messages");
+            }
+
             // Create message
             Message message = Message.builder()
                     .conversation(conversation)
@@ -320,9 +386,21 @@ public class MessageController {
             conversation.setLastMessageAt(Instant.now());
             conversationRepository.save(conversation);
 
+            // Count messages sent by current user after this message
+            long messagesSentByCurrentUser = messageRepository.countByConversationAndSender(conversation, currentUser);
+            boolean canSendMore = isMutualFollow || messagesSentByCurrentUser <= 1;
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("messageId", message.getId());
+            // Explicitly convert to Boolean to ensure JSON serialization is correct
+            response.put("isMutualFollow", Boolean.valueOf(isMutualFollow));
+            response.put("canSendMore", Boolean.valueOf(canSendMore));
+            
+            // Log the response values being sent
+            log.info("SendMessage - Response values: isMutualFollow={}, canSendMore={}", 
+                    isMutualFollow, canSendMore);
+            
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

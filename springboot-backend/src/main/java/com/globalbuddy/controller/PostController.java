@@ -120,15 +120,17 @@ public class PostController {
             long likeCount = postLikeRepository.countByPost(post);
             long commentCount = commentRepository.countByPost(post);
             
-            // Get author name
+            // Get author name and avatar
             AppUser author = post.getAuthor();
             String authorName = author != null ? (author.getDisplayName() != null ? author.getDisplayName() : author.getUsername()) : "Unknown";
+            String authorAvatar = author != null ? author.getAvatar() : null;
             
             PostListResponse response = PostListResponse.builder()
                     .id(postResponse.getId())
                     .communityId(postResponse.getCommunityId())
                     .authorId(postResponse.getAuthorId())
                     .authorName(authorName)
+                    .authorAvatar(authorAvatar)
                     .title(postResponse.getTitle())
                     .body(postResponse.getBody())
                     .tags(postResponse.getTags())
@@ -263,6 +265,7 @@ public class PostController {
         AppUser author = post.getAuthor();
         String authorName = author != null ? author.getUsername() : "Unknown";
         String authorDisplayName = author != null ? author.getDisplayName() : "Unknown";
+        String authorAvatar = author != null ? author.getAvatar() : null;
         
         // Get like count and check if current user liked
         long likeCount = postLikeRepository.countByPost(post);
@@ -288,6 +291,7 @@ public class PostController {
                 .authorName(authorName)
                 .authorDisplayName(authorDisplayName)
                 .authorId(author != null ? author.getId() : null)
+                .authorAvatar(authorAvatar)
                 .likeCount(likeCount)
                 .isLiked(isLiked)
                 .commentCount(commentCount)
@@ -598,6 +602,7 @@ public class PostController {
                 .authorId(author != null ? author.getId() : null)
                 .authorName(author != null ? author.getUsername() : "Unknown")
                 .authorDisplayName(author != null ? author.getDisplayName() : "Unknown")
+                .authorAvatar(author != null ? author.getAvatar() : null)
                 .content(content)
                 .contentZh(comment.getContentZh())
                 .contentEn(comment.getContentEn())

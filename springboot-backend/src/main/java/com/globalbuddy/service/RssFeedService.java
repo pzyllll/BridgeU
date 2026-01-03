@@ -553,8 +553,8 @@ public class RssFeedService {
                     } catch (Exception e) {
                         log.warn("Failed to parse RSS entry: {} - {}", entry.getTitle(), e.getMessage());
                     }
-        }
-        
+                }
+                
         return newsList;
     }
 
@@ -747,7 +747,7 @@ public class RssFeedService {
             // Don't log every failure as it's common (network timeout, anti-crawling, etc.)
             log.debug("Failed to fetch cover image from {}: {}", newsUrl, e.getMessage());
         }
-
+        
         // Return null if no image found (don't use default image URL, let frontend handle it)
         return null;
     }

@@ -17,6 +17,7 @@ public class CommentResponse {
     private String authorId;
     private String authorName;
     private String authorDisplayName;
+    private String authorAvatar;
     private String content;
     private String contentZh;
     private String contentEn;

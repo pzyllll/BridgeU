@@ -1,8 +1,8 @@
 <template>
-  <div class="chat-window">
+  <div class="chat-window" :key="lang">
     <!-- Chat Header -->
     <div class="chat-header">
-      <div class="chat-user-info">
+      <div class="chat-user-info" @click="handleViewUserProfile" style="cursor: pointer;" :title="t('messages.viewProfile')">
         <div class="chat-avatar">
           {{ (otherUser?.displayName || otherUser?.username || 'U')[0].toUpperCase() }}
         </div>
@@ -21,6 +21,16 @@
       >
         ←
       </button>
+    </div>
+
+    <!-- Safety Warning -->
+    <div class="safety-warning" v-if="!isMutualFollow">
+      <div class="warning-icon">⚠️</div>
+      <div class="warning-content">
+        <p class="warning-title">{{ t('messages.safetyWarning') }}</p>
+        <p class="warning-text">{{ t('messages.safetyWarningText') }}</p>
+        <p v-if="!canSendMore" class="warning-limit">{{ t('messages.singleMessageLimit') }}</p>
+      </div>
     </div>
 
     <!-- Messages Container -->
@@ -57,15 +67,15 @@
     <div class="message-input-container">
       <input
         v-model="messageText"
-        :placeholder="t('messages.messagePlaceholder')"
+        :placeholder="canSendMore ? t('messages.messagePlaceholder') : t('messages.waitForFollowBack')"
         class="message-input"
         @keyup.enter="handleSendMessage"
-        :disabled="sending"
+        :disabled="sending || !canSendMore"
       />
       <button
         class="btn btn-primary send-button"
         @click="handleSendMessage"
-        :disabled="!messageText.trim() || sending"
+        :disabled="!messageText.trim() || sending || !canSendMore"
       >
         {{ sending ? t('messages.sending') : t('messages.sendMessage') }}
       </button>
@@ -74,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue';
 import { getConversationMessages, sendMessage, markConversationAsRead } from '../api';
 import { getCurrentLanguage, t } from '../i18n';
 
@@ -102,6 +112,10 @@ const props = defineProps({
   onMessageSent: {
     type: Function,
     default: null
+  },
+  onViewUserProfile: {
+    type: Function,
+    default: null
   }
 });
 
@@ -111,6 +125,12 @@ const messages = ref([]);
 const messageText = ref('');
 const sending = ref(false);
 const messagesContainer = ref(null);
+// Initialize to false to avoid showing wrong state before data loads
+const isMutualFollow = ref(false);
+const canSendMore = ref(false);
+
+// Add reactive language state to trigger re-renders
+const lang = ref(getCurrentLanguage());
 
 const loadMessages = async () => {
   if (!props.conversationId || !props.token) {
@@ -124,6 +144,44 @@ const loadMessages = async () => {
     const response = await getConversationMessages(props.conversationId, props.token);
     if (response.success) {
       messages.value = response.messages || [];
+      
+      // Debug: Log the raw response from backend
+      console.log('ChatWindow: Raw response from backend', {
+        isMutualFollow: response.isMutualFollow,
+        isMutualFollowType: typeof response.isMutualFollow,
+        canSendMore: response.canSendMore,
+        canSendMoreType: typeof response.canSendMore,
+        allKeys: Object.keys(response),
+        fullResponse: JSON.stringify(response, null, 2)
+      });
+      
+      // Update follow status - handle boolean values properly
+      // Convert to boolean explicitly to handle any type issues
+      if (response.isMutualFollow !== undefined && response.isMutualFollow !== null) {
+        isMutualFollow.value = Boolean(response.isMutualFollow);
+      } else {
+        // If not provided, default to false for safety
+        isMutualFollow.value = false;
+      }
+      
+      if (response.canSendMore !== undefined && response.canSendMore !== null) {
+        canSendMore.value = Boolean(response.canSendMore);
+      } else {
+        // If canSendMore is not provided, calculate it based on isMutualFollow
+        // If mutual follow, can always send; if not, check message count
+        const messagesSentByCurrentUser = messages.value.filter(m => m.senderId === props.currentUserId).length;
+        canSendMore.value = isMutualFollow.value || messagesSentByCurrentUser < 1;
+      }
+      
+      // Debug log to help diagnose issues
+      console.log('ChatWindow: Updated status', {
+        isMutualFollow: isMutualFollow.value,
+        canSendMore: canSendMore.value,
+        messagesCount: messages.value.length,
+        messagesSentByCurrentUser: messages.value.filter(m => m.senderId === props.currentUserId).length,
+        responseIsMutualFollow: response.isMutualFollow,
+        responseCanSendMore: response.canSendMore
+      });
       // Mark conversation as read
       await markConversationAsRead(props.conversationId, props.token);
       // Scroll to bottom
@@ -152,19 +210,33 @@ const handleSendMessage = async () => {
   try {
     const response = await sendMessage(props.conversationId, content, props.token);
     if (response.success) {
-      // Reload messages to get the new one
+      // Update follow status
+      if (response.isMutualFollow !== undefined) {
+        isMutualFollow.value = response.isMutualFollow === true;
+      }
+      // Reload messages to get the new one and update canSendMore
       await loadMessages();
       // Notify parent
       if (props.onMessageSent) {
         props.onMessageSent();
       }
     } else {
-      alert(response.message || t('messages.sendFailed'));
+      const errorMsg = response.message || t('messages.sendFailed');
+      alert(errorMsg);
+      // If single message limit reached, update canSendMore
+      if (response.code === 'SINGLE_MESSAGE_LIMIT') {
+        canSendMore.value = false;
+      }
       messageText.value = content; // Restore message on error
     }
   } catch (err) {
     console.error('Failed to send message:', err);
-    alert(err.response?.data?.message || t('messages.sendFailed'));
+    const errorMsg = err.response?.data?.message || t('messages.sendFailed');
+    alert(errorMsg);
+    // If single message limit reached, update canSendMore
+    if (err.response?.data?.code === 'SINGLE_MESSAGE_LIMIT') {
+      canSendMore.value = false;
+    }
     messageText.value = content; // Restore message on error
   } finally {
     sending.value = false;
@@ -177,16 +249,35 @@ const scrollToBottom = () => {
   }
 };
 
+const handleViewUserProfile = () => {
+  if (props.otherUser?.id && props.onViewUserProfile) {
+    props.onViewUserProfile(props.otherUser.id);
+  }
+};
+
 const formatTime = (timestamp) => {
   if (!timestamp) return '';
   
+  // Parse timestamp and validate
+  let time;
+  try {
+    time = new Date(timestamp);
+    // Check if date is invalid or before 1971 (to catch 1970 dates)
+    if (isNaN(time.getTime()) || time.getTime() < 0 || time.getFullYear() < 1971) {
+      time = new Date(); // Use current time as fallback
+    }
+  } catch (e) {
+    time = new Date(); // Use current time as fallback
+  }
+  
+  // Calculate time difference (timezone-independent)
   const now = new Date();
-  const time = new Date(timestamp);
-  const diffMs = now - time;
+  const diffMs = now.getTime() - time.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
+  // Show relative time for recent messages
   if (diffMins < 1) {
     return t('messages.justNow');
   } else if (diffMins < 60) {
@@ -196,7 +287,17 @@ const formatTime = (timestamp) => {
   } else if (diffDays < 7) {
     return `${diffDays}${t('messages.daysAgo')}`;
   } else {
-    return time.toLocaleDateString();
+    // For older messages, format with Thailand timezone
+    const formatter = new Intl.DateTimeFormat(lang.value === 'zh' ? 'zh-CN' : 'en-US', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+    return formatter.format(time);
   }
 };
 
@@ -206,6 +307,29 @@ watch(() => props.conversationId, (newId) => {
     loadMessages();
   } else {
     messages.value = [];
+  }
+});
+
+// Listen for language changes to update UI text
+const handleLanguageChange = (e) => {
+  if (e && e.detail && e.detail.lang) {
+    lang.value = e.detail.lang;
+    // Force re-render by updating a reactive value
+    // The t() function will automatically use the new language
+  }
+};
+
+onMounted(() => {
+  // Add language change listener
+  if (typeof window !== 'undefined') {
+    window.addEventListener('languageChanged', handleLanguageChange);
+  }
+});
+
+onUnmounted(() => {
+  // Clean up language change listener
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('languageChanged', handleLanguageChange);
   }
 });
 
@@ -420,6 +544,46 @@ defineExpose({
 
 .btn-primary:hover:not(:disabled) {
   background: #555;
+}
+
+.safety-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border-bottom: 2px solid #ffc107;
+  border-left: 4px solid #ffc107;
+}
+
+.warning-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.warning-content {
+  flex: 1;
+}
+
+.warning-title {
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: #856404;
+  font-size: 0.9rem;
+}
+
+.warning-text {
+  margin: 0 0 0.25rem 0;
+  color: #856404;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.warning-limit {
+  margin: 0.5rem 0 0 0;
+  color: #d32f2f;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 </style>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="conversation-list">
+  <div class="conversation-list" :key="lang">
     <!-- Header -->
     <div class="header-section">
       <h1 class="page-title">{{ t('messages.title') }}</h1>
@@ -8,8 +8,46 @@
       </button>
     </div>
 
+    <!-- Search Section -->
+    <div class="search-section">
+      <input
+        v-model="searchQuery"
+        type="text"
+        :placeholder="t('messages.searchUsers')"
+        class="search-input"
+        @input="handleSearch"
+      />
+      <button v-if="searchQuery" class="btn-clear-search" @click="clearSearch">✕</button>
+    </div>
+
+    <!-- Search Results -->
+    <div v-if="searchQuery && searchResults.length > 0" class="search-results">
+      <h3 class="search-results-title">{{ t('messages.searchResults') }}</h3>
+      <div class="user-cards-grid">
+        <div
+          v-for="user in searchResults"
+          :key="user.id"
+          class="user-card"
+          @click="handleViewUserProfile(user.id)"
+        >
+          <div class="user-card-avatar" :style="{ backgroundImage: user.avatar ? `url(${user.avatar})` : '' }">
+            {{ !user.avatar ? (user.displayName || user.username || 'U')[0].toUpperCase() : '' }}
+          </div>
+          <div class="user-card-info">
+            <h4 class="user-card-name">{{ user.displayName || user.username || t('messages.anonymous') }}</h4>
+            <p class="user-card-username">@{{ user.username }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Search Results -->
+    <div v-if="searchQuery && !searchLoading && searchResults.length === 0" class="no-search-results">
+      <p>{{ t('messages.noSearchResults') }}</p>
+    </div>
+
     <!-- Loading State -->
-    <div v-if="loading" class="loading-container">
+    <div v-if="loading && !searchQuery" class="loading-container">
       <div class="loading-content">
         <div class="spinner"></div>
         <p>{{ t('messages.loading') }}</p>
@@ -17,7 +55,7 @@
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="error-container">
+    <div v-else-if="error && !searchQuery" class="error-container">
       <div class="error-message">
         <p>{{ error }}</p>
         <button class="btn btn-primary" @click="loadConversations">
@@ -27,7 +65,7 @@
     </div>
 
     <!-- Conversations List -->
-    <div v-else class="conversations-container">
+    <div v-else-if="!searchQuery" class="conversations-container">
       <div v-if="conversations.length === 0" class="empty-state">
         <p>{{ t('messages.noConversations') }}</p>
       </div>
@@ -68,8 +106,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getConversations, deleteConversation } from '../api';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { getConversations, deleteConversation, searchUsers } from '../api';
 import { getCurrentLanguage, t } from '../i18n';
 
 const props = defineProps({
@@ -88,12 +126,22 @@ const props = defineProps({
   onSelectConversation: {
     type: Function,
     required: true
+  },
+  onViewUserProfile: {
+    type: Function,
+    default: null
   }
 });
+
+// Add reactive language state to trigger re-renders
+const lang = ref(getCurrentLanguage());
 
 const loading = ref(false);
 const error = ref(null);
 const conversations = ref([]);
+const searchQuery = ref('');
+const searchResults = ref([]);
+const searchLoading = ref(false);
 
 const loadConversations = async () => {
   if (!props.token) {
@@ -154,16 +202,62 @@ const getLastMessagePreview = (conv) => {
   return content.length > 50 ? content.substring(0, 50) + '...' : content;
 };
 
+const handleSearch = async () => {
+  if (!searchQuery.value.trim()) {
+    searchResults.value = [];
+    return;
+  }
+
+  searchLoading.value = true;
+  try {
+    const response = await searchUsers(searchQuery.value.trim(), 20, props.token);
+    if (response.success) {
+      searchResults.value = response.data || [];
+    } else {
+      searchResults.value = [];
+    }
+  } catch (err) {
+    console.error('Failed to search users:', err);
+    searchResults.value = [];
+  } finally {
+    searchLoading.value = false;
+  }
+};
+
+const clearSearch = () => {
+  searchQuery.value = '';
+  searchResults.value = [];
+};
+
+const handleViewUserProfile = (userId) => {
+  if (props.onViewUserProfile) {
+    props.onViewUserProfile(userId);
+  }
+};
+
 const formatTime = (timestamp) => {
   if (!timestamp) return '';
   
+  // Parse timestamp and validate
+  let time;
+  try {
+    time = new Date(timestamp);
+    // Check if date is invalid or before 1971 (to catch 1970 dates)
+    if (isNaN(time.getTime()) || time.getTime() < 0 || time.getFullYear() < 1971) {
+      time = new Date(); // Use current time as fallback
+    }
+  } catch (e) {
+    time = new Date(); // Use current time as fallback
+  }
+  
+  // Calculate time difference (timezone-independent)
   const now = new Date();
-  const time = new Date(timestamp);
-  const diffMs = now - time;
+  const diffMs = now.getTime() - time.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
+  // Show relative time for recent messages
   if (diffMins < 1) {
     return t('messages.justNow');
   } else if (diffMins < 60) {
@@ -173,12 +267,43 @@ const formatTime = (timestamp) => {
   } else if (diffDays < 7) {
     return `${diffDays}${t('messages.daysAgo')}`;
   } else {
-    return time.toLocaleDateString();
+    // For older messages, format with Thailand timezone
+    const formatter = new Intl.DateTimeFormat(lang.value === 'zh' ? 'zh-CN' : 'en-US', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+    return formatter.format(time);
+  }
+};
+
+// Listen for language changes
+const handleLanguageChange = (e) => {
+  if (e && e.detail && e.detail.lang) {
+    lang.value = e.detail.lang;
+    // Force re-render by updating a reactive value
+    // The t() function will automatically use the new language
   }
 };
 
 onMounted(() => {
   loadConversations();
+  
+  // Add language change listener
+  if (typeof window !== 'undefined') {
+    window.addEventListener('languageChanged', handleLanguageChange);
+  }
+});
+
+onUnmounted(() => {
+  // Clean up language change listener
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('languageChanged', handleLanguageChange);
+  }
 });
 
 // Expose refresh method
@@ -374,6 +499,123 @@ defineExpose({
 
 .btn-primary:hover {
   background: #555;
+}
+
+.search-section {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #333;
+}
+
+.btn-clear-search {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.25rem 0.5rem;
+  color: #666;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.btn-clear-search:hover {
+  opacity: 1;
+}
+
+.search-results {
+  margin-bottom: 1.5rem;
+}
+
+.search-results-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.user-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.user-card:hover {
+  border-color: #333;
+  background: #f9f9f9;
+}
+
+.user-card-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #333;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.user-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-card-username {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-search-results {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #666;
 }
 </style>
 

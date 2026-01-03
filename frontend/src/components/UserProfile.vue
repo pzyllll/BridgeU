@@ -42,6 +42,14 @@
               <span class="stat-value">{{ profile.postCount || 0 }}</span>
               <span class="stat-label">{{ t('userProfile.posts') }}</span>
             </div>
+            <div class="stat-item clickable" @click="showFollowersModal = true">
+              <span class="stat-value">{{ profile.followersCount || 0 }}</span>
+              <span class="stat-label">{{ t('userProfile.followers') }}</span>
+            </div>
+            <div class="stat-item clickable" @click="showMutualFollowsModal = true">
+              <span class="stat-value">{{ profile.mutualFollowsCount || 0 }}</span>
+              <span class="stat-label">{{ t('userProfile.mutualFollows') }}</span>
+            </div>
           </div>
           <div class="profile-actions" v-if="token && !profile.isOwnProfile">
             <button
@@ -52,9 +60,9 @@
               {{ profile.isFollowing ? t('userProfile.following') : t('userProfile.follow') }}
             </button>
             <button
-              v-if="profile.isFollowing"
               class="btn btn-primary"
               @click="handleSendMessage"
+              :title="!profile.isFollowing ? t('userProfile.followFirstToMessage') : ''"
             >
               {{ t('userProfile.sendMessage') }}
             </button>
@@ -96,6 +104,26 @@
         </div>
       </div>
     </div>
+
+    <!-- User List Modals -->
+    <UserListModal
+      :show="showFollowersModal"
+      :userId="userId"
+      type="followers"
+      :token="token"
+      :currentUserId="currentUserId"
+      @close="showFollowersModal = false"
+      @user-click="handleViewUserProfile"
+    />
+    <UserListModal
+      :show="showMutualFollowsModal"
+      :userId="userId"
+      type="mutual-follows"
+      :token="token"
+      :currentUserId="currentUserId"
+      @close="showMutualFollowsModal = false"
+      @user-click="handleViewUserProfile"
+    />
   </div>
 </template>
 
@@ -103,6 +131,7 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { getCurrentLanguage, t } from '../i18n';
+import UserListModal from './UserListModal.vue';
 
 const props = defineProps({
   userId: {
@@ -135,6 +164,8 @@ const profile = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const lang = ref(getCurrentLanguage());
+const showFollowersModal = ref(false);
+const showMutualFollowsModal = ref(false);
 
 const loadProfile = async () => {
   loading.value = true;
@@ -171,14 +202,25 @@ const handleToggleFollow = async () => {
   }
   
   try {
-    const response = await axios.post(
-      `/api/posts/users/${props.userId}/follow`,
-      {},
-      { headers: { Authorization: `Bearer ${props.token}` } }
-    );
-    
-    if (profile.value) {
-      profile.value.isFollowing = response.data.following;
+    if (profile.value?.isFollowing) {
+      // Unfollow
+      const response = await axios.delete(
+        `/api/users/${props.userId}/follow`,
+        { headers: { Authorization: `Bearer ${props.token}` } }
+      );
+      if (response.data.success && profile.value) {
+        profile.value.isFollowing = false;
+      }
+    } else {
+      // Follow
+      const response = await axios.post(
+        `/api/users/${props.userId}/follow`,
+        {},
+        { headers: { Authorization: `Bearer ${props.token}` } }
+      );
+      if (response.data.success && profile.value) {
+        profile.value.isFollowing = true;
+      }
     }
   } catch (err) {
     console.error('Failed to toggle follow:', err);

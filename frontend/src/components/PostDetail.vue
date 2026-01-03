@@ -20,9 +20,18 @@
       <div class="post-author" style="display: flex; align-items: center; gap: 1rem">
         <div 
           class="post-avatar" 
-          style="cursor: pointer"
+          :style="{
+            backgroundImage: postDetail.authorAvatar ? `url(${postDetail.authorAvatar})` : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            cursor: 'pointer'
+          }"
           @click="handleViewAuthorProfile"
-        ></div>
+        >
+          <span v-if="!postDetail.authorAvatar" style="font-size: 20px; color: white; font-weight: bold;">
+            {{ (postDetail.authorDisplayName || postDetail.authorName || 'U')[0].toUpperCase() }}
+          </span>
+        </div>
         <div style="flex: 1">
           <div style="display: flex; align-items: center; gap: 0.5rem">
             <div 
@@ -43,9 +52,10 @@
           v-if="currentUserId && postDetail.authorId && currentUserId !== postDetail.authorId"
           :class="['btn', postDetail.isFollowing ? '' : 'btn-primary']"
           @click="handleToggleFollow"
+          :disabled="isTogglingFollow"
           style="padding: 0.5rem 1rem; font-size: 0.875rem"
         >
-          {{ postDetail.isFollowing ? t('postDetail.following') : t('postDetail.follow') }}
+          {{ isTogglingFollow ? t('common.loading') : (postDetail.isFollowing ? t('postDetail.following') : t('postDetail.follow')) }}
         </button>
       </div>
     </div>
@@ -286,7 +296,19 @@
           "
         >
           <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem">
-            <div class="post-avatar" style="width: 32px; height: 32px"></div>
+            <div 
+              class="post-avatar" 
+              style="width: 32px; height: 32px"
+              :style="{
+                backgroundImage: comment.authorAvatar ? `url(${comment.authorAvatar})` : 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }"
+            >
+              <span v-if="!comment.authorAvatar" style="font-size: 12px; color: white; font-weight: bold;">
+                {{ (comment.authorDisplayName || comment.authorName || 'U')[0].toUpperCase() }}
+              </span>
+            </div>
             <div>
               <div class="post-author-name" style="font-size: 0.875rem">
                 {{ comment.authorDisplayName || comment.authorName || t('postList.anonymous') }}
@@ -553,6 +575,10 @@ const props = defineProps({
   onBack: {
     type: Function,
     default: null
+  },
+  onAuthorClick: {
+    type: Function,
+    default: null
   }
 });
 
@@ -572,6 +598,7 @@ const selectedReportReasons = ref([]);
 const reportDescription = ref('');
 const submittingReport = ref(false);
 const deletingCommentId = ref(null);
+const isTogglingFollow = ref(false);
 
 // Report reasons
 const reportReasons = computed(() => {
@@ -597,10 +624,23 @@ const reportReasons = computed(() => {
 const post = computed(() => postDetail.value?.post);
 
 const formatDate = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
+  if (!dateString) {
+    return t('postDetail.justNow');
+  }
+  
+  let date;
+  try {
+    date = new Date(dateString);
+    if (isNaN(date.getTime()) || date.getTime() < 0 || date.getFullYear() < 1971) {
+      date = new Date();
+    }
+  } catch (e) {
+    date = new Date();
+  }
+  
+  // 时间差计算（时间戳差值与时区无关）
   const now = new Date();
-  const diffMs = now - date;
+  const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
@@ -609,7 +649,15 @@ const formatDate = (dateString) => {
   if (diffMins < 60) return `${diffMins}${t('postDetail.minutesAgo')}`;
   if (diffHours < 24) return `${diffHours}${t('postDetail.hoursAgo')}`;
   if (diffDays < 7) return `${diffDays}${t('postDetail.daysAgo')}`;
-  return date.toLocaleDateString();
+  
+  // 使用泰国时区格式化日期显示
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  return formatter.format(date);
 };
 
 const formatContent = (text) => {
@@ -686,7 +734,11 @@ const loadPostDetail = async () => {
       'requestedLang': langToUse,
       fullData: data
     });
-    postDetail.value = data;
+    // Ensure isFollowing is properly initialized
+    postDetail.value = {
+      ...data,
+      isFollowing: data.isFollowing !== undefined ? data.isFollowing : false
+    };
   } catch (err) {
     console.error('Failed to load post detail:', err);
     error.value = 'Failed to load post';
@@ -813,24 +865,66 @@ const handleSubmitReport = async (targetType, targetId) => {
   }
 };
 
+const handleViewAuthorProfile = () => {
+  if (postDetail.value?.authorId && props.onAuthorClick) {
+    props.onAuthorClick(postDetail.value.authorId);
+  }
+};
+
 const handleToggleFollow = async () => {
   if (!props.token) {
     alert(t('postDetail.loginRequired'));
     return;
   }
 
-  if (!postDetail.value || !postDetail.value.authorId) {
+  if (!postDetail.value || !postDetail.value.authorId || isTogglingFollow.value) {
     return;
   }
 
+  isTogglingFollow.value = true;
   try {
-    const result = await toggleFollow(postDetail.value.authorId, props.token);
-    postDetail.value = {
-      ...postDetail.value,
-      isFollowing: result.following
-    };
+    // Pass current following state to avoid unnecessary error logging
+    // Use nullish coalescing to properly handle undefined
+    const currentFollowing = postDetail.value?.isFollowing ?? false;
+    const result = await toggleFollow(postDetail.value.authorId, props.token, currentFollowing);
+    if (result && (result.success !== false || result.following !== undefined)) {
+      postDetail.value = {
+        ...postDetail.value,
+        isFollowing: result.following !== undefined ? result.following : !currentFollowing
+      };
+    } else {
+      // If toggle failed, show error message
+      const errorMsg = result?.message || t('postDetail.followFailed');
+      alert(errorMsg);
+    }
   } catch (err) {
-    console.error('Failed to toggle follow:', err);
+    // If we get a 400 error with "Already following", it means the state was out of sync
+    // Try to fix it by refreshing the post detail
+    if (err.response?.status === 400 && 
+        (err.response?.data?.message?.includes('Already following') || 
+         err.response?.data?.message?.includes('already following'))) {
+      // State is out of sync, reload the post detail to get correct state
+      console.warn('Follow state out of sync, reloading post detail...');
+      await loadPostDetail();
+      // After reload, explicitly set isFollowing to true since we got "Already following" error
+      if (postDetail.value) {
+        postDetail.value.isFollowing = true;
+      }
+      // Don't show error to user, just silently fix the state
+      return;
+    }
+    
+    // Only log unexpected errors
+    if (!err.isExpectedError) {
+      console.error('Failed to toggle follow:', err);
+    }
+    const errorMsg = err.response?.data?.message || t('postDetail.followFailed');
+    // Only show alert for unexpected errors
+    if (!err.isExpectedError && err.response?.status !== 400) {
+      alert(errorMsg);
+    }
+  } finally {
+    isTogglingFollow.value = false;
   }
 };
 

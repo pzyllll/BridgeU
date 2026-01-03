@@ -45,5 +45,10 @@ public interface AppUserRepository extends JpaRepository<AppUser, String> {
      * 根据角色查找用户
      */
     List<AppUser> findByRole(AppUser.Role role);
+    
+    /**
+     * 根据用户名或显示名称搜索用户（模糊匹配，不区分大小写）
+     */
+    List<AppUser> findByUsernameContainingIgnoreCaseOrDisplayNameContainingIgnoreCase(String username, String displayName);
 }
 

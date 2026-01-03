@@ -35,9 +35,26 @@
       >
         <div class="post-header">
           <div class="post-author">
-            <div class="post-avatar"></div>
+            <div 
+              class="post-avatar"
+              :style="{
+                backgroundImage: post.authorAvatar ? `url(${post.authorAvatar})` : 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                cursor: 'pointer'
+              }"
+              @click.stop="handleViewAuthorProfile(post.authorId)"
+            >
+              <span v-if="!post.authorAvatar" style="font-size: 18px; color: white; font-weight: bold;">
+                {{ (post.authorName || 'U')[0].toUpperCase() }}
+              </span>
+            </div>
             <div>
-              <div class="post-author-name">{{ post.authorName || post.authorId || t('postList.anonymous') }}</div>
+              <div 
+                class="post-author-name"
+                style="cursor: pointer"
+                @click.stop="handleViewAuthorProfile(post.authorId)"
+              >{{ post.authorName || post.authorId || t('postList.anonymous') }}</div>
               <span class="post-author-badge">{{ t('postList.student') }}</span>
             </div>
           </div>
@@ -249,11 +266,30 @@ const formatTag = (tag) => {
   return tag;
 };
 
+const handleViewAuthorProfile = (authorId) => {
+  if (authorId && props.onAuthorClick) {
+    props.onAuthorClick(authorId);
+  }
+};
+
 const formatTime = (timestamp) => {
-  if (!timestamp) return '';
-  const date = new Date(timestamp);
+  if (!timestamp) {
+    return lang.value === 'zh' ? '刚刚' : 'Just now';
+  }
+  
+  let date;
+  try {
+    date = new Date(timestamp);
+    if (isNaN(date.getTime()) || date.getTime() < 0 || date.getFullYear() < 1971) {
+      date = new Date();
+    }
+  } catch (e) {
+    date = new Date();
+  }
+  
+  // 时间差计算（时间戳差值与时区无关）
   const now = new Date();
-  const diffMs = now - date;
+  const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
@@ -263,10 +299,17 @@ const formatTime = (timestamp) => {
   if (diffHours < 24) return `${diffHours}${lang.value === 'zh' ? '小时前' : 'h ago'}`;
   if (diffDays < 7) return `${diffDays}${lang.value === 'zh' ? '天前' : 'd ago'}`;
   
-  // Format as date
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  // 使用泰国时区格式化日期显示
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  const parts = formatter.formatToParts(date);
+  const year = parts.find(p => p.type === 'year').value;
+  const month = parts.find(p => p.type === 'month').value;
+  const day = parts.find(p => p.type === 'day').value;
   return `${day}-${month}-${year}`;
 };
 

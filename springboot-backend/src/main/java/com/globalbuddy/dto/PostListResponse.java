@@ -20,6 +20,7 @@ public class PostListResponse {
     private String communityId;
     private String authorId;
     private String authorName;
+    private String authorAvatar;
     private String title;
     private String body;
     private List<String> tags;
