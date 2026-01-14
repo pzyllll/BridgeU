@@ -14,7 +14,7 @@
       </button>
     </div>
 
-    <div class="login-box">
+    <div class="login-box" :class="{ 'wide-box': isRegister || isForgotPassword }">
       <!-- Header -->
       <div class="login-header">
         <div class="logo">🌐</div>
@@ -1040,6 +1040,11 @@ const resetPassword = async () => {
   margin: 0 auto;
 }
 
+.login-box.wide-box {
+  /* Make room for longer English labels/buttons in register/reset flows */
+  max-width: 640px;
+}
+
 .login-header {
   text-align: center;
   margin-bottom: 0;
@@ -1069,6 +1074,11 @@ const resetPassword = async () => {
   padding: 3.5rem 5rem;
 }
 
+.login-box.wide-box .login-form {
+  padding-left: 4rem;
+  padding-right: 4rem;
+}
+
 .form-group {
   margin-bottom: 2rem;
 }
@@ -1087,13 +1097,44 @@ const resetPassword = async () => {
   border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 1rem;
+  color: #333;
+  background: #fff;
   transition: border-color 0.3s;
   box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: #888;
+}
+
+.input:disabled {
+  color: #666;
+  background: #f3f3f3;
+}
+
+/* Fix Chrome autofill making text unreadable on light backgrounds */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-text-fill-color: #333;
+  transition: background-color 9999s ease-out 0s;
+  box-shadow: 0 0 0px 1000px #fff inset;
 }
 
 .input:focus {
   outline: none;
   border-color: #667eea;
+}
+
+@media (max-width: 768px) {
+  .login-form {
+    padding: 1.5rem 1rem;
+  }
+  .login-box.wide-box .login-form {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 .error-message {

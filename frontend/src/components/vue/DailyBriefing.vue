@@ -45,11 +45,11 @@
             <el-date-picker
               v-model="filterStartDate"
               type="date"
-              format="dd-MM-yyyy"
-              value-format="yyyy-MM-dd"
+              :editable="false"
+              format="DD-MM-YYYY"
               :placeholder="t('dailyBriefing.selectStartDate')"
               :key="`start-date-${currentLang}`"
-              @change="handleFilterChange"
+              @change="handleStartDateChange"
               style="width: 100%;">
             </el-date-picker>
           </div>
@@ -62,11 +62,11 @@
             <el-date-picker
               v-model="filterEndDate"
               type="date"
-              format="dd-MM-yyyy"
-              value-format="yyyy-MM-dd"
+              :editable="false"
+              format="DD-MM-YYYY"
               :placeholder="t('dailyBriefing.selectEndDate')"
               :key="`end-date-${currentLang}`"
-              @change="handleFilterChange"
+              @change="handleEndDateChange"
               style="width: 100%;">
             </el-date-picker>
           </div>
@@ -81,7 +81,6 @@
               :placeholder="t('dailyBriefing.selectSource')"
               :key="`source-select-${currentLang}`"
               clearable
-              @change="handleFilterChange"
               style="width: 100%;">
               <el-option
                 v-for="source in sourceOptions"
@@ -93,6 +92,12 @@
           </div>
 
           <div class="filter-actions">
+            <el-button
+              type="primary"
+              icon="el-icon-search"
+              @click="applyFilters">
+              {{ t('dailyBriefing.filter') }}
+            </el-button>
             <el-button
               type="default"
               icon="el-icon-refresh-left"
@@ -339,12 +344,14 @@ export default {
           params.keyword = this.searchKeyword.trim();
         }
 
-        // 添加日期过滤
-        if (this.filterStartDate) {
-          params.startDate = this.filterStartDate;
+        // 添加日期过滤：使用 Date 对象，统一格式化为 yyyy-MM-dd
+        const safeStart = this.normalizeDateValue(this.filterStartDate);
+        const safeEnd = this.normalizeDateValue(this.filterEndDate);
+        if (safeStart) {
+          params.startDate = safeStart;
         }
-        if (this.filterEndDate) {
-          params.endDate = this.filterEndDate;
+        if (safeEnd) {
+          params.endDate = safeEnd;
         }
 
         // 添加来源过滤
@@ -357,6 +364,15 @@ export default {
         
         const response = await axios.get('/api/news/daily-briefing', { params });
 
+        // 调试信息：记录请求参数和响应
+        console.log('📊 Daily Briefing Request:', {
+          params,
+          responseSize: JSON.stringify(response.data).length,
+          hasData: response.data.success && response.data.data,
+          dataLength: response.data.data?.length || 0,
+          totalElements: response.data.pagination?.totalElements || 0
+        });
+
         if (response.data.success) {
           this.newsList = response.data.data || [];
           this.pagination = {
@@ -365,6 +381,16 @@ export default {
             hasNext: response.data.pagination?.hasNext || false,
             hasPrevious: response.data.pagination?.hasPrevious || false
           };
+          
+          // 如果没有数据，显示提示信息
+          if (this.newsList.length === 0 && (this.filterStartDate || this.filterEndDate || this.filterSource || this.searchKeyword)) {
+            console.warn('⚠️ No news found with current filters:', {
+              startDate: this.filterStartDate,
+              endDate: this.filterEndDate,
+              source: this.filterSource,
+              keyword: this.searchKeyword
+            });
+          }
         } else {
           this.error = response.data.message || t('dailyBriefing.fetchFailed');
         }
@@ -385,11 +411,44 @@ export default {
     },
 
     /**
-     * 处理过滤条件变化
+     * 处理开始日期变化
      */
-    handleFilterChange() {
+    handleStartDateChange(value) {
+      // 直接使用 Date 对象；清空时为 null
+      this.filterStartDate = value || null;
+    },
+
+    /**
+     * 处理结束日期变化
+     */
+    handleEndDateChange(value) {
+      // 直接使用 Date 对象；清空时为 null
+      this.filterEndDate = value || null;
+    },
+
+    /**
+     * 应用筛选条件
+     */
+    applyFilters() {
+      // 验证日期范围
+      if (this.filterStartDate && this.filterEndDate) {
+        const startDate = new Date(this.filterStartDate);
+        const endDate = new Date(this.filterEndDate);
+        if (startDate > endDate) {
+          this.$message.warning(this.t('dailyBriefing.invalidDateRange'));
+          return;
+        }
+      }
+
       this.currentPage = 1;
       this.fetchDailyBriefing();
+    },
+
+    /**
+     * 处理过滤条件变化（已废弃，改为使用 applyFilters）
+     */
+    handleFilterChange() {
+      // 不再自动触发，需要用户点击筛选按钮
     },
 
     /**
@@ -445,6 +504,76 @@ export default {
     },
 
     /**
+     * 规范化日期值：支持 Date 对象和字符串
+     * @param {Date|string} value
+     * @returns {string|null}
+     */
+    normalizeDateValue(value) {
+      if (!value) return null;
+      if (value instanceof Date) {
+        const year = value.getFullYear();
+        const month = String(value.getMonth() + 1).padStart(2, '0');
+        const day = String(value.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        // 忽略带有字母的占位符或未完成输入（如 yyyy-01-Tu）
+        if (/[A-Za-z]/.test(trimmed)) {
+          return null;
+        }
+        // 如果已经是 yyyy-MM-dd 格式，直接返回（避免时区转换问题）
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (dateRegex.test(trimmed)) {
+          // 验证日期是否有效
+          const [year, month, day] = trimmed.split('-').map(Number);
+          const testDate = new Date(year, month - 1, day);
+          if (testDate.getFullYear() === year && 
+              testDate.getMonth() + 1 === month && 
+              testDate.getDate() === day) {
+            return trimmed; // 直接返回，不进行时区转换
+          }
+        }
+        // 支持 ISO 字符串或带 T 的格式，统一转成 yyyy-MM-dd
+        const parsed = new Date(trimmed);
+        if (!isNaN(parsed.getTime())) {
+          const year = parsed.getFullYear();
+          const month = String(parsed.getMonth() + 1).padStart(2, '0');
+          const day = String(parsed.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        }
+        return trimmed;
+      }
+      return null;
+    },
+
+    /**
+     * 验证日期格式是否为 yyyy-MM-dd 格式
+     * @param {string} dateStr 日期字符串
+     * @returns {boolean} 是否为有效格式
+     */
+    isValidDateFormat(dateStr) {
+      if (!dateStr || typeof dateStr !== 'string') {
+        return false;
+      }
+      // 检查是否为 yyyy-MM-dd 格式（例如：2024-12-25）
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(dateStr)) {
+        return false;
+      }
+      // 验证日期是否有效
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        return false;
+      }
+      // 确保解析后的日期与输入字符串匹配（防止无效日期如 2024-13-45）
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return date.getFullYear() === year && 
+             date.getMonth() + 1 === month && 
+             date.getDate() === day;
+    },
+
+    /**
      * 格式化日期（日-月-年 时:分）
      */
     formatDate(date) {
@@ -468,21 +597,41 @@ export default {
 
 <style scoped>
 .daily-briefing {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-  background: linear-gradient(to bottom, #f5f7fa 0%, #ffffff 100%);
+  max-width: 100%;
+  margin: 0;
+  padding: 0 32px;
+  background: transparent;
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
-/* 标题栏样式 */
+/* 装饰元素 */
+.daily-briefing::before {
+  content: '◉';
+  position: absolute;
+  top: 150px;
+  right: 100px;
+  font-size: 200px;
+  color: rgba(155, 89, 182, 0.05);
+  z-index: 0;
+  pointer-events: none;
+  animation: float-decor 4s ease-in-out infinite;
+}
+
+@keyframes float-decor {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+/* 标题栏样式 - 青春活力渐变 */
 .header-bar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 28px 32px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, rgba(155, 89, 182, 0.15) 0%, rgba(255, 107, 107, 0.15) 50%, rgba(52, 152, 219, 0.15) 100%);
+  color: #1A1A1A;
+  padding: 32px;
+  margin-bottom: 32px;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(155, 89, 182, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -491,16 +640,27 @@ export default {
   content: '';
   position: absolute;
   top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  animation: shimmer 3s infinite;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(60px);
 }
 
-@keyframes shimmer {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(-10%, -10%) rotate(180deg); }
+.header-bar::after {
+  content: '✨';
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  font-size: 32px;
+  opacity: 0.4;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.4; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
 }
 
 .header-content {
@@ -524,10 +684,17 @@ export default {
 
 .header-bar .title {
   margin: 0;
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #1A1A1A;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #FF6B6B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .header-right {
@@ -537,10 +704,11 @@ export default {
 
 /* 过滤卡片 */
 .filter-card {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   border-radius: 12px;
-  border: 1px solid #e4e7ed;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  background: #fff;
 }
 
 .filter-container {
@@ -567,12 +735,13 @@ export default {
 }
 
 .filter-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #606266;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666666;
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-bottom: 8px;
 }
 
 .filter-label i {
@@ -644,16 +813,33 @@ export default {
 }
 
 .news-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
-  border: 1px solid #e4e7ed;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 24px;
+  border: none;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.news-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #FF6B6B 0%, #9B59B6 50%, #3498DB 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .news-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-  border-color: #c0c4cc;
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+}
+
+.news-card:hover::before {
+  opacity: 1;
 }
 
 /* 卡片头部 */
@@ -672,10 +858,10 @@ export default {
 
 .news-title {
   margin: 0;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
-  color: #303133;
-  line-height: 1.6;
+  color: #1A1A1A;
+  line-height: 1.5;
   flex: 1;
   transition: color 0.3s;
 }
@@ -707,13 +893,19 @@ export default {
 .section-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .summary-icon {
-  font-size: 18px;
-  color: #409eff;
+  font-size: 24px;
+  animation: rotate 3s linear infinite;
+  color: #FF6B6B;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .section-label {
@@ -725,20 +917,52 @@ export default {
 .summary-text {
   margin: 0;
   font-size: 15px;
-  color: #606266;
-  line-height: 1.8;
+  color: #2C3E50;
+  line-height: 1.7;
   text-align: justify;
-  padding: 16px 20px;
-  background: linear-gradient(to right, #f5f7fa 0%, #fafbfc 100%);
-  border-radius: 8px;
-  border-left: 4px solid #409eff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s;
+  padding: 24px 28px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFF5E6 100%);
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 4px 16px rgba(243, 156, 18, 0.2);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  /* 对话气泡样式 */
+  clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 95% 100%, 0% 100%);
+}
+
+.summary-text::before {
+  content: '🤖✨';
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  font-size: 20px;
+  opacity: 0.7;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.summary-text::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 40px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #FFF9E6;
+  filter: drop-shadow(0 2px 4px rgba(243, 156, 18, 0.2));
 }
 
 .news-card:hover .summary-text {
-  background: linear-gradient(to right, #ecf5ff 0%, #f5f7fa 100%);
-  border-left-color: #66b1ff;
+  background: linear-gradient(135deg, #FFF5E6 0%, #FFEED6 100%);
+  box-shadow: 0 6px 24px rgba(243, 156, 18, 0.3);
+  transform: translateY(-2px);
 }
 
 /* 元信息 */

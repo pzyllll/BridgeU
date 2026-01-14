@@ -1,14 +1,17 @@
 <template>
-  <section style="margin-bottom: 1.5rem">
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem">
-      <input
-        class="input"
-        style="flex: 1"
-        :placeholder="t('postList.searchPlaceholder')"
-        v-model="query"
-        @keydown.enter="loadPosts"
-      />
-      <button class="btn btn-primary" @click="loadPosts">
+  <section style="margin-bottom: 1.5rem; padding: 0 32px">
+    <div style="display: flex; gap: 12px; margin-bottom: 24px; position: relative">
+      <div style="flex: 1; position: relative">
+        <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #999; font-size: 16px;">🔍</span>
+        <input
+          class="input"
+          style="flex: 1; padding-left: 44px"
+          :placeholder="t('postList.searchPlaceholder')"
+          v-model="query"
+          @keydown.enter="loadPosts"
+        />
+      </div>
+      <button class="btn btn-primary" @click="loadPosts" style="min-width: 100px">
         {{ t('postList.search') }}
       </button>
     </div>
@@ -63,11 +66,12 @@
           </span>
         </div>
         <h3 class="post-title">{{ post.title }}</h3>
-        <div v-if="post.imageUrl" style="margin-bottom: 0.5rem">
+        <div v-if="post.imageUrl" style="margin-bottom: 1rem; position: relative; padding: 8px; background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(52, 152, 219, 0.1)); border-radius: 20px; transform: rotate(-1deg); transition: transform 0.3s;">
+          <div style="position: absolute; bottom: -8px; right: -8px; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(52, 152, 219, 0.2)); border-radius: 20px; z-index: -1; transform: rotate(2deg);"></div>
           <img
             :src="post.imageUrl"
             :alt="post.title || 'post image'"
-            style="width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb"
+            style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 16px; border: 3px solid #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); display: block;"
           />
         </div>
         <p v-if="post.score != null" style="color: #7c3aed; font-size: 0.75rem; margin-bottom: 4px">
@@ -77,8 +81,14 @@
         <div class="post-footer">
           <span>{{ formatTime(post.createdAt) }}</span>
           <div class="post-stats">
-            <span>❤️ {{ post.likeCount || 0 }}</span>
-            <span>💬 {{ post.commentCount || 0 }}</span>
+            <span class="stat-item" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255, 107, 107, 0.1); border-radius: 20px; font-weight: 600; color: #FF6B6B;">
+              <span style="font-size: 18px;">❤️</span>
+              {{ post.likeCount || 0 }}
+            </span>
+            <span class="stat-item" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(52, 152, 219, 0.1); border-radius: 20px; font-weight: 600; color: #3498DB;">
+              <span style="font-size: 18px;">💬</span>
+              {{ post.commentCount || 0 }}
+            </span>
           </div>
         </div>
       </article>

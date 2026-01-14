@@ -77,7 +77,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @param pageable Pagination parameters
      * @return Paginated news list
      */
-    @Query("SELECT n FROM News n WHERE n.source LIKE CONCAT('%', :source, '%') AND n.createTime >= :startDate AND n.createTime <= :endDate ORDER BY n.createTime DESC")
+    @Query("SELECT n FROM News n WHERE n.source LIKE CONCAT('%', :source, '%') AND n.publishDate >= :startDate AND n.publishDate <= :endDate ORDER BY n.createTime DESC")
     Page<News> findBySourceAndCreateTimeBetween(@Param("source") String source,
                                                  @Param("startDate") Date startDate,
                                                  @Param("endDate") Date endDate,
@@ -91,7 +91,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @param pageable Pagination parameters
      * @return Paginated news list
      */
-    @Query("SELECT n FROM News n WHERE n.createTime >= :startDate AND n.createTime <= :endDate ORDER BY n.createTime DESC")
+    @Query("SELECT n FROM News n WHERE n.publishDate >= :startDate AND n.publishDate <= :endDate ORDER BY n.createTime DESC")
     Page<News> findByCreateTimeBetweenOrdered(@Param("startDate") Date startDate,
                                                @Param("endDate") Date endDate,
                                                Pageable pageable);
@@ -103,5 +103,110 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      */
     @Query("SELECT DISTINCT n.source FROM News n WHERE n.source IS NOT NULL ORDER BY n.source")
     List<String> findDistinctSources();
+
+    /**
+     * Query news by keyword (searches in title, originalContent, summary, and translations)
+     * with date range filter
+     * 
+     * @param keyword Search keyword
+     * @param startDate Start date
+     * @param endDate End date
+     * @param pageable Pagination parameters
+     * @return Paginated news list
+     */
+    @Query("SELECT n FROM News n WHERE " +
+           "(n.title LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.originalContent LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summary LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.titleZh LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.titleEn LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summaryZh LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summaryEn LIKE CONCAT('%', :keyword, '%')) AND " +
+           "n.publishDate >= :startDate AND n.publishDate <= :endDate " +
+           "ORDER BY n.createTime DESC")
+    Page<News> findByKeywordAndCreateTimeBetween(@Param("keyword") String keyword,
+                                                  @Param("startDate") Date startDate,
+                                                  @Param("endDate") Date endDate,
+                                                  Pageable pageable);
+
+    /**
+     * Query news by keyword, source, and date range
+     * Searches in title, originalContent, summary, and translations
+     * 
+     * @param keyword Search keyword
+     * @param source Source website name
+     * @param startDate Start date
+     * @param endDate End date
+     * @param pageable Pagination parameters
+     * @return Paginated news list
+     */
+    @Query("SELECT n FROM News n WHERE " +
+           "(n.title LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.originalContent LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summary LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.titleZh LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.titleEn LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summaryZh LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summaryEn LIKE CONCAT('%', :keyword, '%')) AND " +
+           "n.source LIKE CONCAT('%', :source, '%') AND " +
+           "n.publishDate >= :startDate AND n.publishDate <= :endDate " +
+           "ORDER BY n.createTime DESC")
+    Page<News> findByKeywordAndSourceAndCreateTimeBetween(@Param("keyword") String keyword,
+                                                            @Param("source") String source,
+                                                            @Param("startDate") Date startDate,
+                                                            @Param("endDate") Date endDate,
+                                                            Pageable pageable);
+
+    /**
+     * Query news by keyword only (no date filter)
+     * Searches in title, originalContent, summary, and translations
+     *
+     * @param keyword Search keyword
+     * @param pageable Pagination parameters
+     * @return Paginated news list
+     */
+    @Query("SELECT n FROM News n WHERE " +
+           "(n.title LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.originalContent LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summary LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.titleZh LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.titleEn LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summaryZh LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summaryEn LIKE CONCAT('%', :keyword, '%')) " +
+           "ORDER BY n.createTime DESC")
+    Page<News> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    /**
+     * Query news by keyword and source only (no date filter)
+     * Searches in title, originalContent, summary, and translations
+     *
+     * @param keyword Search keyword
+     * @param source Source website name
+     * @param pageable Pagination parameters
+     * @return Paginated news list
+     */
+    @Query("SELECT n FROM News n WHERE " +
+           "(n.title LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.originalContent LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summary LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.titleZh LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.titleEn LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summaryZh LIKE CONCAT('%', :keyword, '%') OR " +
+           "n.summaryEn LIKE CONCAT('%', :keyword, '%')) AND " +
+           "n.source LIKE CONCAT('%', :source, '%') " +
+           "ORDER BY n.createTime DESC")
+    Page<News> findByKeywordAndSource(@Param("keyword") String keyword,
+                                      @Param("source") String source,
+                                      Pageable pageable);
+
+    /**
+     * Query news by source only (no date filter)
+     *
+     * @param source Source website name
+     * @param pageable Pagination parameters
+     * @return Paginated news list
+     */
+    @Query("SELECT n FROM News n WHERE n.source LIKE CONCAT('%', :source, '%') ORDER BY n.createTime DESC")
+    Page<News> findBySourceOrdered(@Param("source") String source, Pageable pageable);
 }
 

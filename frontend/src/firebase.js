@@ -3,7 +3,7 @@ import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth
 
 // Firebase 配置（已由你提供）
 const firebaseConfig = {
-  apiKey: '',
+  apiKey: 'AIzaSyCD92Xs3Y3iXGIYtuSzznACo-t5TfsylfY',
   authDomain: 'bridgeu-87fbe.firebaseapp.com',
   projectId: 'bridgeu-87fbe',
   storageBucket: 'bridgeu-87fbe.firebasestorage.app',

@@ -211,6 +211,10 @@ const props = defineProps({
   token: {
     type: String,
     required: true
+  },
+  onViewUserProfile: {
+    type: Function,
+    default: null
   }
 });
 
@@ -246,6 +250,13 @@ const handleViewUserProfile = (userId) => {
   // Emit event to parent to navigate to user profile
   if (props.onViewUserProfile) {
     props.onViewUserProfile(userId);
+  } else {
+    // Fallback for non-prop usage patterns
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('viewUserProfile', {
+        detail: { userId }
+      }));
+    }
   }
 };
 

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,24 +59,30 @@ public class NewsController {
             @RequestParam(required = false, defaultValue = "en") String lang,
             @RequestParam(required = false) String source,
             @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String keyword) {
         
         try {
-            log.info("Fetching news briefing, page: {}, size: {}, lang: {}, source: {}, startDate: {}, endDate: {}", 
-                    page, size, lang, source, startDate, endDate);
+            log.info("Fetching news briefing, page: {}, size: {}, lang: {}, source: {}, startDate: {}, endDate: {}, keyword: {}", 
+                    page, size, lang, source, startDate, endDate, keyword);
 
             // Parse date filters
             Date startDateFilter = null;
             Date endDateFilter = null;
             ZoneId zoneId = ZoneId.systemDefault();
+            boolean userProvidedStartDate = false;
+            boolean userProvidedEndDate = false;
+            boolean hasUserDateFilter = false;
             
             if (startDate != null && !startDate.isEmpty()) {
                 try {
                     LocalDate localStartDate = LocalDate.parse(startDate);
                     startDateFilter = Date.from(localStartDate.atStartOfDay().atZone(zoneId).toInstant());
-                    log.debug("Parsed startDate filter: {}", startDateFilter);
+                    userProvidedStartDate = true;
+                    hasUserDateFilter = true;
+                    log.info("User provided startDate: {} -> {}", startDate, startDateFilter);
                 } catch (Exception e) {
-                    log.warn("Invalid startDate format: {}, ignoring filter", startDate);
+                    log.warn("Invalid startDate format: {}, ignoring filter", startDate, e);
                 }
             }
             
@@ -85,33 +90,47 @@ public class NewsController {
                 try {
                     LocalDate localEndDate = LocalDate.parse(endDate);
                     endDateFilter = Date.from(localEndDate.atTime(23, 59, 59, 999_000_000).atZone(zoneId).toInstant());
-                    log.debug("Parsed endDate filter: {}", endDateFilter);
+                    userProvidedEndDate = true;
+                    hasUserDateFilter = true;
+                    log.info("User provided endDate: {} -> {}", endDate, endDateFilter);
                 } catch (Exception e) {
-                    log.warn("Invalid endDate format: {}, ignoring filter", endDate);
+                    log.warn("Invalid endDate format: {}, ignoring filter", endDate, e);
                 }
             }
             
-            // If no date filters provided, default to last 7 days (to show recent news)
-            if (startDateFilter == null && endDateFilter == null) {
-                LocalDate today = LocalDate.now();
-                LocalDate sevenDaysAgo = today.minusDays(7);
-                LocalDateTime startOfDay = sevenDaysAgo.atStartOfDay();
-                LocalDateTime endOfDay = today.atTime(23, 59, 59, 999_000_000);
-                startDateFilter = Date.from(startOfDay.atZone(zoneId).toInstant());
-                endDateFilter = Date.from(endOfDay.atZone(zoneId).toInstant());
-                log.debug("No date filters, defaulting to last 7 days: {} to {}", startDateFilter, endDateFilter);
-            } else if (startDateFilter == null) {
-                // If only endDate is provided, set startDate to 30 days ago
-                LocalDate computedEndDate = endDateFilter != null ?
-                    LocalDate.ofInstant(endDateFilter.toInstant(), zoneId) : LocalDate.now();
-                LocalDate computedStartDate = computedEndDate.minusDays(30);
-                startDateFilter = Date.from(computedStartDate.atStartOfDay().atZone(zoneId).toInstant());
-                log.debug("Only endDate provided, setting startDate to 30 days before: {}", startDateFilter);
-            } else if (endDateFilter == null) {
+            // Handle keyword search
+            String keywordTrimmed = (keyword != null) ? keyword.trim() : null;
+            boolean hasKeyword = keywordTrimmed != null && !keywordTrimmed.isEmpty();
+            boolean hasSource = source != null && !source.isEmpty();
+            boolean useDateFilter = hasUserDateFilter;
+
+            // Default behavior when NO filters are provided (no date, no keyword, no source):
+            // show ALL news (paginated) instead of forcing a recent date window.
+            if (!hasUserDateFilter && !hasKeyword && !hasSource) {
+                useDateFilter = false;
+                log.debug("No filters provided, returning ALL news with pagination (no default date window).");
+            } else if (hasUserDateFilter) {
                 // If only startDate is provided, set endDate to today
+                if (userProvidedStartDate && !userProvidedEndDate) {
                 LocalDate today = LocalDate.now();
                 endDateFilter = Date.from(today.atTime(23, 59, 59, 999_000_000).atZone(zoneId).toInstant());
-                log.debug("Only startDate provided, setting endDate to today: {}", endDateFilter);
+                    log.info("Only startDate provided by user, setting endDate to today: {}", endDateFilter);
+                } else if (!userProvidedStartDate && userProvidedEndDate && endDateFilter != null) {
+                    // If only endDate is provided, set startDate to 30 days ago
+                    LocalDate computedEndDate = LocalDate.ofInstant(endDateFilter.toInstant(), zoneId);
+                    LocalDate computedStartDate = computedEndDate.minusDays(30);
+                    startDateFilter = Date.from(computedStartDate.atStartOfDay().atZone(zoneId).toInstant());
+                    log.info("Only endDate provided by user, setting startDate to 30 days before: {}", startDateFilter);
+                }
+
+                // Ensure we have both date filters at this point (fallback only if parsing failed)
+                if (startDateFilter == null || endDateFilter == null) {
+                    LocalDate today = LocalDate.now();
+                    LocalDate sevenDaysAgo = today.minusDays(7);
+                    startDateFilter = Date.from(sevenDaysAgo.atStartOfDay().atZone(zoneId).toInstant());
+                    endDateFilter = Date.from(today.atTime(23, 59, 59, 999_000_000).atZone(zoneId).toInstant());
+                    log.warn("Date parsing failed, using fallback date range: {} to {}", startDateFilter, endDateFilter);
+                }
             }
 
             // Create pagination object, sorted by creation time descending
@@ -119,23 +138,54 @@ public class NewsController {
 
             // Query news with filters
             Page<News> newsPage;
-            // Ensure we have both date filters at this point
-            if (startDateFilter == null || endDateFilter == null) {
-                // Fallback: if dates are still null, use last 7 days
-                LocalDate today = LocalDate.now();
-                LocalDate sevenDaysAgo = today.minusDays(7);
-                startDateFilter = Date.from(sevenDaysAgo.atStartOfDay().atZone(zoneId).toInstant());
-                endDateFilter = Date.from(today.atTime(23, 59, 59, 999_000_000).atZone(zoneId).toInstant());
-            }
             
-            if (source != null && !source.isEmpty()) {
+            if (hasKeyword) {
+                if (hasSource) {
+                    if (useDateFilter) {
+                    // Filter by keyword, source, and date range
+                    newsPage = newsRepository.findByKeywordAndSourceAndCreateTimeBetween(
+                        keywordTrimmed, source, startDateFilter, endDateFilter, pageable);
+                    log.info("Using filtered query with keyword: {}, source: {}, date range: {} to {}", 
+                            keywordTrimmed, source, startDateFilter, endDateFilter);
+                } else {
+                        // Filter by keyword and source only (all historical news)
+                        newsPage = newsRepository.findByKeywordAndSource(keywordTrimmed, source, pageable);
+                        log.info("Using filtered query with keyword: {}, source: {} (no date range, search in ALL news)",
+                                keywordTrimmed, source);
+                    }
+                } else {
+                    if (useDateFilter) {
+                    // Filter by keyword and date range
+                    newsPage = newsRepository.findByKeywordAndCreateTimeBetween(
+                        keywordTrimmed, startDateFilter, endDateFilter, pageable);
+                    log.info("Using filtered query with keyword: {}, date range: {} to {}", 
+                            keywordTrimmed, startDateFilter, endDateFilter);
+                    } else {
+                        // Filter by keyword only (all historical news)
+                        newsPage = newsRepository.findByKeyword(keywordTrimmed, pageable);
+                        log.info("Using filtered query with keyword: {} (no date range, search in ALL news)",
+                                keywordTrimmed);
+                    }
+                }
+            } else if (hasSource) {
+                if (useDateFilter) {
                 // Filter by source and date range
                 newsPage = newsRepository.findBySourceAndCreateTimeBetween(source, startDateFilter, endDateFilter, pageable);
                 log.info("Using filtered query with source: {}, date range: {} to {}", source, startDateFilter, endDateFilter);
+                } else {
+                    // Filter by source only (all historical news)
+                    newsPage = newsRepository.findBySourceOrdered(source, pageable);
+                    log.info("Using filtered query with source: {} (no date range, search in ALL news)", source);
+                }
             } else {
-                // Filter by date range only
+                // No keyword/source filters; either user-provided date range OR no date filter (all news)
+                if (useDateFilter) {
                 newsPage = newsRepository.findByCreateTimeBetweenOrdered(startDateFilter, endDateFilter, pageable);
                 log.info("Using date range filter: {} to {}", startDateFilter, endDateFilter);
+                } else {
+                    newsPage = newsRepository.findAll(pageable);
+                    log.info("No date filter provided, returning all news (paginated)");
+                }
             }
 
             // Convert to DTO with language preference
@@ -236,14 +286,14 @@ public class NewsController {
                 // No Chinese translation available
                 if (originalTitleIsThai) {
                     // If original is Thai, NEVER show it - use English or placeholder
-                    if (news.getTitleEn() != null && !news.getTitleEn().isEmpty()) {
-                        title = news.getTitleEn();
-                        log.warn("⚠️ Chinese title not available, using English fallback for Thai news: {}", news.getId());
-                    } else {
-                        title = "[新闻标题翻译中...]";
-                        log.error("❌ No translation available for Thai news title: {}", news.getId());
-                    }
+                if (news.getTitleEn() != null && !news.getTitleEn().isEmpty()) {
+                    title = news.getTitleEn();
+                    log.warn("⚠️ Chinese title not available, using English fallback for Thai news: {}", news.getId());
                 } else {
+                    title = "[新闻标题翻译中...]";
+                    log.error("❌ No translation available for Thai news title: {}", news.getId());
+                }
+            } else {
                     // Original is not Thai (English or other), but user selected Chinese
                     // Use English translation if available, otherwise use placeholder
                     if (news.getTitleEn() != null && !news.getTitleEn().isEmpty()) {
@@ -256,7 +306,7 @@ public class NewsController {
                             log.error("❌ Original title contains Thai, but no translation available: {}", news.getId());
                         } else {
                             // Original is English/other, use it as fallback
-                            log.debug("⚠️ Chinese title translation not available for news: {}, using original (non-Thai)", news.getId());
+                log.debug("⚠️ Chinese title translation not available for news: {}, using original (non-Thai)", news.getId());
                         }
                     }
                 }
@@ -269,14 +319,14 @@ public class NewsController {
                 // No Chinese translation available
                 if (originalSummaryIsThai) {
                     // If original is Thai, NEVER show it - use English or placeholder
-                    if (news.getSummaryEn() != null && !news.getSummaryEn().isEmpty()) {
-                        summary = news.getSummaryEn();
-                        log.warn("⚠️ Chinese summary not available, using English fallback for Thai news: {}", news.getId());
-                    } else {
-                        summary = "[新闻内容翻译中...]";
-                        log.error("❌ No translation available for Thai news summary: {}", news.getId());
-                    }
+                if (news.getSummaryEn() != null && !news.getSummaryEn().isEmpty()) {
+                    summary = news.getSummaryEn();
+                    log.warn("⚠️ Chinese summary not available, using English fallback for Thai news: {}", news.getId());
                 } else {
+                    summary = "[新闻内容翻译中...]";
+                    log.error("❌ No translation available for Thai news summary: {}", news.getId());
+                }
+            } else {
                     // Original is not Thai (English or other), but user selected Chinese
                     // Use English translation if available, otherwise use placeholder
                     if (news.getSummaryEn() != null && !news.getSummaryEn().isEmpty()) {
@@ -289,7 +339,7 @@ public class NewsController {
                             log.error("❌ Original summary contains Thai, but no translation available: {}", news.getId());
                         } else {
                             // Original is English/other, use it as fallback
-                            log.debug("⚠️ Chinese summary translation not available for news: {}, using original (non-Thai)", news.getId());
+                log.debug("⚠️ Chinese summary translation not available for news: {}, using original (non-Thai)", news.getId());
                         }
                     }
                 }
@@ -305,19 +355,19 @@ public class NewsController {
                                                  !languageDetectionService.containsThai(news.getTitle());
                 
                 if (originalTitleIsThai) {
-                    // If original is Thai and no English translation, try Chinese as fallback
-                    if (news.getTitleZh() != null && !news.getTitleZh().isEmpty()) {
-                        title = news.getTitleZh();
-                        log.warn("⚠️ English title not available, using Chinese fallback for Thai news: {}", news.getId());
-                    } else {
-                        title = "[News title translating...]";
-                        log.error("❌ No translation available for Thai news title: {}", news.getId());
-                    }
+                // If original is Thai and no English translation, try Chinese as fallback
+                if (news.getTitleZh() != null && !news.getTitleZh().isEmpty()) {
+                    title = news.getTitleZh();
+                    log.warn("⚠️ English title not available, using Chinese fallback for Thai news: {}", news.getId());
+                } else {
+                    title = "[News title translating...]";
+                    log.error("❌ No translation available for Thai news title: {}", news.getId());
+                }
                 } else if (originalTitleIsChinese) {
                     // If original is Chinese and no English translation, show placeholder
                     title = "[News title translating...]";
                     log.warn("⚠️ English title not available for Chinese news: {}, showing placeholder", news.getId());
-                } else {
+            } else {
                     // Original is English or other language, use it directly
                     log.debug("⚠️ English title translation not available for news: {}, using original (English/other)", news.getId());
                 }
@@ -332,19 +382,19 @@ public class NewsController {
                                                   !languageDetectionService.containsThai(news.getSummary());
                 
                 if (originalSummaryIsThai) {
-                    // If original is Thai and no English translation, try Chinese as fallback
-                    if (news.getSummaryZh() != null && !news.getSummaryZh().isEmpty()) {
-                        summary = news.getSummaryZh();
-                        log.warn("⚠️ English summary not available, using Chinese fallback for Thai news: {}", news.getId());
-                    } else {
-                        summary = "[News content translating...]";
-                        log.error("❌ No translation available for Thai news summary: {}", news.getId());
-                    }
+                // If original is Thai and no English translation, try Chinese as fallback
+                if (news.getSummaryZh() != null && !news.getSummaryZh().isEmpty()) {
+                    summary = news.getSummaryZh();
+                    log.warn("⚠️ English summary not available, using Chinese fallback for Thai news: {}", news.getId());
+                } else {
+                    summary = "[News content translating...]";
+                    log.error("❌ No translation available for Thai news summary: {}", news.getId());
+                }
                 } else if (originalSummaryIsChinese) {
                     // If original is Chinese and no English translation, show placeholder
                     summary = "[News content translating...]";
                     log.warn("⚠️ English summary not available for Chinese news: {}, showing placeholder", news.getId());
-                } else {
+            } else {
                     // Original is English or other language, use it directly
                     log.debug("⚠️ English summary translation not available for news: {}, using original (English/other)", news.getId());
                 }

@@ -26,9 +26,9 @@
 
           <!-- Community Page -->
           <template v-else-if="currentPage === 'community'">
-            <div class="section-title" style="display: flex; justify-content: space-between; align-items: center">
+            <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; padding: 0 32px 24px 32px">
               <span>{{ lang === 'zh' ? '社区动态' : 'Community Feed' }}</span>
-              <div style="display: flex; gap: 0.5rem">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
                 <span
                   :class="['pill', { active: selectedTag === 'all' }]"
                   @click="selectedTag = 'all'"
@@ -37,39 +37,44 @@
                   {{ lang === 'zh' ? '全部' : 'All' }}
                 </span>
                 <span
-                  :class="['pill', { active: selectedTag === 'rent' }]"
-                  @click="selectedTag = 'rent'"
+                  :class="['pill', { active: selectedTag === 'study' }]"
+                  data-tag="study"
+                  @click="selectedTag = 'study'"
                   style="cursor: pointer"
                 >
-                  🏠 #{{ lang === 'zh' ? '租房' : 'Rent' }}
+                  📚 #{{ lang === 'zh' ? '学习' : 'Study' }}
                 </span>
                 <span
-                  :class="['pill', { active: selectedTag === 'learning' }]"
-                  @click="selectedTag = 'learning'"
+                  :class="['pill', { active: selectedTag === 'housing' }]"
+                  data-tag="housing"
+                  @click="selectedTag = 'housing'"
                   style="cursor: pointer"
                 >
-                  📚 #{{ lang === 'zh' ? '学习' : 'Learning' }}
+                  🏠 #{{ lang === 'zh' ? '住房' : 'Housing' }}
                 </span>
                 <span
-                  :class="['pill', { active: selectedTag === 'market' }]"
-                  @click="selectedTag = 'market'"
+                  :class="['pill', { active: selectedTag === 'travel' }]"
+                  data-tag="travel"
+                  @click="selectedTag = 'travel'"
                   style="cursor: pointer"
                 >
-                  🛒 #{{ lang === 'zh' ? '市场' : 'Market' }}
+                  ✈️ #{{ lang === 'zh' ? '旅行' : 'Travel' }}
                 </span>
                 <span
-                  :class="['pill', { active: selectedTag === 'visa' }]"
-                  @click="selectedTag = 'visa'"
+                  :class="['pill', { active: selectedTag === 'part-time-job' }]"
+                  data-tag="part-time-job"
+                  @click="selectedTag = 'part-time-job'"
                   style="cursor: pointer"
                 >
-                  🛂 #{{ lang === 'zh' ? '签证' : 'Visa' }}
+                  💼 #{{ lang === 'zh' ? '兼职工作' : 'Part-time Job' }}
                 </span>
                 <span
-                  :class="['pill', { active: selectedTag === 'food' }]"
-                  @click="selectedTag = 'food'"
+                  :class="['pill', { active: selectedTag === 'life-services' }]"
+                  data-tag="life-services"
+                  @click="selectedTag = 'life-services'"
                   style="cursor: pointer"
                 >
-                  🍜 #{{ lang === 'zh' ? '美食' : 'Food' }}
+                  🛍️ #{{ lang === 'zh' ? '生活服务' : 'Life Services' }}
                 </span>
               </div>
             </div>

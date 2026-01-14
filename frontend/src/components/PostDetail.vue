@@ -320,7 +320,7 @@
           </div>
           <div style="display: flex; justify-content: space-between; align-items: flex-start">
             <div style="margin-left: 2.5rem; line-height: 1.6; flex: 1">
-              {{ comment.content }}
+            {{ comment.content }}
             </div>
             <div style="display: flex; gap: 0.5rem; margin-left: 1rem">
               <button
@@ -888,10 +888,10 @@ const handleToggleFollow = async () => {
     const currentFollowing = postDetail.value?.isFollowing ?? false;
     const result = await toggleFollow(postDetail.value.authorId, props.token, currentFollowing);
     if (result && (result.success !== false || result.following !== undefined)) {
-      postDetail.value = {
-        ...postDetail.value,
+    postDetail.value = {
+      ...postDetail.value,
         isFollowing: result.following !== undefined ? result.following : !currentFollowing
-      };
+    };
     } else {
       // If toggle failed, show error message
       const errorMsg = result?.message || t('postDetail.followFailed');
@@ -916,7 +916,7 @@ const handleToggleFollow = async () => {
     
     // Only log unexpected errors
     if (!err.isExpectedError) {
-      console.error('Failed to toggle follow:', err);
+    console.error('Failed to toggle follow:', err);
     }
     const errorMsg = err.response?.data?.message || t('postDetail.followFailed');
     // Only show alert for unexpected errors
