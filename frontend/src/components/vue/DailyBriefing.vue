@@ -35,7 +35,7 @@
           </el-input>
         </div>
 
-        <!-- 过滤条件 -->
+        <!-- 过滤条件（仅按日期范围过滤） -->
         <div class="filter-section">
           <div class="filter-group">
             <label class="filter-label">
@@ -71,25 +71,7 @@
             </el-date-picker>
           </div>
 
-          <div class="filter-group">
-            <label class="filter-label">
-              <i class="el-icon-link"></i>
-              {{ t('dailyBriefing.source') }}
-            </label>
-            <el-select
-              v-model="filterSource"
-              :placeholder="t('dailyBriefing.selectSource')"
-              :key="`source-select-${currentLang}`"
-              clearable
-              style="width: 100%;">
-              <el-option
-                v-for="source in sourceOptions"
-                :key="source.value"
-                :label="source.label"
-                :value="source.value">
-              </el-option>
-            </el-select>
-          </div>
+          <!-- 来源筛选已取消，过滤逻辑只按日期范围和关键字 -->
 
           <div class="filter-actions">
             <el-button
@@ -248,12 +230,10 @@ export default {
         hasNext: false,
         hasPrevious: false
       },
-      // 搜索和过滤
+      // 搜索和过滤（仅按日期范围和关键字）
       searchKeyword: '',
       filterStartDate: null,
       filterEndDate: null,
-      filterSource: null,
-      sourceOptions: [], // 将从后端动态获取
       // 当前语言
       currentLang: getCurrentLanguage()
     };
@@ -272,7 +252,6 @@ export default {
   },
   mounted() {
     this.fetchDailyBriefing();
-    this.fetchNewsSources(); // 获取所有可用的新闻来源
     // 监听语言变化
     this.handleLanguageChange = (e) => {
       if (e && e.detail && e.detail.lang) {
@@ -299,30 +278,6 @@ export default {
       return translate(key, params);
     },
     /**
-     * 获取所有可用的新闻来源
-     */
-    async fetchNewsSources() {
-      try {
-        const response = await axios.get('/api/news/sources');
-        if (response.data.success && response.data.data) {
-          // 将来源数组转换为选项格式
-          this.sourceOptions = response.data.data.map(source => ({
-            label: source,
-            value: source
-          }));
-          console.log('Loaded news sources:', this.sourceOptions.length, this.sourceOptions);
-        } else {
-          console.warn('Failed to fetch news sources:', response.data.message);
-          // 如果获取失败，使用空数组
-          this.sourceOptions = [];
-        }
-      } catch (error) {
-        console.error('Error fetching news sources:', error);
-        // 如果出错，使用空数组
-        this.sourceOptions = [];
-      }
-    },
-    /**
      * 获取新闻简报
      */
     async fetchDailyBriefing() {
@@ -344,7 +299,7 @@ export default {
           params.keyword = this.searchKeyword.trim();
         }
 
-        // 添加日期过滤：使用 Date 对象，统一格式化为 yyyy-MM-dd
+        // 添加日期过滤：使用 Date 对象，统一格式化为 yyyy-MM-dd（按发布日期过滤）
         const safeStart = this.normalizeDateValue(this.filterStartDate);
         const safeEnd = this.normalizeDateValue(this.filterEndDate);
         if (safeStart) {
@@ -352,11 +307,6 @@ export default {
         }
         if (safeEnd) {
           params.endDate = safeEnd;
-        }
-
-        // 添加来源过滤
-        if (this.filterSource) {
-          params.source = this.filterSource;
         }
         
         // 添加语言参数（重要：根据当前语言设置传递lang参数）
@@ -382,12 +332,11 @@ export default {
             hasPrevious: response.data.pagination?.hasPrevious || false
           };
           
-          // 如果没有数据，显示提示信息
-          if (this.newsList.length === 0 && (this.filterStartDate || this.filterEndDate || this.filterSource || this.searchKeyword)) {
+          // 如果没有数据，显示提示信息（仅按日期范围和关键字）
+          if (this.newsList.length === 0 && (this.filterStartDate || this.filterEndDate || this.searchKeyword)) {
             console.warn('⚠️ No news found with current filters:', {
               startDate: this.filterStartDate,
               endDate: this.filterEndDate,
-              source: this.filterSource,
               keyword: this.searchKeyword
             });
           }
@@ -458,7 +407,6 @@ export default {
       this.searchKeyword = '';
       this.filterStartDate = null;
       this.filterEndDate = null;
-      this.filterSource = null;
       this.currentPage = 1;
       this.fetchDailyBriefing();
     },

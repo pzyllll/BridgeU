@@ -242,7 +242,7 @@ const translations = {
     newPost: {
       title: '➕ New Post',
       autoTranslation: '🌐 Auto Translation:',
-      autoTranslationDesc: 'Your post will be automatically translated to Chinese and English. You can write in any language (Chinese/English/Thai) - the system will detect and translate it automatically.',
+      autoTranslationDesc: 'Your post will be automatically translated to Chinese and English. You can write in any language (Chinese/English) - the system will detect and translate it automatically.',
       selectTag: 'Select Tag (Mandatory)',
       community: 'Community',
       authorId: 'Author ID',
@@ -601,7 +601,7 @@ const translations = {
     newPost: {
       title: '➕ 发布新帖',
       autoTranslation: '🌐 自动翻译：',
-      autoTranslationDesc: '您的帖子将自动翻译成中文和英文。您可以用任何语言（中文/英文/泰文）编写 - 系统会自动检测并翻译。',
+      autoTranslationDesc: '您的帖子将自动翻译成中文和英文。您可以用任何语言（中文/英文）编写 - 系统会自动检测并翻译。',
       selectTag: '选择标签（必填）',
       community: '社区',
       authorId: '作者ID',

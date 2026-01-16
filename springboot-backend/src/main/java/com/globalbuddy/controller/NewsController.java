@@ -124,17 +124,17 @@ public class NewsController {
                 }
 
                 // Ensure we have both date filters at this point (fallback only if parsing failed)
-                if (startDateFilter == null || endDateFilter == null) {
-                    LocalDate today = LocalDate.now();
-                    LocalDate sevenDaysAgo = today.minusDays(7);
-                    startDateFilter = Date.from(sevenDaysAgo.atStartOfDay().atZone(zoneId).toInstant());
-                    endDateFilter = Date.from(today.atTime(23, 59, 59, 999_000_000).atZone(zoneId).toInstant());
+            if (startDateFilter == null || endDateFilter == null) {
+                LocalDate today = LocalDate.now();
+                LocalDate sevenDaysAgo = today.minusDays(7);
+                startDateFilter = Date.from(sevenDaysAgo.atStartOfDay().atZone(zoneId).toInstant());
+                endDateFilter = Date.from(today.atTime(23, 59, 59, 999_000_000).atZone(zoneId).toInstant());
                     log.warn("Date parsing failed, using fallback date range: {} to {}", startDateFilter, endDateFilter);
                 }
             }
 
-            // Create pagination object, sorted by creation time descending
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+            // Create pagination object, sorted by publish date descending
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishDate"));
 
             // Query news with filters
             Page<News> newsPage;
@@ -142,12 +142,12 @@ public class NewsController {
             if (hasKeyword) {
                 if (hasSource) {
                     if (useDateFilter) {
-                    // Filter by keyword, source, and date range
-                    newsPage = newsRepository.findByKeywordAndSourceAndCreateTimeBetween(
+                        // Filter by keyword, source, and date range on publishDate
+                        newsPage = newsRepository.findByKeywordAndSourceAndPublishDateBetween(
                         keywordTrimmed, source, startDateFilter, endDateFilter, pageable);
-                    log.info("Using filtered query with keyword: {}, source: {}, date range: {} to {}", 
+                        log.info("Using filtered query with keyword: {}, source: {}, publish date range: {} to {}",
                             keywordTrimmed, source, startDateFilter, endDateFilter);
-                } else {
+                    } else {
                         // Filter by keyword and source only (all historical news)
                         newsPage = newsRepository.findByKeywordAndSource(keywordTrimmed, source, pageable);
                         log.info("Using filtered query with keyword: {}, source: {} (no date range, search in ALL news)",
@@ -155,10 +155,10 @@ public class NewsController {
                     }
                 } else {
                     if (useDateFilter) {
-                    // Filter by keyword and date range
-                    newsPage = newsRepository.findByKeywordAndCreateTimeBetween(
+                        // Filter by keyword and publish date range
+                        newsPage = newsRepository.findByKeywordAndPublishDateBetween(
                         keywordTrimmed, startDateFilter, endDateFilter, pageable);
-                    log.info("Using filtered query with keyword: {}, date range: {} to {}", 
+                        log.info("Using filtered query with keyword: {}, publish date range: {} to {}",
                             keywordTrimmed, startDateFilter, endDateFilter);
                     } else {
                         // Filter by keyword only (all historical news)
@@ -169,9 +169,9 @@ public class NewsController {
                 }
             } else if (hasSource) {
                 if (useDateFilter) {
-                // Filter by source and date range
-                newsPage = newsRepository.findBySourceAndCreateTimeBetween(source, startDateFilter, endDateFilter, pageable);
-                log.info("Using filtered query with source: {}, date range: {} to {}", source, startDateFilter, endDateFilter);
+                    // Filter by source and publish date range
+                    newsPage = newsRepository.findBySourceAndPublishDateBetween(source, startDateFilter, endDateFilter, pageable);
+                    log.info("Using filtered query with source: {}, publish date range: {} to {}", source, startDateFilter, endDateFilter);
                 } else {
                     // Filter by source only (all historical news)
                     newsPage = newsRepository.findBySourceOrdered(source, pageable);
@@ -180,8 +180,8 @@ public class NewsController {
             } else {
                 // No keyword/source filters; either user-provided date range OR no date filter (all news)
                 if (useDateFilter) {
-                newsPage = newsRepository.findByCreateTimeBetweenOrdered(startDateFilter, endDateFilter, pageable);
-                log.info("Using date range filter: {} to {}", startDateFilter, endDateFilter);
+                    newsPage = newsRepository.findByPublishDateBetweenOrdered(startDateFilter, endDateFilter, pageable);
+                    log.info("Using publish date range filter: {} to {}", startDateFilter, endDateFilter);
                 } else {
                     newsPage = newsRepository.findAll(pageable);
                     log.info("No date filter provided, returning all news (paginated)");

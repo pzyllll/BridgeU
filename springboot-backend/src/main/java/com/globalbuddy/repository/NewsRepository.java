@@ -62,7 +62,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @param pageable Pagination parameters
      * @return Paginated news list
      */
-    @Query("SELECT n FROM News n WHERE n.createTime >= :startOfDay AND n.createTime <= :endOfDay ORDER BY n.createTime DESC")
+    @Query("SELECT n FROM News n WHERE n.publishDate >= :startOfDay AND n.publishDate <= :endOfDay ORDER BY n.publishDate DESC")
     Page<News> findTodayNews(@Param("startOfDay") Date startOfDay, 
                              @Param("endOfDay") Date endOfDay, 
                              Pageable pageable);
@@ -77,8 +77,8 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @param pageable Pagination parameters
      * @return Paginated news list
      */
-    @Query("SELECT n FROM News n WHERE n.source LIKE CONCAT('%', :source, '%') AND n.publishDate >= :startDate AND n.publishDate <= :endDate ORDER BY n.createTime DESC")
-    Page<News> findBySourceAndCreateTimeBetween(@Param("source") String source,
+    @Query("SELECT n FROM News n WHERE n.source LIKE CONCAT('%', :source, '%') AND n.publishDate >= :startDate AND n.publishDate <= :endDate ORDER BY n.publishDate DESC")
+    Page<News> findBySourceAndPublishDateBetween(@Param("source") String source,
                                                  @Param("startDate") Date startDate,
                                                  @Param("endDate") Date endDate,
                                                  Pageable pageable);
@@ -91,8 +91,8 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @param pageable Pagination parameters
      * @return Paginated news list
      */
-    @Query("SELECT n FROM News n WHERE n.publishDate >= :startDate AND n.publishDate <= :endDate ORDER BY n.createTime DESC")
-    Page<News> findByCreateTimeBetweenOrdered(@Param("startDate") Date startDate,
+    @Query("SELECT n FROM News n WHERE n.publishDate >= :startDate AND n.publishDate <= :endDate ORDER BY n.publishDate DESC")
+    Page<News> findByPublishDateBetweenOrdered(@Param("startDate") Date startDate,
                                                @Param("endDate") Date endDate,
                                                Pageable pageable);
 
@@ -107,6 +107,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     /**
      * Query news by keyword (searches in title, originalContent, summary, and translations)
      * with date range filter
+     * Case-insensitive partial match as per SRS-35
      * 
      * @param keyword Search keyword
      * @param startDate Start date
@@ -115,16 +116,16 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @return Paginated news list
      */
     @Query("SELECT n FROM News n WHERE " +
-           "(n.title LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.originalContent LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summary LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.titleZh LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.titleEn LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summaryZh LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summaryEn LIKE CONCAT('%', :keyword, '%')) AND " +
+           "(LOWER(n.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.originalContent) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summary) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.titleZh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.titleEn) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summaryZh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summaryEn) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
            "n.publishDate >= :startDate AND n.publishDate <= :endDate " +
-           "ORDER BY n.createTime DESC")
-    Page<News> findByKeywordAndCreateTimeBetween(@Param("keyword") String keyword,
+           "ORDER BY n.publishDate DESC")
+    Page<News> findByKeywordAndPublishDateBetween(@Param("keyword") String keyword,
                                                   @Param("startDate") Date startDate,
                                                   @Param("endDate") Date endDate,
                                                   Pageable pageable);
@@ -132,6 +133,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     /**
      * Query news by keyword, source, and date range
      * Searches in title, originalContent, summary, and translations
+     * Case-insensitive partial match as per SRS-35
      * 
      * @param keyword Search keyword
      * @param source Source website name
@@ -141,17 +143,17 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @return Paginated news list
      */
     @Query("SELECT n FROM News n WHERE " +
-           "(n.title LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.originalContent LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summary LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.titleZh LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.titleEn LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summaryZh LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summaryEn LIKE CONCAT('%', :keyword, '%')) AND " +
+           "(LOWER(n.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.originalContent) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summary) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.titleZh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.titleEn) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summaryZh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summaryEn) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
            "n.source LIKE CONCAT('%', :source, '%') AND " +
            "n.publishDate >= :startDate AND n.publishDate <= :endDate " +
-           "ORDER BY n.createTime DESC")
-    Page<News> findByKeywordAndSourceAndCreateTimeBetween(@Param("keyword") String keyword,
+           "ORDER BY n.publishDate DESC")
+    Page<News> findByKeywordAndSourceAndPublishDateBetween(@Param("keyword") String keyword,
                                                             @Param("source") String source,
                                                             @Param("startDate") Date startDate,
                                                             @Param("endDate") Date endDate,
@@ -160,25 +162,27 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     /**
      * Query news by keyword only (no date filter)
      * Searches in title, originalContent, summary, and translations
+     * Case-insensitive partial match as per SRS-35
      *
      * @param keyword Search keyword
      * @param pageable Pagination parameters
      * @return Paginated news list
      */
     @Query("SELECT n FROM News n WHERE " +
-           "(n.title LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.originalContent LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summary LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.titleZh LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.titleEn LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summaryZh LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summaryEn LIKE CONCAT('%', :keyword, '%')) " +
-           "ORDER BY n.createTime DESC")
+           "(LOWER(n.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.originalContent) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summary) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.titleZh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.titleEn) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summaryZh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summaryEn) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "ORDER BY n.publishDate DESC")
     Page<News> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     /**
      * Query news by keyword and source only (no date filter)
      * Searches in title, originalContent, summary, and translations
+     * Case-insensitive partial match as per SRS-35
      *
      * @param keyword Search keyword
      * @param source Source website name
@@ -186,27 +190,28 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @return Paginated news list
      */
     @Query("SELECT n FROM News n WHERE " +
-           "(n.title LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.originalContent LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summary LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.titleZh LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.titleEn LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summaryZh LIKE CONCAT('%', :keyword, '%') OR " +
-           "n.summaryEn LIKE CONCAT('%', :keyword, '%')) AND " +
+           "(LOWER(n.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.originalContent) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summary) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.titleZh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.titleEn) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summaryZh) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(n.summaryEn) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
            "n.source LIKE CONCAT('%', :source, '%') " +
-           "ORDER BY n.createTime DESC")
+           "ORDER BY n.publishDate DESC")
     Page<News> findByKeywordAndSource(@Param("keyword") String keyword,
                                       @Param("source") String source,
                                       Pageable pageable);
 
     /**
      * Query news by source only (no date filter)
+     * Results are ordered by publish date (newest first)
      *
      * @param source Source website name
      * @param pageable Pagination parameters
      * @return Paginated news list
      */
-    @Query("SELECT n FROM News n WHERE n.source LIKE CONCAT('%', :source, '%') ORDER BY n.createTime DESC")
+    @Query("SELECT n FROM News n WHERE n.source LIKE CONCAT('%', :source, '%') ORDER BY n.publishDate DESC")
     Page<News> findBySourceOrdered(@Param("source") String source, Pageable pageable);
 }
 

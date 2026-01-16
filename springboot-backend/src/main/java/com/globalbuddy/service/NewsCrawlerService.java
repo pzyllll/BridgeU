@@ -19,11 +19,20 @@ import org.apache.hc.core5.ssl.SSLContextBuilder;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,6 +49,11 @@ public class NewsCrawlerService {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
     private static final int TIMEOUT = 30000; // 30 seconds timeout (increased timeout)
     private static final String BANGKOK_POST_BASE_URL = "https://www.bangkokpost.com";
+    /**
+     * 统一使用的时区，用于将各网站的发布时间规范化后存入数据库
+     * 这里选择 UTC，前端在展示时再根据用户所在时区格式化
+     */
+    private static final ZoneId STANDARD_ZONE = ZoneId.of("UTC");
     
     private final RssFeedService rssFeedService;
     private final GoogleTrendsRssService googleTrendsRssService;
@@ -178,6 +192,149 @@ public class NewsCrawlerService {
     }
 
     /**
+     * 从新闻详情页 URL 中解析发布时间，并统一转换到标准时区
+     * 如果解析失败，返回 null，由调用方决定回退策略
+     */
+    private Date extractPublishDateFromArticleUrl(String url) {
+        try {
+            if (url == null || url.isEmpty()) {
+                return null;
+            }
+
+            Document doc = Jsoup.connect(url)
+                    .userAgent(USER_AGENT)
+                    .timeout(TIMEOUT)
+                    .followRedirects(true)
+                    .get();
+
+            Date result = extractPublishDateFromDocument(doc);
+            if (result != null) {
+                return result;
+            }
+        } catch (Exception e) {
+            log.debug("Failed to extract publish date from article url {}: {}", url, e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 从详情页 Document 中解析发布时间
+     * 尝试多种常见的 meta / time 格式，并统一到 STANDARD_ZONE
+     */
+    private Date extractPublishDateFromDocument(Document doc) {
+        if (doc == null) {
+            return null;
+        }
+
+        // 1. 常见 meta 标签：OG、schema.org、通用 pubdate
+        String[] metaSelectors = new String[]{
+                "meta[property=article:published_time]",
+                "meta[name=article:published_time]",
+                "meta[name=pubdate]",
+                "meta[name=publishdate]",
+                "meta[name=publish_date]",
+                "meta[itemprop=datePublished]",
+                "meta[property=\"og:article:published_time\"]"
+        };
+
+        for (String selector : metaSelectors) {
+            Element meta = doc.selectFirst(selector);
+            if (meta != null) {
+                String content = meta.attr("content");
+                if (content == null || content.isEmpty()) {
+                    content = meta.attr("value");
+                }
+                Date parsed = parseDateStringToUtc(content);
+                if (parsed != null) {
+                    return parsed;
+                }
+            }
+        }
+
+        // 2. <time datetime="...">
+        Element timeEl = doc.selectFirst("time[datetime]");
+        if (timeEl != null) {
+            String datetime = timeEl.attr("datetime");
+            Date parsed = parseDateStringToUtc(datetime);
+            if (parsed != null) {
+                return parsed;
+            }
+        }
+
+        // 3. 常见的日期类名，解析纯文本（只做简单支持，避免过多误判）
+        Element dateEl = doc.selectFirst(".publish-date, .published-date, .post-date, .entry-date, .date, .time");
+        if (dateEl != null) {
+            String text = dateEl.text();
+            Date parsed = parseDateStringToUtc(text);
+            if (parsed != null) {
+                return parsed;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 将各种字符串时间解析为统一时区（STANDARD_ZONE）的 java.util.Date
+     * 解析失败返回 null
+     */
+    private Date parseDateStringToUtc(String value) {
+        if (value == null) {
+            return null;
+        }
+        String text = value.trim();
+        if (text.isEmpty()) {
+            return null;
+        }
+
+        List<DateTimeFormatter> formatters = Arrays.asList(
+                // ISO 带时区，如 2024-01-12T20:44:00+07:00、2024-01-12T13:44:00Z
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+                DateTimeFormatter.ISO_ZONED_DATE_TIME,
+                // 本地日期时间，假定为泰国时间，再转换到 STANDARD_ZONE
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
+                // 例如 12 Jan 2024 20:44
+                DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm", Locale.ENGLISH),
+                DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss", Locale.ENGLISH),
+                // 例如 Jan 12, 2024 8:44 PM
+                DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a", Locale.ENGLISH),
+                DateTimeFormatter.ofPattern("MMM d, yyyy hh:mm a", Locale.ENGLISH)
+        );
+
+        // 先尝试可直接得到带偏移量/时区的格式
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                if (formatter == DateTimeFormatter.ISO_OFFSET_DATE_TIME ||
+                        formatter == DateTimeFormatter.ISO_ZONED_DATE_TIME) {
+                    OffsetDateTime odt = OffsetDateTime.parse(text, formatter);
+                    Instant instant = odt.toInstant();
+                    return Date.from(instant);
+                }
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+
+        // 再尝试本地时间格式，假定为泰国本地时间（Asia/Bangkok），再转换到标准时区
+        ZoneId sourceZone = ZoneId.of("Asia/Bangkok");
+        for (DateTimeFormatter formatter : formatters) {
+            try {
+                if (formatter == DateTimeFormatter.ISO_OFFSET_DATE_TIME ||
+                        formatter == DateTimeFormatter.ISO_ZONED_DATE_TIME) {
+                    continue;
+                }
+                LocalDateTime ldt = LocalDateTime.parse(text, formatter);
+                ZonedDateTime zdt = ldt.atZone(sourceZone);
+                ZonedDateTime standardZdt = zdt.withZoneSameInstant(STANDARD_ZONE);
+                return Date.from(standardZdt.toInstant());
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get all configured Thai news website RSS feed configurations
      * Used for testing and debugging
      * 
@@ -201,9 +358,7 @@ public class NewsCrawlerService {
             "Google News (International Students)"
         ));
         
-        // 注意：之前的各个媒体网站RSS源已全部移除，因为它们无法正常工作
-        // （XML解析失败、404错误、504超时等）
-        // Google News RSS 已经包含了这些媒体的内容，无需单独配置
+      
         
         return rssFeeds;
     }
@@ -508,13 +663,18 @@ public class NewsCrawlerService {
                         }
                     }
 
+                    Date publishDate = extractPublishDateFromArticleUrl(absUrl);
+                    if (publishDate == null) {
+                        publishDate = new Date();
+                    }
+
                     News news = News.builder()
                             .title(title)
                             .originalUrl(absUrl)
                             .source("Bangkok Post")
                             .summary(summary)
                             .createTime(new Date())
-                            .publishDate(new Date())
+                            .publishDate(publishDate)
                             .build();
 
                     newsList.add(news);
@@ -713,13 +873,18 @@ public class NewsCrawlerService {
                         }
                     }
                     
+                    Date publishDate = extractPublishDateFromArticleUrl(absUrl);
+                    if (publishDate == null) {
+                        publishDate = new Date();
+                    }
+
                     News news = News.builder()
                             .title(title)
                             .originalUrl(absUrl)
                             .source("清迈大学校友会 (CMUAC)")
                             .summary(summary)
                             .createTime(new Date())
-                            .publishDate(new Date())
+                            .publishDate(publishDate)
                             .build();
                     
                     newsList.add(news);
@@ -894,13 +1059,18 @@ public class NewsCrawlerService {
                                 }
                             }
                             
+                            Date publishDate = extractPublishDateFromArticleUrl(absUrl);
+                            if (publishDate == null) {
+                                publishDate = new Date();
+                            }
+
                             News news = News.builder()
                                     .title(title)
                                     .originalUrl(absUrl)
                                     .source("中国驻清迈总领馆")
                                     .summary(summary)
                                     .createTime(new Date())
-                                    .publishDate(new Date())
+                                    .publishDate(publishDate)
                                     .build();
                             
                             newsList.add(news);
@@ -1010,13 +1180,18 @@ public class NewsCrawlerService {
                         }
                     }
                     
+                    Date publishDate = extractPublishDateFromArticleUrl(absUrl);
+                    if (publishDate == null) {
+                        publishDate = new Date();
+                    }
+
                     News news = News.builder()
                             .title(title)
                             .originalUrl(absUrl)
                             .source("泰国电子签证")
                             .summary(summary)
                             .createTime(new Date())
-                            .publishDate(new Date())
+                            .publishDate(publishDate)
                             .build();
                     
                     newsList.add(news);
@@ -1168,13 +1343,18 @@ public class NewsCrawlerService {
                                 }
                             }
                             
+                            Date publishDate = extractPublishDateFromArticleUrl(absUrl);
+                            if (publishDate == null) {
+                                publishDate = new Date();
+                            }
+
                             News news = News.builder()
                                     .title(title)
                                     .originalUrl(absUrl)
                                     .source("清迈大学 (CMU)")
                                     .summary(summary)
                                     .createTime(new Date())
-                                    .publishDate(new Date())
+                                    .publishDate(publishDate)
                                     .build();
                             
                             newsList.add(news);
@@ -1264,13 +1444,18 @@ public class NewsCrawlerService {
             }
 
             // 构建 News 对象
+            Date publishDate = extractPublishDateFromArticleUrl(link);
+            if (publishDate == null) {
+                publishDate = new Date();
+            }
+
             return News.builder()
                     .title(title)
                     .originalUrl(link)
                     .source(source)
                     .summary(summary) // 这里先存储摘要，后续可以用 AI 生成更详细的总结
                     .createTime(new Date())
-                    .publishDate(new Date()) // 如果页面有发布时间，可以在这里提取
+                    .publishDate(publishDate) // 如果页面有发布时间，可以在这里提取
                     .build();
 
         } catch (Exception e) {
