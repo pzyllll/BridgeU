@@ -159,25 +159,69 @@ export default {
         };
         const response = await axios.get(`/api/news/daily-briefing/${this.newsId}`, { params });
 
-        if (response.data.success) {
-          this.news = response.data.data;
-          // 获取原始内容（如果可用）
-          this.originalContent = response.data.originalContent || null;
+        // Per activity diagram: First check if HTTP request succeeds (status 200)
+        if (response.status === 200) {
+          // Then check if Response data.success is true
+          if (response.data.success) {
+            // Frontend sets news = response.data.data
+            this.news = response.data.data;
+            // Frontend sets originalContent = response.data.originalContent
+            this.originalContent = response.data.originalContent || null;
+          } else {
+            // Frontend shows error message from response.data.message or localized message
+            this.error = response.data.message || this.t('dailyBriefingDetail.fetchFailed');
+          }
         } else {
-          this.error = response.data.message || this.t('dailyBriefingDetail.fetchFailed');
+          // Non-200 status code (should not normally occur with axios, but handle per activity diagram)
+          this.error = this.t('dailyBriefingDetail.networkError');
         }
       } catch (error) {
         console.error('获取新闻详情失败:', error);
+        // Handle errors according to activity diagram in BridgeU-SRS.md
+        // Check if HTTP response was received
         if (error.response) {
+          // HTTP response received - check status code
           if (error.response.status === 404) {
+            // 404: Frontend shows localized error message using i18n key 'dailyBriefingDetail.notFound'
             this.error = this.t('dailyBriefingDetail.notFound');
+          } else if (error.response.status === 401) {
+            // 401: Authentication token invalid or expired
+            // The api.js interceptor will handle token clearing and trigger auth:unauthorized event
+            // App.vue will handle logout and redirect to login page
+            // Component can show user-friendly message if needed, but redirect will happen automatically
+            if (error.userMessage) {
+              this.error = error.userMessage;
+            } else {
+              this.error = this.currentLang === 'zh' ? '登录已过期，请重新登录' : 'Login expired, please log in again';
+            }
+          } else if (error.response.status === 500) {
+            // 500: Frontend shows error message from response.data.message
+            this.error = error.response.data?.message || this.t('dailyBriefingDetail.networkError');
+          } else if (error.response.status === 200) {
+            // 200: Check response.data.success (handled in try block above)
+            // This should not happen here, but handle for safety
+            if (error.response.data && !error.response.data.success) {
+              this.error = error.response.data.message || this.t('dailyBriefingDetail.fetchFailed');
+            }
           } else if (error.response.data && error.response.data.message) {
+            // Other HTTP status codes: Show error message if available
             this.error = error.response.data.message;
           } else {
+            // HTTP error without message
             this.error = this.t('dailyBriefingDetail.networkError');
           }
         } else {
-          this.error = error.message || this.t('dailyBriefingDetail.networkError');
+          // Network error or timeout (no HTTP response received)
+          // Per activity diagram: check if error.response exists and error.response.data.message exists
+          // Note: This check is per activity diagram specification, even though in JavaScript
+          // if error.response exists, code would enter the if branch above
+          if (error.response && error.response.data && error.response.data.message) {
+            // Frontend shows error message from error.response.data.message
+            this.error = error.response.data.message;
+          } else {
+            // Frontend shows localized message using i18n key 'dailyBriefingDetail.networkError' or error.message
+            this.error = error.message || this.t('dailyBriefingDetail.networkError');
+          }
         }
       } finally {
         this.loading = false;

@@ -111,6 +111,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { fetchPosts } from '../api';
 import { getLanguagePreference } from '../utils/language';
 import { t, getCurrentLanguage, setLanguage } from '../i18n';
+import { parseBackendDate, formatBangkokAbsolute } from '../utils/datetime';
 
 const props = defineProps({
   onPostClick: {
@@ -284,43 +285,38 @@ const handleViewAuthorProfile = (authorId) => {
 
 const formatTime = (timestamp) => {
   if (!timestamp) {
-    return lang.value === 'zh' ? '刚刚' : 'Just now';
+    return lang.value === 'zh' ? '未知时间' : 'Unknown time';
   }
   
-  let date;
-  try {
-    date = new Date(timestamp);
-    if (isNaN(date.getTime()) || date.getTime() < 0 || date.getFullYear() < 1971) {
-      date = new Date();
-    }
-  } catch (e) {
-    date = new Date();
+  const date = parseBackendDate(timestamp);
+  if (!date) {
+    console.warn('Invalid timestamp:', timestamp);
+    return lang.value === 'zh' ? '无效时间' : 'Invalid time';
   }
   
-  // 时间差计算（时间戳差值与时区无关）
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+  // 使用 UTC 时间戳计算时间差（时间戳是时区无关的）
+  const nowUtc = Date.now();
+  const dateUtc = date.getTime();
+  const diffMs = nowUtc - dateUtc;
+  
+  // 如果时间在未来（可能是数据问题），显示曼谷时间
+  if (diffMs < 0) {
+    return formatBangkokAbsolute(date) || (lang.value === 'zh' ? '无效时间' : 'Invalid time');
+  }
+  
+  // 计算时间差
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
   
+  // 显示相对时间
   if (diffMins < 1) return lang.value === 'zh' ? '刚刚' : 'Just now';
   if (diffMins < 60) return `${diffMins}${lang.value === 'zh' ? '分钟前' : 'm ago'}`;
   if (diffHours < 24) return `${diffHours}${lang.value === 'zh' ? '小时前' : 'h ago'}`;
   if (diffDays < 7) return `${diffDays}${lang.value === 'zh' ? '天前' : 'd ago'}`;
   
-  // 使用泰国时区格式化日期显示
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Asia/Bangkok',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-  const parts = formatter.formatToParts(date);
-  const year = parts.find(p => p.type === 'year').value;
-  const month = parts.find(p => p.type === 'month').value;
-  const day = parts.find(p => p.type === 'day').value;
-  return `${day}-${month}-${year}`;
+  // 超过7天，显示曼谷时间的日期和时间
+  return formatBangkokAbsolute(date) || (lang.value === 'zh' ? '无效时间' : 'Invalid time');
 };
 
 const filteredPosts = computed(() => {

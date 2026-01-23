@@ -427,6 +427,15 @@ export default {
      * 查看详情
      */
     viewDetail(newsId) {
+      if (newsId === null || newsId === undefined || newsId === '') {
+        // Provide explicit feedback instead of “no response”
+        if (this.$message && this.$message.warning) {
+          this.$message.warning(this.t('dailyBriefing.invalidNewsId') || '无法打开详情：新闻ID无效');
+        } else {
+          console.warn('Invalid newsId for viewDetail:', newsId);
+        }
+        return;
+      }
       this.$emit('view-detail', newsId);
     },
 

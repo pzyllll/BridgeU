@@ -87,6 +87,7 @@
 import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue';
 import { getConversationMessages, sendMessage, markConversationAsRead } from '../api';
 import { getCurrentLanguage, t } from '../i18n';
+import { parseBackendDate, formatBangkokAbsolute } from '../utils/datetime';
 
 const props = defineProps({
   conversationId: {
@@ -259,20 +260,11 @@ const formatTime = (timestamp) => {
   if (!timestamp) return '';
   
   // Parse timestamp and validate
-  let time;
-  try {
-    time = new Date(timestamp);
-    // Check if date is invalid or before 1971 (to catch 1970 dates)
-    if (isNaN(time.getTime()) || time.getTime() < 0 || time.getFullYear() < 1971) {
-      time = new Date(); // Use current time as fallback
-    }
-  } catch (e) {
-    time = new Date(); // Use current time as fallback
-  }
+  const time = parseBackendDate(timestamp);
+  if (!time) return '';
   
   // Calculate time difference (timezone-independent)
-  const now = new Date();
-  const diffMs = now.getTime() - time.getTime();
+  const diffMs = Date.now() - time.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
@@ -288,16 +280,7 @@ const formatTime = (timestamp) => {
     return `${diffDays}${t('messages.daysAgo')}`;
   } else {
     // For older messages, format with Thailand timezone
-    const formatter = new Intl.DateTimeFormat(lang.value === 'zh' ? 'zh-CN' : 'en-US', {
-      timeZone: 'Asia/Bangkok',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-    return formatter.format(time);
+    return formatBangkokAbsolute(time) || '';
   }
 };
 

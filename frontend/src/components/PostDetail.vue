@@ -543,6 +543,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { fetchPostDetail, addComment, toggleLike, toggleFollow, getCommentSummary, deleteComment, submitReport } from '../api';
 import { getCurrentLanguage, t } from '../i18n';
+import { parseBackendDate, formatBangkokAbsolute } from '../utils/datetime';
 
 // Filter out browser extension errors
 if (typeof window !== 'undefined') {
@@ -628,19 +629,23 @@ const formatDate = (dateString) => {
     return t('postDetail.justNow');
   }
   
-  let date;
-  try {
-    date = new Date(dateString);
-    if (isNaN(date.getTime()) || date.getTime() < 0 || date.getFullYear() < 1971) {
-      date = new Date();
-    }
-  } catch (e) {
-    date = new Date();
+  const date = parseBackendDate(dateString);
+  if (!date) {
+    console.warn('Invalid timestamp:', dateString);
+    return lang.value === 'zh' ? '无效时间' : 'Invalid time';
   }
   
-  // 时间差计算（时间戳差值与时区无关）
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
+  // 使用 UTC 时间戳计算时间差（时间戳是时区无关的）
+  const nowUtc = Date.now();
+  const dateUtc = date.getTime();
+  const diffMs = nowUtc - dateUtc;
+  
+  // 如果时间在未来（可能是数据问题），显示曼谷时间
+  if (diffMs < 0) {
+    return formatBangkokAbsolute(date) || (lang.value === 'zh' ? '无效时间' : 'Invalid time');
+  }
+  
+  // 计算时间差
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
@@ -650,14 +655,8 @@ const formatDate = (dateString) => {
   if (diffHours < 24) return `${diffHours}${t('postDetail.hoursAgo')}`;
   if (diffDays < 7) return `${diffDays}${t('postDetail.daysAgo')}`;
   
-  // 使用泰国时区格式化日期显示
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Asia/Bangkok',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-  return formatter.format(date);
+  // 超过7天，显示曼谷时间的日期和时间
+  return formatBangkokAbsolute(date) || (lang.value === 'zh' ? '无效时间' : 'Invalid time');
 };
 
 const formatContent = (text) => {

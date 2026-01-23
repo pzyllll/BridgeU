@@ -212,7 +212,7 @@ import { setLanguage, getCurrentLanguage } from './i18n';
 // Element Plus locale for dynamic language switching
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import en from 'element-plus/dist/locale/en.mjs';
-import { ElConfigProvider } from 'element-plus';
+import { ElConfigProvider, ElMessage } from 'element-plus';
 
 // Get initial auth state from localStorage
 const getInitialAuthState = () => {
@@ -422,7 +422,17 @@ const handleNavigate = (page, postId = null) => {
 };
 
 const handleViewNewsDetail = (newsId) => {
-  selectedNewsId.value = newsId;
+  if (newsId === null || newsId === undefined || newsId === '') {
+    ElMessage.warning(lang.value === 'zh' ? '无法打开详情：新闻ID无效' : 'Cannot open detail: invalid news id');
+    return;
+  }
+  // Ensure we are on the briefing page and have a valid id
+  currentPage.value = 'briefing';
+  selectedNewsId.value = Number(newsId);
+  // Give a visible feedback (scroll to top) even if detail request is slow
+  if (typeof window !== 'undefined') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 };
 
 const handleBackToBriefingList = () => {
