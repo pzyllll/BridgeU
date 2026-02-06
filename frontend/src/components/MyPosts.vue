@@ -220,7 +220,7 @@ onMounted(() => {
 .btn-back {
   background: transparent;
   border: none;
-  color: #409eff;
+  color: var(--color-primary);
   cursor: pointer;
   font-size: 14px;
   margin-bottom: 16px;
@@ -252,7 +252,7 @@ onMounted(() => {
 
 .spinner {
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #409eff;
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -401,12 +401,12 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: #409eff;
+  background: var(--color-primary);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #66b1ff;
+  background: var(--color-primary-dark);
 }
 
 @media (max-width: 768px) {

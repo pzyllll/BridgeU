@@ -583,7 +583,7 @@ export default {
 
 /* 标题栏样式 - 青春活力渐变 */
 .header-bar {
-  background: linear-gradient(135deg, rgba(155, 89, 182, 0.15) 0%, rgba(255, 107, 107, 0.15) 50%, rgba(52, 152, 219, 0.15) 100%);
+  background: linear-gradient(135deg, rgba(182, 156, 255, 0.14) 0%, rgba(155, 89, 182, 0.12) 50%, rgba(52, 152, 219, 0.12) 100%);
   color: #1A1A1A;
   padding: 32px;
   margin-bottom: 32px;
@@ -600,7 +600,7 @@ export default {
   right: -20%;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(255, 107, 107, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(182, 156, 255, 0.28) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(60px);
 }
@@ -648,7 +648,7 @@ export default {
   line-height: 1.3;
   position: relative;
   z-index: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #FF6B6B 100%);
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-learning) 50%, var(--color-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -734,7 +734,7 @@ export default {
   font-size: 36px;
   margin-bottom: 16px;
   animation: rotating 2s linear infinite;
-  color: #409eff;
+  color: var(--color-primary);
 }
 
 .loading-text {
@@ -785,7 +785,7 @@ export default {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #FF6B6B 0%, #9B59B6 50%, #3498DB 100%);
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-learning) 50%, var(--color-housing) 100%);
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -824,7 +824,7 @@ export default {
 }
 
 .news-card:hover .news-title {
-  color: #409eff;
+  color: var(--color-primary);
 }
 
 .source-tag {
@@ -857,7 +857,7 @@ export default {
 .summary-icon {
   font-size: 24px;
   animation: rotate 3s linear infinite;
-  color: #FF6B6B;
+  color: var(--color-primary);
 }
 
 @keyframes rotate {

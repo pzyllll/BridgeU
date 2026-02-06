@@ -301,7 +301,7 @@ export default {
   font-size: 36px;
   margin-bottom: 16px;
   animation: rotating 2s linear infinite;
-  color: #409eff;
+  color: var(--color-primary);
 }
 
 .loading-text {
@@ -369,7 +369,7 @@ export default {
 
 .summary-icon {
   font-size: 20px;
-  color: #409eff;
+  color: var(--color-primary);
 }
 
 .section-label {
@@ -386,7 +386,7 @@ export default {
   padding: 20px 24px;
   background: linear-gradient(to right, #f5f7fa 0%, #fafbfc 100%);
   border-radius: 8px;
-  border-left: 4px solid #409eff;
+  border-left: 4px solid var(--color-primary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   white-space: pre-wrap;
   word-wrap: break-word;

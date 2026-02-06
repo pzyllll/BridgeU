@@ -5,7 +5,6 @@ com\globalbuddy\service\ImageModerationService.class
 com\globalbuddy\dto\AuthRequest$AuthRequestBuilder.class
 com\globalbuddy\model\AppUser$MerchantStatus.class
 com\globalbuddy\controller\SearchController$PostResponseWithScore.class
-com\globalbuddy\service\NlpService$QaReference.class
 com\globalbuddy\model\News$NewsBuilder.class
 com\globalbuddy\dto\CommentRequest.class
 com\globalbuddy\controller\SearchController$CommunityResponseWithScore.class
@@ -14,7 +13,6 @@ com\globalbuddy\security\JwtService.class
 com\globalbuddy\service\NewsToPostService$ConversionResult.class
 com\globalbuddy\dto\CommunityPostRequest.class
 com\globalbuddy\controller\AuthController.class
-com\globalbuddy\service\NlpService$ScoredPost.class
 com\globalbuddy\service\AiSummaryService.class
 com\globalbuddy\service\QwenService.class
 com\globalbuddy\service\ContentModerationService$ParsedResult.class
@@ -28,7 +26,6 @@ com\globalbuddy\dto\PostResponse.class
 com\globalbuddy\controller\SearchController.class
 com\globalbuddy\dto\MerchantRegisterRequest.class
 com\globalbuddy\model\converter\StringListConverter.class
-com\globalbuddy\service\NlpService$QaResult.class
 com\globalbuddy\model\AppUser$Role.class
 com\globalbuddy\dto\CommentResponse.class
 com\globalbuddy\dto\RegisterRequest.class
@@ -51,7 +48,6 @@ com\globalbuddy\service\DocumentDetectionService$DocumentType.class
 com\globalbuddy\service\ImageModerationService$ImageStatus.class
 com\globalbuddy\dto\PostDetailResponse$PostDetailResponseBuilder.class
 com\globalbuddy\model\PostLike.class
-com\globalbuddy\service\NlpService.class
 com\globalbuddy\service\TranslationService.class
 com\globalbuddy\config\WebMvcConfig.class
 com\globalbuddy\service\ContentModerationService.class

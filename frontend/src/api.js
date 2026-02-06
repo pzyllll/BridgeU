@@ -148,7 +148,6 @@ export const fetchPosts = (params = {}) => {
   }).then((res) => res.data);
 };
 export const searchAll = (params = {}) => client.get('/api/search', { params }).then((res) => res.data);
-export const askQuestion = (payload) => client.post('/api/nlp/qa', payload).then((res) => res.data);
 export const createPost = (payload, token) =>
   client
     .post('/api/posts', payload, {

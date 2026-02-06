@@ -250,7 +250,7 @@ onMounted(() => {
 
 .spinner {
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #409eff;
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   width: 40px;
   height: 40px;

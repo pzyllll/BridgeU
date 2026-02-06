@@ -10,7 +10,6 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\ConversationRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\EmailService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\model\UserFollow.java
-C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\NlpService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\CommunityPostRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\VerificationCodeService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\security\JwtAuthenticationFilter.java
@@ -67,7 +66,6 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\SemanticService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\AiSummaryService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\LanguageDetectionService.java
-C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\controller\NlpController.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\CommunityResponse.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\GlobalBuddyApplication.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\VerificationCodeRepository.java

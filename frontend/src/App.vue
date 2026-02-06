@@ -7,7 +7,6 @@
         <Sidebar 
           :current-page="currentPage" 
           @navigate="handleNavigate"
-          :is-admin="isAdmin"
           :user="user"
         />
         <main class="main-content">
@@ -96,15 +95,6 @@
 
           <!-- Search -->
           <SearchPanel v-else-if="currentPage === 'search'" :key="`search-${lang}`" />
-
-          <!-- AI Assistant -->
-          <NlpAssistant v-else-if="currentPage === 'assistant'" :key="`assistant-${lang}`" />
-
-          <!-- Admin Panel -->
-          <template v-else-if="currentPage === 'admin'">
-            <AdminPanel v-if="isAdmin" :key="`admin-${lang}`" :token="token" />
-            <div v-else class="card">{{ lang === 'zh' ? '无权访问' : 'Access Denied' }}</div>
-          </template>
 
           <!-- Post Detail -->
           <template v-else-if="currentPage === 'postDetail'">
@@ -201,9 +191,7 @@ import DailyBriefingDetail from './components/vue/DailyBriefingDetail.vue';
 import UserProfile from './components/UserProfile.vue';
 import MyProfile from './components/MyProfile.vue';
 import MyPosts from './components/MyPosts.vue';
-import NlpAssistant from './components/NlpAssistant.vue';
 import NewPostForm from './components/NewPostForm.vue';
-import AdminPanel from './components/AdminPanel.vue';
 import ConversationList from './components/ConversationList.vue';
 import ChatWindow from './components/ChatWindow.vue';
 import { fetchMyRejectedPosts } from './api';
@@ -246,8 +234,6 @@ const lang = ref(getCurrentLanguage());
 const selectedTag = ref('all');
 const rejectedPosts = ref([]);
 const showMyPostsList = ref(false);
-
-const isAdmin = computed(() => user.value?.role === 'ADMIN');
 
 // Element Plus locale - 响应语言变化
 const elementLocale = computed(() => {
@@ -385,6 +371,18 @@ const handleLogout = () => {
 const handleNavigate = (page, postId = null) => {
   if (page === 'logout') {
     handleLogout();
+    return;
+  }
+  // 管理员面板入口已移除：避免手动触发后出现残留页面状态
+  if (page === 'admin') {
+    currentPage.value = 'briefing';
+    selectedPostId.value = null;
+    selectedNewsId.value = null;
+    selectedUserId.value = null;
+    selectedConversationId.value = null;
+    selectedConversation.value = null;
+    showMyPostsList.value = false;
+    ElMessage.info(lang.value === 'zh' ? '管理面板已移除' : 'Admin panel has been removed');
     return;
   }
   if (page === 'postDetail' && postId) {

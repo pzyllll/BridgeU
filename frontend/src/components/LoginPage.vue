@@ -1049,7 +1049,7 @@ const resetPassword = async () => {
   text-align: center;
   margin-bottom: 0;
   padding: 2rem 2rem;
-  background: linear-gradient(135deg, rgba(255,159,137,0.18), rgba(157,186,213,0.14));
+  background: linear-gradient(135deg, rgba(182, 156, 255, 0.16), rgba(157, 186, 213, 0.12));
 }
 
 .logo {

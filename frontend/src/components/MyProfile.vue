@@ -619,7 +619,7 @@ onMounted(() => {
 
 .spinner {
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #409eff;
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -673,7 +673,7 @@ onMounted(() => {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #409eff;
+  background: var(--color-primary);
   border: 2px solid white;
   color: white;
   cursor: pointer;
@@ -685,7 +685,7 @@ onMounted(() => {
 }
 
 .btn-edit-avatar:hover {
-  background: #66b1ff;
+  background: var(--color-primary-dark);
 }
 
 .profile-info {
@@ -766,7 +766,7 @@ onMounted(() => {
 
 .form-input:focus {
   outline: none;
-  border-color: #409eff;
+  border-color: var(--color-primary);
 }
 
 .form-hint {
@@ -792,12 +792,12 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: #409eff;
+  background: var(--color-primary);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #66b1ff;
+  background: var(--color-primary-dark);
 }
 
 .btn:disabled {
@@ -807,7 +807,7 @@ onMounted(() => {
 
 .btn-link {
   background: transparent;
-  color: #409eff;
+  color: var(--color-primary);
   text-decoration: underline;
   padding: 8px 0;
 }

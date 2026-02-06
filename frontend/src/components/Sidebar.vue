@@ -19,19 +19,6 @@
         <span>{{ item.label }}</span>
       </div>
 
-      <!-- Admin Entry -->
-      <template v-if="isAdmin">
-        <div class="nav-section-title" style="margin-top: 1rem">{{ t('sidebar.admin') }}</div>
-        <div
-          :class="['nav-item', { active: currentPage === 'admin' }]"
-          @click="$emit('navigate', 'admin')"
-          :style="{ background: currentPage === 'admin' ? '#ffd700' : 'transparent' }"
-        >
-          <span>🔧</span>
-          <span>{{ t('sidebar.adminPanel') }}</span>
-        </div>
-      </template>
-
       <div style="margin-top: auto; border-top: 2px solid #333">
         <!-- Language Switcher -->
         <div style="
@@ -77,7 +64,6 @@
         
         <div v-if="user" style="padding: 0.5rem; font-family: monospace; font-size: 0.8rem; color: #666">
           {{ user.displayName || user.username }}
-          <span v-if="isAdmin" class="pill active" style="margin-left: 0.5rem; font-size: 0.6rem">{{ t('sidebar.admin') }}</span>
         </div>
         <div
           :class="['nav-item', { active: currentPage === 'profile' }]"
@@ -108,10 +94,6 @@ const props = defineProps({
     type: String,
     required: true
   },
-  isAdmin: {
-    type: Boolean,
-    default: false
-  },
   user: {
     type: Object,
     default: null
@@ -131,7 +113,6 @@ const navItems = computed(() => {
     { id: 'community', label: t('sidebar.communityFeed'), icon: '🏠' },
     { id: 'post', label: t('sidebar.newPost'), icon: '➕' },
     { id: 'messages', label: t('sidebar.messages'), icon: '💬' },
-    { id: 'assistant', label: t('sidebar.aiAssistant'), icon: '🤖' },
   ];
 });
 

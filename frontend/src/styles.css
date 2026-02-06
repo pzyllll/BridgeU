@@ -1,9 +1,9 @@
-/* BridgeU UI Refresh - 青春活力风格 */
+/* BridgeU UI Refresh - 香芋紫温暖风 */
 :root {
-  /* 主色调：活力珊瑚橙 */
-  --color-primary: #FF6B6B;
-  --color-primary-dark: #FF5252;
-  --color-primary-light: #FF8E8E;
+  /* 主色调：香芋紫（温暖） */
+  --color-primary: #B69CFF;
+  --color-primary-dark: #9B7BFF;
+  --color-primary-light: #D2C2FF;
   
   /* 撞色系统 */
   --color-learning: #9B59B6; /* 学习 - 亮紫色 */
@@ -28,7 +28,7 @@
   --color-divider: #E8ECEF;
   
   /* 彩色发光阴影 */
-  --shadow-primary: 0 10px 30px -10px rgba(255, 107, 107, 0.4);
+  --shadow-primary: 0 10px 30px -10px rgba(182, 156, 255, 0.45);
   --shadow-learning: 0 10px 30px -10px rgba(155, 89, 182, 0.4);
   --shadow-housing: 0 10px 30px -10px rgba(52, 152, 219, 0.4);
   --shadow-life: 0 10px 30px -10px rgba(46, 204, 113, 0.4);
@@ -64,7 +64,7 @@ html, body, #root {
   position: relative;
 }
 
-/* 彩色光斑背景 - 青春活力 */
+  /* 彩色光斑背景 - 香芋紫温暖 */
 body::before,
 #root::before {
   content: '';
@@ -72,7 +72,7 @@ body::before,
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 107, 107, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(182, 156, 255, 0.16) 0%, transparent 70%);
   top: -300px;
   right: -300px;
   z-index: 0;
@@ -295,7 +295,7 @@ body:has(.login-container),
 }
 
 .nav-item:hover {
-  background: rgba(255, 107, 107, 0.08);
+  background: rgba(182, 156, 255, 0.10);
   color: var(--color-primary);
   transform: translateX(4px);
 }
@@ -305,7 +305,7 @@ body:has(.login-container),
 }
 
 .nav-item.active {
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 142, 142, 0.1));
+  background: linear-gradient(135deg, rgba(182, 156, 255, 0.18), rgba(210, 194, 255, 0.12));
   color: var(--color-primary);
   font-weight: 700;
   box-shadow: var(--shadow-primary);
@@ -321,7 +321,7 @@ body:has(.login-container),
   height: 24px;
   background: var(--color-primary);
   border-radius: 0 4px 4px 0;
-  box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+  box-shadow: 0 0 12px rgba(182, 156, 255, 0.45);
 }
 
 .nav-item.active span:first-child {
@@ -345,7 +345,7 @@ body:has(.login-container),
   top: 100px;
   right: 50px;
   font-size: 120px;
-  color: rgba(255, 107, 107, 0.08);
+  color: rgba(182, 156, 255, 0.10);
   z-index: 0;
   pointer-events: none;
 }
@@ -525,7 +525,7 @@ body:has(.login-container),
 }
 
 .btn-primary:hover {
-  box-shadow: 0 12px 40px -10px rgba(255, 107, 107, 0.5);
+  box-shadow: 0 12px 40px -10px rgba(182, 156, 255, 0.50);
   transform: translateY(-2px) scale(1.02);
 }
 .btn-primary:hover { box-shadow: var(--shadow-hover); }
@@ -675,7 +675,7 @@ select.input { cursor: pointer; }
 .login-header {
   text-align: center;
   padding: 3rem 2.5rem;
-  background: linear-gradient(135deg, rgba(255,159,137,0.18), rgba(157,186,213,0.14));
+  background: linear-gradient(135deg, rgba(182, 156, 255, 0.16), rgba(157, 186, 213, 0.12));
 }
 
 .login-header .logo {
@@ -721,7 +721,7 @@ select.input { cursor: pointer; }
 .login-tab.active {
   border-bottom: 3px solid var(--color-primary);
   color: var(--color-primary);
-  background: rgba(255,159,137,0.10);
+  background: rgba(182, 156, 255, 0.12);
 }
 
 .login-form { padding: 3.5rem 5rem; }
@@ -783,8 +783,8 @@ select.input { cursor: pointer; }
   position: absolute;
   top: 12px;
   right: 12px;
-  background: rgba(255,159,137,0.18);
-  color: #C75E44;
+  background: rgba(182, 156, 255, 0.18);
+  color: #6B4FB8;
   font-size: 10px;
   font-weight: 800;
   padding: 4px 8px;
@@ -885,15 +885,15 @@ select.input { cursor: pointer; }
   height: 52px;
   border-radius: 50%;
   border: 3px solid var(--color-primary);
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(52, 152, 219, 0.15));
+  background: linear-gradient(135deg, rgba(182, 156, 255, 0.22), rgba(52, 152, 219, 0.13));
   display: inline-flex;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 4px 12px rgba(182, 156, 255, 0.28);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .post-avatar:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  box-shadow: 0 6px 20px rgba(182, 156, 255, 0.36);
 }
 
 .post-author-name { 
@@ -913,13 +913,13 @@ select.input { cursor: pointer; }
 
 .post-tag {
   padding: 8px 14px;
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(52, 152, 219, 0.1));
+  background: linear-gradient(135deg, rgba(182, 156, 255, 0.12), rgba(52, 152, 219, 0.10));
   color: var(--color-primary);
   font-size: 12px;
   font-weight: 700;
   border-radius: var(--radius-pill);
   border: 2px solid var(--color-primary);
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+  box-shadow: 0 2px 8px rgba(182, 156, 255, 0.22);
   display: inline-flex;
   align-items: center;
   gap: 4px;

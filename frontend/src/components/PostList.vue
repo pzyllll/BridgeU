@@ -66,8 +66,8 @@
           </span>
         </div>
         <h3 class="post-title">{{ post.title }}</h3>
-        <div v-if="post.imageUrl" style="margin-bottom: 1rem; position: relative; padding: 8px; background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(52, 152, 219, 0.1)); border-radius: 20px; transform: rotate(-1deg); transition: transform 0.3s;">
-          <div style="position: absolute; bottom: -8px; right: -8px; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(52, 152, 219, 0.2)); border-radius: 20px; z-index: -1; transform: rotate(2deg);"></div>
+        <div v-if="post.imageUrl" style="margin-bottom: 1rem; position: relative; padding: 8px; background: linear-gradient(135deg, rgba(182, 156, 255, 0.12), rgba(52, 152, 219, 0.10)); border-radius: 20px; transform: rotate(-1deg); transition: transform 0.3s;">
+          <div style="position: absolute; bottom: -8px; right: -8px; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(182, 156, 255, 0.22), rgba(52, 152, 219, 0.18)); border-radius: 20px; z-index: -1; transform: rotate(2deg);"></div>
           <img
             :src="post.imageUrl"
             :alt="post.title || 'post image'"
@@ -81,7 +81,7 @@
         <div class="post-footer">
           <span>{{ formatTime(post.createdAt) }}</span>
           <div class="post-stats">
-            <span class="stat-item" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255, 107, 107, 0.1); border-radius: 20px; font-weight: 600; color: #FF6B6B;">
+            <span class="stat-item" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(182, 156, 255, 0.14); border-radius: 20px; font-weight: 600; color: var(--color-primary);">
               <span style="font-size: 18px;">❤️</span>
               {{ post.likeCount || 0 }}
             </span>
