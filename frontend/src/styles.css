@@ -441,6 +441,13 @@ body:has(.login-container),
   color: var(--color-life);
 }
 
+/* 兼职 / 生活服务 标签：使用主色香芋紫 */
+.pill[data-tag="part-time-job"],
+.pill[data-tag="life-services"] {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .pill[data-tag="food"] {
   border-color: var(--color-food);
   color: var(--color-food);
@@ -491,6 +498,14 @@ body:has(.login-container),
   background: var(--color-travel);
   border-color: var(--color-travel);
   box-shadow: 0 10px 30px -10px rgba(231, 76, 60, 0.4);
+}
+
+/* 兼职 / 生活服务 选中态：香芋紫实心 */
+.pill.active[data-tag="part-time-job"],
+.pill.active[data-tag="life-services"] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-primary);
 }
 
 /* 默认active（all标签） */
