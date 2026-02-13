@@ -156,17 +156,23 @@
           <template v-else-if="currentPage === 'profile'">
             <MyProfile
               :on-view-user-profile="handleViewUserProfile"
-              v-if="!showMyPostsList"
+              v-if="!showMyPostsList && !showMyReportsList"
               :user-id="user?.id"
               :token="token"
               @view-my-posts="showMyPostsList = true"
+              @view-my-reports="showMyReportsList = true"
               @view-post-detail="(postId) => handleNavigate('postDetail', postId)"
             />
             <MyPosts
-              v-else
+              v-else-if="showMyPostsList"
               :token="token"
               @back="showMyPostsList = false"
               @view-post-detail="(postId) => handleNavigate('postDetail', postId)"
+            />
+            <MyReports
+              v-else-if="showMyReportsList"
+              :token="token"
+              @back="showMyReportsList = false"
             />
           </template>
 
@@ -191,6 +197,7 @@ import DailyBriefingDetail from './components/vue/DailyBriefingDetail.vue';
 import UserProfile from './components/UserProfile.vue';
 import MyProfile from './components/MyProfile.vue';
 import MyPosts from './components/MyPosts.vue';
+import MyReports from './components/MyReports.vue';
 import NewPostForm from './components/NewPostForm.vue';
 import ConversationList from './components/ConversationList.vue';
 import ChatWindow from './components/ChatWindow.vue';
@@ -234,6 +241,7 @@ const lang = ref(getCurrentLanguage());
 const selectedTag = ref('all');
 const rejectedPosts = ref([]);
 const showMyPostsList = ref(false);
+const showMyReportsList = ref(false);
 
 // Element Plus locale - 响应语言变化
 const elementLocale = computed(() => {
@@ -357,6 +365,7 @@ const handleLogout = () => {
   token.value = null;
   rejectedPosts.value = [];
   showMyPostsList.value = false;
+  showMyReportsList.value = false;
   currentPage.value = 'briefing'; // Reset to default page
   selectedPostId.value = null;
   selectedNewsId.value = null;
@@ -382,6 +391,7 @@ const handleNavigate = (page, postId = null) => {
     selectedConversationId.value = null;
     selectedConversation.value = null;
     showMyPostsList.value = false;
+    showMyReportsList.value = false;
     ElMessage.info(lang.value === 'zh' ? '管理面板已移除' : 'Admin panel has been removed');
     return;
   }
@@ -393,16 +403,19 @@ const handleNavigate = (page, postId = null) => {
     selectedConversationId.value = null;
     selectedConversation.value = null;
     showMyPostsList.value = false;
+    showMyReportsList.value = false;
   } else if (page === 'messages') {
     currentPage.value = 'messages';
     selectedPostId.value = null;
     selectedNewsId.value = null;
     selectedUserId.value = null;
     showMyPostsList.value = false;
+    showMyReportsList.value = false;
     // Keep conversation selection when navigating to messages
   } else if (page === 'profile') {
     currentPage.value = 'profile';
     showMyPostsList.value = false;
+    showMyReportsList.value = false;
     selectedPostId.value = null;
     selectedNewsId.value = null;
     selectedUserId.value = null;
@@ -416,6 +429,7 @@ const handleNavigate = (page, postId = null) => {
     selectedConversationId.value = null; // Reset conversation when navigating away
     selectedConversation.value = null;
     showMyPostsList.value = false;
+    showMyReportsList.value = false;
   }
 };
 

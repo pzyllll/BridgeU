@@ -4,6 +4,7 @@ import com.globalbuddy.model.AppUser;
 import com.globalbuddy.model.Report;
 import com.globalbuddy.repository.ReportRepository;
 import com.globalbuddy.service.ContentModerationService;
+import com.globalbuddy.service.ReportModerationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ public class ReportController {
 
     private final ReportRepository reportRepository;
     private final ContentModerationService contentModerationService;
+    private final ReportModerationService reportModerationService;
 
     /**
      * Get current authenticated user
@@ -91,13 +93,12 @@ public class ReportController {
             log.info("Report submitted: id={}, targetType={}, targetId={}, reasons={}", 
                     report.getId(), targetType, targetId, reasons);
 
-            // Trigger AI moderation review for the reported content
-            // This will be handled asynchronously or in a separate process
-            // For now, we just save the report
+            // Trigger AI moderation review for the reported content asynchronously
+            reportModerationService.processReport(report.getId());
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", "Report submitted successfully");
+            response.put("message", "Report submitted successfully. AI review is in progress.");
             response.put("reportId", report.getId());
 
             return ResponseEntity.ok(response);

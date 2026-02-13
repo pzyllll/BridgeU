@@ -43,9 +43,12 @@ public class AuthController {
     @PostMapping("/send-verification-code")
     public ResponseEntity<?> sendVerificationCode(@Valid @RequestBody SendVerificationCodeRequest request) {
         try {
+            log.info("收到发送验证码请求: type={}, identifier={}", request.getType(), request.getIdentifier());
+            
             // 验证邮箱格式
             if ("email".equalsIgnoreCase(request.getType())) {
                 if (!request.getIdentifier().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+                    log.warn("邮箱格式不正确: {}", request.getIdentifier());
                     return ResponseEntity.badRequest().body(Map.of(
                         "error", "邮箱格式不正确",
                         "field", "identifier"
@@ -56,6 +59,7 @@ public class AuthController {
             // 检查是否已注册（注册时）
             if ("email".equalsIgnoreCase(request.getType())) {
                 if (userRepository.existsByEmail(request.getIdentifier())) {
+                    log.warn("邮箱已被注册: {}", request.getIdentifier());
                     return ResponseEntity.badRequest().body(Map.of(
                         "error", "该邮箱已被注册",
                         "field", "identifier"
@@ -63,6 +67,7 @@ public class AuthController {
                 }
             } else if ("phone".equalsIgnoreCase(request.getType())) {
                 if (userRepository.existsByPhone(request.getIdentifier())) {
+                    log.warn("手机号已被注册: {}", request.getIdentifier());
                     return ResponseEntity.badRequest().body(Map.of(
                         "error", "该手机号已被注册",
                         "field", "identifier"
@@ -71,6 +76,7 @@ public class AuthController {
             }
 
             // 发送验证码（默认用途为注册）
+            log.debug("开始调用验证码服务发送验证码");
             boolean sent = verificationCodeService.sendVerificationCode(
                 request.getIdentifier(),
                 request.getType(),
@@ -78,18 +84,28 @@ public class AuthController {
             );
 
             if (sent) {
+                log.info("验证码发送成功: {}", request.getIdentifier());
                 return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "验证码已发送"
                 ));
             } else {
+                log.error("验证码发送失败: {}", request.getIdentifier());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "error", "发送验证码失败，请稍后重试"
                 ));
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            log.error("发送验证码时发生运行时异常: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "error", e.getMessage() != null ? e.getMessage() : "发送验证码失败"
+                "error", e.getMessage() != null ? e.getMessage() : "发送验证码失败",
+                "details", e.getClass().getSimpleName()
+            ));
+        } catch (Exception e) {
+            log.error("发送验证码时发生未知异常: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "error", "发送验证码失败: " + (e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()),
+                "details", e.getClass().getName()
             ));
         }
     }

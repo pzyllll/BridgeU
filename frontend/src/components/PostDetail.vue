@@ -544,6 +544,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { fetchPostDetail, addComment, toggleLike, toggleFollow, getCommentSummary, deleteComment, submitReport } from '../api';
 import { getCurrentLanguage, t } from '../i18n';
 import { parseBackendDate, formatBangkokAbsolute } from '../utils/datetime';
+import { ElMessage } from 'element-plus';
 
 // Filter out browser extension errors
 if (typeof window !== 'undefined') {
@@ -844,21 +845,63 @@ const openCommentReportDialog = (commentId) => {
 
 const handleSubmitReport = async (targetType, targetId) => {
   if (!targetId || selectedReportReasons.value.length === 0) {
+    ElMessage.warning(t('postDetail.reportReasonsRequired'));
     return;
   }
   
   submittingReport.value = true;
   try {
-    await submitReport(targetType, targetId, selectedReportReasons.value, reportDescription.value, props.token);
-    alert(t('postDetail.reportSubmitted'));
-    showReportDialog.value = false;
-    showCommentReportDialog.value = false;
-    reportTargetId.value = null;
-    selectedReportReasons.value = [];
-    reportDescription.value = '';
+    const response = await submitReport(targetType, targetId, selectedReportReasons.value, reportDescription.value, props.token);
+    
+    // Check if response indicates success
+    if (response && response.success !== false) {
+      ElMessage.success({
+        message: response.message || t('postDetail.reportSubmitted'),
+        duration: 3000,
+        showClose: true
+      });
+      // Close dialogs and reset form
+      showReportDialog.value = false;
+      showCommentReportDialog.value = false;
+      reportTargetId.value = null;
+      selectedReportReasons.value = [];
+      reportDescription.value = '';
+    } else {
+      // Handle case where API returns success: false
+      const errorMsg = response?.message || t('postDetail.reportFailed');
+      ElMessage.error({
+        message: errorMsg,
+        duration: 4000,
+        showClose: true
+      });
+    }
   } catch (err) {
     console.error('Failed to submit report:', err);
-    alert(err.response?.data?.message || t('postDetail.reportFailed'));
+    
+    // Handle different error scenarios
+    let errorMsg = t('postDetail.reportFailed');
+    
+    if (err.response) {
+      // Server responded with error status
+      if (err.response.status === 401) {
+        errorMsg = getCurrentLanguage() === 'zh' 
+          ? '您需要登录才能提交举报' 
+          : 'You need to be logged in to submit a report';
+      } else if (err.response.status === 400) {
+        errorMsg = err.response.data?.message || errorMsg;
+      } else if (err.response.data?.message) {
+        errorMsg = err.response.data.message;
+      }
+    } else if (err.message) {
+      // Network error or other error
+      errorMsg = err.message;
+    }
+    
+    ElMessage.error({
+      message: errorMsg,
+      duration: 4000,
+      showClose: true
+    });
   } finally {
     submittingReport.value = false;
   }

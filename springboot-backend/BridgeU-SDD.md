@@ -2,7 +2,7 @@
 
 **Software Design Development**
 
-Zhiyi Pan 652115558  
+Zhiyi Pan 652115558
 Bachelor of Science, Software Engineering Program  
 College of Arts, Media, and Technology, Chiang Mai University  
 December 2025  
@@ -714,4 +714,3 @@ The following files implement Feature 1: Daily Briefing System.
   - `frontend/src/api.js` (`fetchDailyBriefing`, `fetchNewsSources`)
   - `frontend/vite.config.js` (dev proxy for `/api`)
 
- 

@@ -39,7 +39,8 @@ public class CommunityPost {
     public enum Status {
         PENDING_REVIEW,  // Pending review
         APPROVED,        // Approved
-        REJECTED         // Rejected
+        REJECTED,        // Rejected
+        REPORTED_REMOVED // Removed due to report (can be restored)
     }
 
     @Id

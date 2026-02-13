@@ -15,15 +15,21 @@ Asst. Prof. Pattama Longani, Ph.D.
 
 
 Chapter 1 Introduction
-1.1 Purpose and Scope
-The purpose of the Test Plan document for the BridgeU system is to establish a test plan of the unit testing to discover the potential bugs or defects. The unit testing covers all implemented methods in the BridgeU system.
+1.1 Purpose
+The purpose of this Test Plan is to define a structured approach for testing the BridgeU system, including unit, integration, and system testing activities. It aims to detect potential defects as early as possible, ensure that all implemented features behave correctly under normal and exceptional conditions, and provide evidence that the system satisfies the requirements defined in the SRS and SDD.
 
-1.2 Acronyms and Definitions
+1.2 Scope
+The scope of this Test Plan covers all essential functions of the BridgeU platform using both white-box and black-box testing techniques:
+- White-box testing focuses on **internal implementation**, including unit tests for Vue.js components, Spring Boot controllers, services, repositories, and utility classes (e.g., Daily Briefing pipeline, language detection, content moderation).  
+- Black-box testing focuses on **externally visible behavior**, including integration tests for REST APIs and database interactions, and system tests that verify end-to-end user scenarios (such as viewing Daily Briefings, applying filters, searching, switching languages, and viewing news details).  
+
+
+1.3 Acronyms and Definitions
 Acronyms
 URS	User Requirement Specification 
 UTC	Unit Test Case
 STC	System Test Case
-YD	Test Data
+TD	Test Data
 SRS	Software Requirement Specification
 SDD	Software Design Development 
 API	Application Programming Interface
@@ -58,17 +64,36 @@ The objectives of testing the BridgeU system are:
 3. To ensure that all API endpoints return correct responses according to the specifications
 4. To validate that all user interactions (search, filter, pagination, etc.) work as expected
 5. To ensure proper error handling and user feedback mechanisms throughout the system
-6. To verify integration between frontend and backend components
+6. To verify integration between frontend Vue.js components and backend Spring Boot API endpoints
 7. To validate data consistency and integrity across all features
 2.2 Scope of Testing
-The scope of testing covers all BridgeU system essential functions using unit testing, system testing, and integration testing. 
-2.3 Test Responsibility
+The scope of testing covers all BridgeU system essential functions using unit testing, integration testing, and system testing. 
+
+2.3 Test Duration
+The planned testing schedule for the BridgeU project is organised by feature and test level.  
+Each feature follows the same 4‑week cycle (unit → integration → system), for a **total of 12 weeks** across all three features:
+- **Weeks 1–4 – Feature 1: Daily Briefing System**  
+  - Weeks 1–2: Design and execute unit tests (UTC) for frontend Daily Briefing components and backend news pipeline (controllers, services, repositories).  
+  - Week 3: Design and execute integration tests (ITC) for `/api/news/daily-briefing` and `/api/news/daily-briefing/{id}`, verifying interaction with the `news` table.  
+  - Week 4: Execute system tests (STC‑01 ~ STC‑06) for Feature 1, validating end‑to‑end user scenarios in the browser.  
+- **Weeks 5–8 – Feature 2: Community Interaction Platform**  
+  - Weeks 5–6: Unit tests for community posts, comments, likes, follows, and report‑related controllers/services.  
+  - Week 7: Integration tests for community REST APIs and database tables (`posts`, `comments`, `post_likes`, `user_follows`, `reports`).  
+  - Week 8: System tests for community UI flows (feed, posting, commenting, following, reporting, AI moderation).  
+- **Weeks 9–12 – Feature 3: Auth & Profile / Private Messaging**  
+  - Weeks 9–10: Unit tests for authentication, verification codes, profile management, conversations and messages.  
+  - Week 11: Integration tests for auth/messaging APIs and their interaction with `users`, `verification_codes`, `conversations`, `messages`.  
+  - Week 12: System tests for login/registration, profile update, mutual follow and private messaging flows.  
+The schedule may be refined during the project, but all three features must complete their 4‑week test cycles before final acceptance.
+
+2.4 Test Responsibility
 Name	Responsibility
 Unit Test	ZhiYiPan
+Integration Test	ZhiYiPan
 System Test	ZhiYiPan
 Test Record	ZhiYiPan
 
-2.4 Test Strategy
+2.5 Test Strategy
 The BridgeU system testing follows a structured approach:
 Test Planning:
 Test case design based on use case descriptions and system requirements
@@ -89,9 +114,30 @@ All test cases are documented with clear descriptions and expected results
 Test execution results are recorded with timestamps
 Failed tests are logged with detailed error messages and steps to reproduce
 
+In addition, the following testing methodologies are applied:
+- **White-box testing** for unit tests of Vue.js components, Spring Boot controllers, services, repositories, and utility classes.  
+- **Black-box testing** for integration and system tests, focusing on observable behaviour of REST APIs and UI workflows against requirements.  
+- **Regression testing** is performed after major changes to ensure that previously implemented features continue to work as expected.  
+
+2.6 Test Environment
+The tests for BridgeU are executed in a controlled environment to ensure reproducible results.
+
+- **Hardware**:  
+  - Laptop-class machine with at least Intel i5 (or equivalent) CPU, 16 GB RAM, 512 GB SSD.  
+  - Screen resolution 1920×1080 or higher for verifying responsive UI layouts.  
+- **Operating System**:  
+  - Windows 10 / Windows 11 64-bit.  
+- **Backend Software Stack**:  
+  - JDK 17 or later.  
+  - Spring Boot backend (`global-buddy-backend`) running on port 8080.  
+  - MySQL 8.x database instance with schema `bridgeu`.  
+- **Frontend & Tools**:  
+  - Node.js / npm for running the Vue.js frontend.  
+  - Modern web browser (e.g., Google Chrome, Microsoft Edge) with Developer Tools (Network tab, Console).  
+  - Postman or similar API client for integration testing of REST endpoints.  
 
 
-2.5 Result of Testing
+2.7 Result of Testing
 
 Test Execution:
 Each test case is executed and produces an actual output
@@ -118,6 +164,7 @@ Chapter 3 Unit test
 3.1.1 Unit Test Cases
 3.1.1.1 UTC-01: Test fetchDailyBriefing()
 Description: Tests the frontend component method for fetching daily briefing list, verifying it correctly handles pagination, language parameters, search keywords, date filters, and properly processes API responses and error cases.
+Prerequisite: Frontend application is running and connected to the backend API; database contains at least 20 valid news records.
 Test ID: UTC-01
 Test Function: fetchDailyBriefing()
 Test Cases: 
@@ -175,6 +222,7 @@ ID	Description	Input	Expected Result
 
 3.1.2 UTC-02: Test fetchNewsDetail()
 Description:Tests the frontend component method for fetching news details, verifying it correctly retrieves news details based on news ID and language parameters, and handles 404 errors and network errors.
+Prerequisite: Same as UTC-01, and at least one news record with a valid ID exists in the database.
 Test ID: UTC-02
 Test Function: fetchNewsDetail()
 Test Cases:
@@ -227,6 +275,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.3 UTC-03: Test handleSearch()
 Description:Tests the frontend component method for handling search operations, verifying it resets pagination, triggers search requests, and correctly handles clearing search keywords.
+Prerequisite: Daily Briefing page is loaded successfully and `fetchDailyBriefing()` is available on the component instance.
 Test ID: UTC-03
 Test Function: handleSearch()
 Test Cases:
@@ -247,6 +296,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.4 UTC-04: Test applyFilters()
 Description:Tests the frontend component method for applying date filters, verifying it correctly sets start and end dates, resets pagination, and triggers data refetch.
+Prerequisite: Daily Briefing page is loaded with date filter controls rendered and bound to component state.
 Test ID: UTC-04
 Test Function: applyFilters()
 Test Cases:
@@ -282,6 +332,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.5 UTC-05: Test resetFilters()
 Description:Tests the frontend component method for resetting filters, verifying it clears date filters and search keywords,resets pagination, and refetches all news data.
+Prerequisite: Daily Briefing page is loaded and at least one filter (keyword or date) has been applied.
 Test ID: UTC-05
 Test Function: resetFilters()
 Test Cases:
@@ -302,6 +353,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.6 UTC-06: Test handlePageChange()
 Description:Tests the frontend component method for handling page changes, verifying it correctly updates the current page number and refetches news data for the corresponding page.
+Prerequisite: Daily Briefing list is visible with pagination controls rendered.
 Test ID: UTC-06
 Test Function: handlePageChange(page)
 Test Cases:
@@ -327,6 +379,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.7 UTC-07: Test normalizeDateValue() 
 Description:Tests the utility method for normalizing date values, verifying it correctly handles various date input formats (strings, Date objects, null, etc.) and returns normalized date values.
+Prerequisite: JavaScript date utilities and localization libraries used by the component are loaded (no external API dependency).
 Test ID: UTC-07
 Test Function: normalizeDateValue(value)
 Test Cases:
@@ -358,6 +411,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.8 UTC-08: Test formatDate()
 Description: Tests the utility method for formatting dates, verifying it correctly formats date displays based on the current interface language (Chinese or English) and handles various date input formats.
+Prerequisite: Component or utility module has access to the current interface language setting (`currentLang`).
 Test ID: UTC-08
 Test Function: formatDate(date)
 Test Cases:
@@ -385,6 +439,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.9 UTC-09: Test convertToDTO()
 Description:Tests the backend service method for converting news entities to Data Transfer Objects (DTOs), verifying it correctly selects Chinese or English versions of titles and summaries based on the language parameter.
+Prerequisite: News entity objects are instantiated in memory with various combinations of original and translated fields; no database access is required.
 Test ID: UTC-09
 Test Function: convertToDTO(news, lang)
 Test Cases:
@@ -453,6 +508,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.10 UTC-10: Test getDailyBriefing() – Backend
 Description:Tests the backend controller API method for retrieving daily briefing list, verifying it correctly handles pagination, language, date filtering, keyword search parameters, and returns appropriate response data.
+Prerequisite: Spring Boot backend is running with access to the `news` table in the MySQL `bridgeu` database; `NewsRepository` is correctly wired.
 Test ID: UTC-10
 Test Function: getDailyBriefing()
 Test Cases:
@@ -506,6 +562,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.11 UTC-11: Test getNewsDetail() – Backend
 Description:Tests the backend controller API method for retrieving news details, verifying it correctly returns news details based on news ID and language parameters, and handles cases where news does not exist.
+Prerequisite: Backend is running and the `news` table contains at least one valid record and one non-existent ID to test 404 behaviour.
 Test ID: UTC-11
 Test Function: getNewsDetail()
 Test Cases:
@@ -565,6 +622,7 @@ ID	Description	Input	Expected Result
 }
 3.1.1.12 UTC-12: Test findByKeyword()
 Description: Tests the backend repository method for searching news by keyword, verifying it performs fuzzy matching searches across multiple fields (titles, summaries, Chinese and English versions) and supports pagination.
+Prerequisite: `NewsRepository` is available in a Spring test context with test data inserted into the `news` table.
 Test ID: UTC-12
 Test Function: findByKeyword(keyword, pageable)
 Test Cases:
@@ -618,6 +676,7 @@ ID	Description	Input	Expected Result
 
 3.1.1.13 UTC-13: Test findByPublishDateBetweenOrdered()
 Description:Tests the backend repository method for querying news by publication date range, verifying it correctly filters news within the specified date range, orders by publication date in descending order, and supports pagination.
+Prerequisite: `NewsRepository` is available in a Spring test context with multiple news records covering different publish dates for the target range.
 Test ID: UTC-13
 Test Function: findByPublishDateBetweenOrdered(startDate, endDate, pageable)`
 Test Cases:
@@ -669,16 +728,79 @@ ID	Description	Input	Expected Result
 
 
 
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+3.2 Feature 1 – Integration Test (Daily Briefing System)
 
+3.2.1 ITC-01: GET /api/news/daily-briefing with Database Filters
 
+**Description**: This integration test verifies that `NewsController.getDailyBriefing()` correctly integrates with `NewsRepository` and the database, handling pagination, date range, keyword, and source filters according to the implemented logic.
 
+**Prepared Data**:  
+- Spring Boot backend running with a real MySQL `bridgeu` database.  
+- `news` table contains at least 30 rows with different `publish_date`, `source`, `title`, `summary`, and translation fields (`titleEn`, `titleZh`, `summaryEn`, `summaryZh`).  
 
+**Test Script**:  
+1. Send `GET /api/news/daily-briefing?page=0&size=10&lang=en` using Postman or an automated integration test.  
+2. Verify that the response status is **200 OK** and the JSON body has `success = true`, `data` (array), and `pagination` object.  
+3. Run `SELECT COUNT(*) FROM news;` in the database and verify that `pagination.totalElements` equals this count and `data.length <= 10`.  
+4. Send `GET /api/news/daily-briefing?page=0&size=10&lang=en&startDate=2026-01-01&endDate=2026-01-31`.  
+5. Verify that all returned items have `publishDate` between `2026-01-01 00:00:00` and `2026-01-31 23:59:59`, and that the number of items matches the SQL query for this range.  
+6. Send `GET /api/news/daily-briefing?...&keyword=Thailand`.  
+7. Confirm that all returned news rows contain “Thailand” (case-insensitive) in at least one of: `title`, `summary`, `titleEn`, `summaryEn`, `titleZh`, or `summaryZh`.  
+8. Send `GET /api/news/daily-briefing?...&keyword=Thailand&source=Bangkok%20Post`.  
+9. Verify that every result matches **both** the keyword and the source, and that no unexpected errors occur.  
 
+---
 
+3.2.2 ITC-02: GET /api/news/daily-briefing/{id} and DTO Conversion
 
+**Description**: This integration test verifies that `NewsController.getNewsDetail()` and `convertToDTO()` integrate correctly with `NewsRepository`, `LanguageDetectionService`, and the `news` table, including language selection and Thai-content hiding rules.
 
+**Prepared Data**:  
+- At least three `news` records:  
+  - Record A: has both `titleEn`/`summaryEn` and `titleZh`/`summaryZh`.  
+  - Record B: has only English translations (`titleEn`/`summaryEn`), with non-Thai original text.  
+  - Record C: `originalContent` is primarily Thai, with missing or partial translations.  
 
+**Test Script**:  
+1. For record A, call `GET /api/news/daily-briefing/{idA}?lang=zh`.  
+2. Verify response `success = true` and that `data.title` / `data.summary` equal `titleZh` / `summaryZh`.  
+3. Call `GET /api/news/daily-briefing/{idA}?lang=en` and verify that `data.title` / `data.summary` equal `titleEn` / `summaryEn`.  
+4. For record B, call `GET /api/news/daily-briefing/{idB}?lang=zh` and verify that the DTO falls back to English translations (no Thai characters in `data.title`).  
+5. For record C, confirm in DB that `original_content` is Thai. Call `GET /api/news/daily-briefing/{idC}?lang=en`.  
+6. Verify that the response has `success = true`, `data` filled, and `originalContent = null`, confirming integration with `LanguageDetectionService.hasAnyThai()` and Thai-content hiding.  
+7. Call `GET /api/news/daily-briefing/999999?lang=en` (non-existent ID) and verify that the API returns HTTP 404 with `success = false` and an appropriate error message.  
 
+---
+
+3.2.3 ITC-03: Scheduled Crawl & Store Pipeline
+
+**Description**: This integration test verifies that the scheduled crawl pipeline integrates `NewsScheduler`, `NewsCrawlerService`, `NewsRelevanceService`, `AiSummaryService`, `TranslationService`, `LanguageDetectionService`, and `NewsRepository` to insert relevant, non-duplicate news into the database.
+
+**Prepared Data**:  
+- Backend running in a test profile with stubbed external dependencies:  
+  - `NewsCrawlerService` returns a fixed list of raw news items.  
+  - AI services (`AiSummaryService`, `TranslationService`) return deterministic summaries and translations.  
+- `news` table initially empty or with a known record count **N**.  
+
+**Test Script**:  
+1. Trigger `NewsScheduler.scheduledCrawlAndSummarize()` once (either by waiting for the cron time in a test environment or by calling the method directly in an integration test).  
+2. Verify that the crawler stub is invoked and returns the configured raw news list.  
+3. After the job finishes, query the database and confirm that the number of rows in `news` has increased by the expected number of **relevant** (non-filtered) items, and no duplicates were added for identical `originalUrl` values.  
+4. Inspect one newly inserted row and verify that `titleEn`/`titleZh`, `summaryEn`/`summaryZh`, `originalUrl`, `source`, `publishDate`, and `createTime` are populated from the crawler and AI stubs as designed.  
+5. Run the scheduler again with the same stub data and confirm that the record count in `news` does **not** increase (deduplication via `findByOriginalUrl` works correctly).  
+
+---
 
 Chapter 4 System test
 
@@ -701,6 +823,15 @@ Chapter 4 System test
 5. Open the browser **Network** tab and confirm that the frontend sends a `GET /api/news/daily-briefing?page=0&size=10&lang=en` request without `keyword`, `startDate`, `endDate`, or `source` parameters.  
 6. Check the API response body and confirm it contains `{ "success": true, "data": [...], "pagination": {...} }`.  
 7. Scroll through all news items on the first page and verify that all visible titles and summaries are in **Chinese or English only**, with **no Thai characters** displayed.  
+
+**Test Case (table format)**:  
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Open Daily Briefing page with default state | Open BridgeU in a browser and navigate to “Daily Briefing” page with no filters applied. | Page shows 10 news cards with title, summary, source, publish date and actions; no search keyword, date or source filter is selected. |
+| 2 | Verify backend request parameters | Observe Network tab for list request. | Request is `GET /api/news/daily-briefing?page=0&size=10&lang=en` with **no** `keyword`, `startDate`, `endDate` or `source` parameters. |
+| 3 | Verify pagination behaviour | Scroll to bottom of list. | Pagination bar shows at least 2 pages when total news records > 10. |
+| 4 | Check UI language rule | Inspect all items on first page. | All visible titles and summaries are in Chinese or English only; **no Thai characters** appear anywhere in the list. |
 
 ---
 
@@ -725,6 +856,15 @@ Chapter 4 System test
 10. Finally, set **start date** to `2026-02-10` and **end date** to `2026-02-01` (startDate > endDate) and click **Apply Filters**.  
 11. Verify that the frontend shows a validation warning that the start date cannot be later than the end date, **no API request** is sent, and the list content remains unchanged.  
 
+**Test Case (table format)**:  
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Filter list by fixed date range | Set start date `01‑01‑2026`, end date `07‑01‑2026` and click “Apply Filters”. | Network request is `GET /api/news/daily-briefing?...&startDate=2026-01-01&endDate=2026-01-07`; returned list only contains news with `publishDate` between these timestamps and `pagination.totalElements` equals DB count for that period. |
+| 2 | Filter with only start date | Clear filters, set start date `10‑01‑2026`, leave end date empty, click “Apply Filters”. | Request contains `startDate=2026-01-10` and **no** `endDate`; backend returns news from `2026‑01‑10` up to today only, without error. |
+| 3 | Filter with only end date and inferred start date | Clear filters, set end date `20‑01‑2026`, leave start date empty, click “Apply Filters”. | Backend infers start date as 30 days before `20-01-2026`; results only include news in this computed range. |
+| 4 | Validate invalid date range | Set start date `10‑02‑2026`, end date `01‑02‑2026`, click “Apply Filters”. | Frontend shows validation warning (start date cannot be later than end date), **no API request** is sent and list content remains unchanged. |
+
 ---
 
 4.1.3 STC-03: Search Daily Briefing by Keyword
@@ -746,6 +886,14 @@ Chapter 4 System test
 8. Enter a different keyword such as **“student”**, set a valid date range, and click **Search**.  
 9. Verify that the API request includes both `keyword` and `startDate`/`endDate`, and that results only include items matching **both** the keyword and the date range.  
 
+**Test Case (table format)**:  
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Search by keyword | Enter `Thailand` in search box and click “Search”. | UI resets current page to 1; request is `GET /api/news/daily-briefing?...&keyword=Thailand`; returned list only contains news whose title, originalContent, summary or any translation field includes “thailand” (case‑insensitive). |
+| 2 | Clear keyword search | Clear search box and click “Search” again. | New request has no `keyword` parameter; list shows unfiltered results (respecting only any active date/source filters). |
+| 3 | Combine keyword and date filters | Enter `student`, set a valid date range, click “Search”. | Request includes both `keyword` and `startDate`/`endDate`; results only include items matching both the keyword and the date range. |
+
 ---
 
 4.1.4 STC-04: Switch Interface Language
@@ -754,8 +902,7 @@ Chapter 4 System test
 
 **Prepared Data**:  
 - Same environment as STC-01.  
-- Database includes news where: some have both `titleEn`/`summaryEn` and `titleZh`/`summaryZh`; some have only one language; some have Thai originals with or without translations.  
-
+- Database contains a dedicated test set of news records where **every record has both English and Chinese translations** (`titleEn`/`summaryEn` and `titleZh`/`summaryZh`).
 **Test script**:  
 1. Ensure the interface language is set to **English (en)**, then open the Daily Briefing list.  
 2. Observe a few news items and note their titles and summaries in English.  
@@ -765,6 +912,15 @@ Chapter 4 System test
 6. Switch the interface language back to **English (en)**.  
 7. Verify that the frontend re-sends `GET /api/news/daily-briefing` with `lang=en` and that titles/summaries are displayed in English when available, otherwise in Chinese or placeholder texts; still no Thai characters appear.  
 8. For a news item whose original title/summary is Thai and has no translations, switch between **zh** and **en** and confirm that only placeholder texts are shown, and the original Thai text is never displayed.  
+
+**Test Case (table format)**:  
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Load list in English | Set interface language to `en`, open Daily Briefing list. | News list shows titles/summaries in English when available; others fall back to Chinese or placeholder texts; no Thai characters displayed. |
+| 2 | Switch to Chinese | Use language toggle to switch to `zh`. | Network request is resent with `lang=zh`; items with `titleZh`/`summaryZh` display Chinese text; items without Chinese translations show English or placeholder `[新闻标题翻译中...]` / `[新闻内容翻译中...]`; still no Thai characters. |
+| 3 | Switch back to English | Switch language back to `en`. | Request is resent with `lang=en`; list displays English titles/summaries when available, otherwise Chinese or placeholders; no Thai characters. |
+| 4 | Thai‑only records | Select a news item whose original title/summary is Thai and has no translations, toggle between `zh` and `en`. | Only placeholder texts are shown in all languages; original Thai text is never displayed. |
 
 ---
 
@@ -787,6 +943,14 @@ Chapter 4 System test
 8. Manually modify the browser URL to `/daily-briefing/999999` (an ID that does not exist) and press Enter.  
 9. Confirm that the backend returns HTTP 404 with `success = false` and message `"News not found with id: 999999"`, and that the frontend shows a localized “News not found” message with a way to navigate back to the list, without any uncaught error.  
 
+**Test Case (table format)**:  
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Open detail for non‑Thai content | From list, click “View Detail” on news item N whose `originalContent` is non‑Thai. | Network sends `GET /api/news/daily-briefing/N?lang=<currentLang>`; response `{ success: true, data: NewsBriefDTO, originalContent: "..." }`; detail page shows title, summary, source, publish date and original content section. |
+| 2 | Open detail for Thai content | From list, click “View Detail” on news item T whose `originalContent` is primarily Thai. | Backend returns `success = true` with `originalContent = null`; detail page only shows translated title/summary or placeholders and **no Thai original text**. |
+| 3 | Handle non‑existent ID | Manually open `/daily-briefing/999999` in browser. | Backend returns HTTP 404 with `success = false` and message `"News not found with id: 999999"`; frontend shows localized “News not found” message with navigation back to list and no uncaught error. |
+
 ---
 
 4.1.6 STC-06: Open Original News Link
@@ -805,3 +969,10 @@ Chapter 4 System test
 5. From the Daily Briefing list, click **“View Detail”** on the same news item to open the detail page.  
 6. On the detail page, click **“Open Original”** again.  
 7. Verify that a new browser tab opens with the **same URL** as in step 3 and that this URL matches the `originalUrl` field returned by the backend for that news item.  
+
+**Test Case (table format)**:  
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Open original link from list | On Daily Briefing list, click “Open Original” for a news item with valid `originalUrl`. | Browser opens a **new tab** with the URL equal to the `originalUrl` from backend; existing BridgeU tab stays open; Network tab shows no extra API calls beyond the list request. |
+| 2 | Open original link from detail | From the same item, click “View Detail” then “Open Original” on detail page. | New tab opens with the **same URL** as in test 1; this URL matches the `originalUrl` value returned by the backend for that news item. |

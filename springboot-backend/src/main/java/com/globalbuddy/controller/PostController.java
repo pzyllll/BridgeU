@@ -65,10 +65,11 @@ public class PostController {
         List<CommunityPost> posts = postRepository.findAllByOrderByCreatedAtDesc();
         
         // 1) 只向前台展示已经通过审核的帖子
-        // 2) 过滤掉从新闻自动转换来的帖子（category = "News & Information" 或 tags 中包含 "News"）
+        // 2) 过滤掉被举报下架的帖子
+        // 3) 过滤掉从新闻自动转换来的帖子（category = "News & Information" 或 tags 中包含 "News"）
         //    现在新闻只在每日简报里展示，不再出现在社区列表
         posts = posts.stream()
-                .filter(post -> post.getStatus() == CommunityPost.Status.APPROVED)
+                .filter(post -> post.getStatus() == CommunityPost.Status.APPROVED) // 只显示已审核通过的帖子（自动过滤被举报下架的帖子）
                 .filter(post -> {
                     // 过滤掉系统自动生成的新闻贴（旧数据安全兜底）
                     AppUser author = post.getAuthor();
@@ -280,9 +281,10 @@ public class PostController {
             isFollowing = userFollowRepository.existsByFollowerAndFollowing(currentUser, author);
         }
         
-        // Get comments with language preference
+        // Get comments with language preference (filter out reported/removed comments)
         List<Comment> comments = commentRepository.findByPostOrderByCreatedAtDesc(post);
         List<CommentResponse> commentResponses = comments.stream()
+                .filter(comment -> comment.getStatus() == null || comment.getStatus() == Comment.Status.ACTIVE) // Filter out reported/removed comments
                 .map(comment -> toCommentResponse(comment, lang))
                 .collect(Collectors.toList());
         
@@ -418,8 +420,10 @@ public class PostController {
         
         CommunityPost post = postOpt.get();
         
-        // Get all comments for this post
-        List<Comment> comments = commentRepository.findByPostOrderByCreatedAtDesc(post);
+        // Get all comments for this post (filter out reported/removed comments)
+        List<Comment> comments = commentRepository.findByPostOrderByCreatedAtDesc(post).stream()
+                .filter(comment -> comment.getStatus() == null || comment.getStatus() == Comment.Status.ACTIVE)
+                .collect(Collectors.toList());
         
         if (comments.isEmpty()) {
             Map<String, Object> response = new HashMap<>();

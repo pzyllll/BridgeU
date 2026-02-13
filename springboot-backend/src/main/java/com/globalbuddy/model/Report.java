@@ -93,16 +93,40 @@ public class Report {
     @Column(columnDefinition = "TEXT")
     private String reviewNotes;
 
+    /**
+     * AI moderation result (JSON string)
+     */
+    @Column(name = "ai_result", columnDefinition = "TEXT")
+    private String aiResult;
+
+    /**
+     * AI confidence score (0.0 - 1.0)
+     */
+    @Column(name = "ai_confidence")
+    private Double aiConfidence;
+
+    /**
+     * Violation snippet extracted by AI (the specific part that violates guidelines)
+     */
+    @Column(name = "violation_snippet", columnDefinition = "TEXT")
+    private String violationSnippet;
+
+    /**
+     * Whether the reported content was found to be in violation
+     */
+    @Column(name = "is_violation")
+    private Boolean isViolation;
+
     public enum TargetType {
         POST,
         COMMENT
     }
 
     public enum Status {
-        PENDING,
-        REVIEWED,
-        RESOLVED,
-        DISMISSED
+        PENDING,        // Waiting for AI review
+        REVIEWED,       // AI review completed
+        RESOLVED,       // Content was penalized/removed
+        DISMISSED       // Report was dismissed, content is compliant
     }
 }
 

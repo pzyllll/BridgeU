@@ -1,0 +1,191 @@
+## BridgeU - Project Plan
+
+**System Name**: BridgeU – Bilingual Community & Daily Briefing Platform for International Students in Thailand  
+**Prepared by**: Zhiyi Pan (Student ID: 652115558)  
+**Project Advisor**: Asst. Prof. Pattama Longani, Ph.D.  
+**Date**: January 2026  
+
+---
+
+### 1. Introduction
+
+#### 1.1 Purpose
+
+The purpose of this Project Plan is to define the project management activities, resources, and schedule required to successfully deliver the BridgeU web application.  
+It provides a high‑level view of the work products (Proposal, SRS, SDD, Test Plan, Source Code), clarifies responsibilities, and describes how the project will be monitored and controlled in alignment with ISO/IEC 29110 and the detailed requirements and design documented in the **BridgeU‑SRS** and **BridgeU‑SDD v2.0**.
+
+#### 1.2 Project Overview
+
+BridgeU is a web‑based platform that helps international students in Thailand adapt to local life and connect with each other and local merchants.  
+The system provides:
+- **Daily Briefing System** – automatically crawls news from Google News RSS, summarizes it using Qwen AI, and presents bilingual (Chinese/English) daily briefings with powerful search and date filters.
+- **Community Interaction Platform** – a bilingual forum where users can create posts, comment, like, follow each other, and use private messaging, with Qwen AI‑based translation, content moderation, and comment summarization to ensure a safe environment.
+- **Authentication & Profile Management** – secure registration (email or phone + verification code), login/logout, profile editing (display name, avatar, preferred language), and a “My Community Posts” view showing post review status.
+
+The architecture is a standard client‑server web system: a Vue.js frontend communicates with a Spring Boot backend via REST APIs, persisting data in a MySQL 8 database and integrating with Aliyun Qwen AI services.
+
+#### 1.3 Project Scope
+
+The project scope covers the following major functional areas (features), which are consistent with the Proposal, SRS, and SDD:
+
+- **Feature #1: Daily Briefing System**  
+  - Scheduled crawling of Thai news at 8:00 AM daily from approved media sources.  
+  - AI‑generated Chinese/English titles and summaries using Qwen AI.  
+  - Daily Briefing list with pagination, keyword search, date range and source filters, and a button to open the original news link.  
+
+
+- **Feature #2: Community Interaction Platform**  
+  - Bilingual post creation and editing with predefined tags (Study, Housing, Travel, Part‑time Job, Life Services).  
+  - Infinite‑scroll community feed with keyword and tag filters, likes, comments, AI comment summary, and report functions.  
+  - Mutual‑follow management and one‑to‑one private messaging (conversation list, message history, read/unread/delete).
+
+- **Feature #3: Authentication & Profile / My Community Activity**  
+  - Registration via email or phone with verification codes, secure password rules, and login/logout.  
+  - Profile management (display name, avatar, preferred language) and real‑time language switching across the UI.  
+  - “My Community Posts” page showing the user’s posts and their AI review status (awaiting moderation, approved, rejected).
+
+Non‑functional scope includes performance (responsive UI, pre‑generated AI summaries), security (JWT, password hashing), and maintainability (layered architecture, clear API contracts as detailed in SRS/SDD).
+
+---
+
+### 2. Project Deliverables (Work Products)
+
+The BridgeU project will produce the following key documents and artefacts:
+
+1. **Project Proposal** – `Proposal.md` describing background, target users, features, user journey, business review, architecture, objectives, milestones, and references.  
+2. **Project Plan (PMP)** – this document, `BridgeU-projectplan`, defining management activities, schedule, and configuration management.  
+3. **Software Requirement Specification (SRS)** – `BridgeU-SRS.md` describing functional and non‑functional requirements, use cases, and system constraints.  
+4. **Software Design Document (SDD)** – `BridgeU-SDD.md` and `BridgeU-SDDv.2.md` describing architecture, DFDs, ERD, data dictionary, and component design.  
+5. **Software Test Plan & Test Record** – `BridgeU-TestPlan.md` containing unit, integration, and system test cases and execution records.  
+6. **Traceability Record** – `BridgeU-TraceabilityRecord.md` mapping URS ↔ SRS ↔ design artefacts ↔ test cases.  
+7. **Final Software Product** – complete source code (Vue frontend + Spring Boot backend + database schema), build scripts, and deployment instructions, as well as the runnable application.  
+8. **Presentation & Final Report** – slides and final written report summarizing objectives, design, implementation, and evaluation results.
+
+---
+
+### 3. Management Procedures
+
+#### 3.1 Project Team & Roles
+
+This project is carried out by a single student developer under the supervision of an academic advisor:
+
+- **Zhiyi Pan (Student)**  
+  - Requirement elicitation and refinement (Proposal, SRS).  
+  - UI/UX design and frontend implementation (Vue.js).  
+  - Backend design and implementation (Spring Boot, REST APIs, database schema).  
+  - AI integration (Qwen AI for translation, summarization, moderation).  
+  - Test design and execution (unit, integration, and system tests).  
+  - Documentation (SDD v2, Test Plan, Traceability Record, Project Plan, Final Report).
+
+- **Asst. Prof. Pattama Longani, Ph.D. (Project Advisor)**  
+  - Provides technical and methodological guidance.  
+  - Reviews and approves milestones (Proposal, Progress I, Final Progress).  
+  - Evaluates deliverables and gives feedback to improve quality.
+
+#### 3.2 Monitoring and Controlling
+
+- **Meeting Schedule**  
+  - Regular consultation with the advisor to review progress, discuss issues, and validate design/testing decisions.  
+  - Additional meetings before each major milestone (Proposal defense, Progress I, Final presentation).
+
+- **Software Development Life Cycle (SDLC)**  
+  - The project adopts an **iterative and incremental** approach aligned with ISO/IEC 29110:  
+    - Iteration 1 (Proposal & Architecture): clarify objectives, target users, high‑level features, and architecture.  
+    - Iteration 2 (Progress I): complete SRS and SDD, implement **Feature 1**, and prepare initial test cases.  
+    - Iteration 3 (Final Progress): implement **Feature 2** and **Feature 3**, refine design, and complete full testing and documentation.  
+
+- **Progress Tracking**  
+  - Use the milestone schedule from the Proposal (Chapter 10) as the baseline.  
+  - Track task completion by date and adjust effort allocation if delays occur.  
+  - Ensure that all SRS requirements are covered by design (SDD) and tests (Test Plan) using the Traceability Record.
+
+---
+
+### 4. Quality Standards
+
+This project follows the **ISO/IEC 29110** standard for Very Small Entities (VSEs), focusing on:
+
+1. **Project Management (PM) Process** – planning, assessment, and closure:  
+   - Establish clear scope, schedule, roles, and risks in the Project Plan.  
+   - Periodically assess progress against the milestone plan and adjust when needed.  
+   - Perform formal closure with final report, presentation, and advisor evaluation.
+
+2. **Software Implementation (SI) Process** – analysis, design, construction, and testing:  
+   - Requirements are documented in `BridgeU-SRS.md` with use cases and non‑functional constraints.  
+   - Design is captured in `BridgeU-SDDv.2.md` (architecture, DFDs, ERD, data dictionary, component design).  
+   - Construction follows a layered architecture (Controller → Service → Repository → Entity/DTO) as described in the SDD.  
+   - Testing is guided by `BridgeU-TestPlan.md`, including unit, integration, and system tests, and recorded to provide objective evidence of requirement coverage.
+
+Additional quality practices include code review (self‑review and advisor feedback), consistent coding standards (naming, formatting), and regular backups of documents and source code.
+
+---
+
+### 5. Software Configuration Management
+
+#### 5.1 Naming Conventions
+
+Project artefacts follow a consistent naming pattern:
+
+- **Format**: `BridgeU-[DocumentName]_v[Version].[Extension]`  
+  - Examples:  
+    - `BridgeU-ProjectPlan_v1.0.docx`  
+    - `BridgeU-SRS_v1.0.docx`  
+    - `BridgeU-SDDv2.0.docx`  
+    - `BridgeU-TestPlan_v1.0.docx`
+- Source code modules use descriptive package and file names consistent with the SDD, such as:  
+  - Backend: `com.globalbuddy.controller.NewsController`, `MessageController`, `AuthController`, etc.  
+  - Frontend: Vue component files like `DailyBriefingList.vue`, `DailyBriefingDetail.vue`, `CommunityPage.vue`, `ProfilePage.vue`.
+
+Version numbers are incremented when major changes to requirements, design, or test scope are made (e.g., SDD v1 → v2 with new DFD/ERD).
+
+#### 5.2 Project Repository
+
+- **Document Storage**:  
+  - All formal documents (Proposal, SRS, SDD, Test Plan, Project Plan, Final Report) are stored in a structured folder under the BridgeU project directory and can also be backed up to cloud storage (e.g., Google Drive / OneDrive) for safety.
+
+- **Version Control**:  
+  - Source code and Markdown documentation are managed in a Git repository (e.g., on GitHub or a private Git server).  
+  - Each significant change (new feature, refactoring, new tests) is committed with meaningful messages.  
+  - Branches can be used for experimental features or major refactors, which are then merged back into the main branch after testing.
+
+---
+
+### 6. Project Schedule & Milestones
+
+The project schedule is based on the milestones and task breakdown defined in the Proposal (Chapter 10), organized into four main phases.
+
+- **Phase 1 – Project Proposal**  
+  - **Duration**: 20 Nov 2025 – 19 Dec 2025 (29 days)  
+  - **Main Tasks**:  
+    - Research background, target users, and similar systems.  
+    - Write the Proposal document (`Proposal.md`).  
+    - Prepare and deliver the Proposal presentation.  
+
+- **Phase 2 – Progress I (Requirements & Design)**  
+  - **Approx. Duration**: 20 Dec 2025 – 26 Jan 2026 (~36 days)  
+  - **Main Tasks** (aligned with Proposal milestone table):  
+    - Draft and refine the **Software Requirement Specification (SRS)**.  
+    - Create this **Project Plan** document.  
+    - Develop the initial **Software Design Document (SDD)**, later refined into `BridgeU-SDDv.2.md` with DFDs, ERD, and data dictionary.  
+    - Implement **Feature #1 – Daily Briefing System** (frontend + backend + database + AI integration).  
+    - Prepare the Progress I report and presentation.  
+
+- **Phase 3 – Progress II (Implementation & Testing)**  
+  - **Approx. Duration**: 27 Jan 2026 – 11 Mar 2026  
+  - **Main Tasks**:  
+    - Implement **Feature #2 – Community Interaction Platform** (posts, comments, likes, tags, AI moderation, AI comment summary, mutual follow list, private messaging).  
+    - Implement **Feature #3 – Authentication & Profile / My Community Activity** (registration, login/logout, profile, “My Community Posts”).  
+    - Design and execute unit tests (UTC), integration tests (ITC), and system tests (STC) as defined in `BridgeU-TestPlan.md`.  
+    - Fix defects found during testing and update SRS/SDD/Test Plan where necessary.  
+
+- **Phase 4 – Final Submission & Closure**  
+  - **Approx. Duration**: 12 Mar 2026 – 25 Mar 2026  
+  - **Main Tasks**:  
+    - Finalize source code, database schema, and deployment instructions.  
+    - Complete the **Final Report**, including evaluation results and reflection on ISO/IEC 29110 processes.  
+    - Prepare and deliver the **final presentation/demo** to the advisor and committee.  
+    - Archive all project artefacts (documents, code, test records, traceability matrix) for assessment and future reference.
+
+This schedule may be refined in consultation with the advisor, but all three core features (Daily Briefing, Community Interaction, Authentication & Profile) must reach completion, be fully tested, and documented before the final submission.
+
+

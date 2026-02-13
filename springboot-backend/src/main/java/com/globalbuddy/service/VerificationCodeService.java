@@ -41,21 +41,43 @@ public class VerificationCodeService {
      */
     @Transactional
     public boolean sendVerificationCode(String identifier, String type, String purpose) {
+        log.debug("sendVerificationCode called: identifier={}, type={}, purpose={}", identifier, type, purpose);
         try {
-            VerificationCode.CodeType codeType = VerificationCode.CodeType.valueOf(type.toUpperCase());
+            // 将前端传来的类型转换为枚举值
+            String normalizedType = type.toUpperCase();
+            if ("PHONE".equals(normalizedType)) {
+                normalizedType = "SMS";
+            }
+            log.debug("Normalized type: {} -> {}", type, normalizedType);
+            
+            VerificationCode.CodeType codeType = VerificationCode.CodeType.valueOf(normalizedType);
             VerificationCode.CodePurpose codePurpose = VerificationCode.CodePurpose.valueOf(purpose.toUpperCase());
+            log.debug("Parsed enums: codeType={}, codePurpose={}", codeType, codePurpose);
 
             // 检查是否在1分钟内已发送过验证码（防止频繁发送）
             LocalDateTime oneMinuteAgo = LocalDateTime.now().minusMinutes(1);
+            log.debug("检查是否在1分钟内已发送过验证码");
             if (verificationCodeRepository.existsRecentCode(identifier, codeType, oneMinuteAgo)) {
                 log.warn("验证码发送过于频繁: {}", identifier);
                 throw new RuntimeException("验证码发送过于频繁，请稍后再试");
             }
 
+            // 将旧的未使用验证码标记为已使用（确保只使用最新的验证码）
+            LocalDateTime now = LocalDateTime.now();
+            log.debug("查找旧的验证码");
+            Optional<VerificationCode> oldValidCode = verificationCodeRepository.findLatestValidCode(
+                identifier, codeType, codePurpose, now);
+            if (oldValidCode.isPresent()) {
+                log.info("标记旧的验证码为已使用: {} (新验证码即将发送)", identifier);
+                verificationCodeRepository.markAsUsed(oldValidCode.get().getId());
+            }
+
             // 生成验证码
             String code = generateCode();
+            log.debug("生成的验证码: {}", code);
 
             // 创建验证码记录
+            log.debug("创建验证码实体");
             VerificationCode verificationCode = VerificationCode.builder()
                 .identifier(identifier)
                 .type(codeType)
@@ -65,15 +87,24 @@ public class VerificationCodeService {
                 .used(false)
                 .build();
 
+            log.debug("保存验证码到数据库");
             verificationCodeRepository.save(verificationCode);
+            log.debug("验证码已保存，ID: {}", verificationCode.getId());
 
             // 发送验证码
+            log.debug("开始发送验证码: codeType={}", codeType);
             boolean sent = false;
             if (codeType == VerificationCode.CodeType.EMAIL) {
+                log.debug("调用EmailService发送验证码");
                 sent = emailService.sendVerificationCode(identifier, code, codePurpose);
             } else if (codeType == VerificationCode.CodeType.SMS) {
+                log.debug("调用SmsService发送验证码");
                 sent = smsService.sendVerificationCode(identifier, code, codePurpose);
+            } else {
+                log.error("未知的验证码类型: {}", codeType);
+                throw new IllegalArgumentException("未知的验证码类型: " + codeType);
             }
+            log.debug("验证码发送结果: sent={}", sent);
 
             if (sent) {
                 log.info("验证码发送成功: {} ({})", identifier, codeType);
@@ -85,11 +116,15 @@ public class VerificationCodeService {
                 return false;
             }
         } catch (IllegalArgumentException e) {
-            log.error("无效的验证码类型或用途: type={}, purpose={}", type, purpose);
-            throw new RuntimeException("无效的验证码类型或用途");
+            log.error("无效的验证码类型或用途: type={}, purpose={}, error={}", type, purpose, e.getMessage(), e);
+            throw new RuntimeException("无效的验证码类型或用途: " + e.getMessage(), e);
+        } catch (RuntimeException e) {
+            log.error("发送验证码时发生运行时异常: {}", e.getMessage(), e);
+            throw e; // 重新抛出RuntimeException，保持原始异常信息
         } catch (Exception e) {
-            log.error("发送验证码时发生错误: {}", e.getMessage(), e);
-            throw new RuntimeException("发送验证码失败: " + e.getMessage());
+            log.error("发送验证码时发生未知异常: type={}, identifier={}, error={}, class={}", 
+                type, identifier, e.getMessage(), e.getClass().getName(), e);
+            throw new RuntimeException("发送验证码失败: " + e.getMessage() + " (" + e.getClass().getSimpleName() + ")", e);
         }
     }
 
@@ -130,7 +165,12 @@ public class VerificationCodeService {
     @Transactional
     public VerificationResult verifyCodeWithDetails(String identifier, String code, String type, String purpose) {
         try {
-            VerificationCode.CodeType codeType = VerificationCode.CodeType.valueOf(type.toUpperCase());
+            // 将前端传来的类型转换为枚举值
+            String normalizedType = type.toUpperCase();
+            if ("PHONE".equals(normalizedType)) {
+                normalizedType = "SMS";
+            }
+            VerificationCode.CodeType codeType = VerificationCode.CodeType.valueOf(normalizedType);
             VerificationCode.CodePurpose codePurpose = VerificationCode.CodePurpose.valueOf(purpose.toUpperCase());
 
             // 先尝试查找有效的验证码
@@ -159,7 +199,7 @@ public class VerificationCodeService {
                 .filter(vc -> vc.getIdentifier().equals(identifier) 
                     && vc.getType() == codeType 
                     && vc.getPurpose() == codePurpose)
-                .max((vc1, vc2) -> vc1.getCreatedAt().compareTo(vc2.getCreatedAt()));
+                .max((vc1, vc2) -> vc2.getCreatedAt().compareTo(vc1.getCreatedAt())); // 修复：降序排序，获取最新的
 
             if (latestCode.isEmpty()) {
                 log.warn("未找到验证码: {}", identifier);
@@ -214,7 +254,12 @@ public class VerificationCodeService {
     @Transactional
     public void markCodeAsUsed(String identifier, String type, String purpose) {
         try {
-            VerificationCode.CodeType codeType = VerificationCode.CodeType.valueOf(type.toUpperCase());
+            // 将前端传来的类型转换为枚举值
+            String normalizedType = type.toUpperCase();
+            if ("PHONE".equals(normalizedType)) {
+                normalizedType = "SMS";
+            }
+            VerificationCode.CodeType codeType = VerificationCode.CodeType.valueOf(normalizedType);
             VerificationCode.CodePurpose codePurpose = VerificationCode.CodePurpose.valueOf(purpose.toUpperCase());
             
             // 查找最新的未使用验证码

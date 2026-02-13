@@ -8,12 +8,15 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\ReportRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\PostMigrationService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\ConversationRepository.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\controller\NotificationController.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\EmailService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\model\UserFollow.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\CommunityPostRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\VerificationCodeService.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\model\Notification.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\security\JwtAuthenticationFilter.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\controller\MessageController.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\NotificationService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\AuthResponse.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\RegisterWithVerificationRequest.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\model\Comment.java
@@ -27,6 +30,7 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\controller\PostController.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\TranslationService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\controller\NewsAdminController.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\NotificationRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\NewsBriefDTO.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\SmsService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\PhoneResetPasswordRequest.java
@@ -53,6 +57,7 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\UserFollowRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\NewsRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\ContentModerationService.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\ReportModerationService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\DocumentDetectionService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\GoogleTrendsRssService.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\NewsRelevanceService.java

@@ -70,6 +70,13 @@
             >
               {{ t('myProfile.myCommunityPosts') }}
             </button>
+            <button 
+              v-if="!isEditing" 
+              class="btn" 
+              @click="viewMyReports"
+            >
+              {{ t('postDetail.viewMyReports') }}
+            </button>
           </div>
         </div>
       </div>
@@ -219,7 +226,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['viewMyPosts', 'viewPostDetail']);
+const emit = defineEmits(['viewMyPosts', 'viewPostDetail', 'viewMyReports']);
 
 const profile = ref(null);
 const myPosts = ref([]);
@@ -509,6 +516,10 @@ const viewMyPosts = () => {
 
 const viewPostDetail = (postId) => {
   emit('viewPostDetail', postId);
+};
+
+const viewMyReports = () => {
+  emit('viewMyReports');
 };
 
 const getStatusClass = (status) => {

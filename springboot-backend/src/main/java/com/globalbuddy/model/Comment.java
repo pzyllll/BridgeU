@@ -54,6 +54,22 @@ public class Comment {
     @Column(name = "original_language", length = 10)
     private String originalLanguage;
 
+    /**
+     * Comment status
+     */
+    public enum Status {
+        ACTIVE,           // Active and visible
+        REPORTED_REMOVED  // Removed due to report (can be restored)
+    }
+
+    /**
+     * Comment status
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private Status status = Status.ACTIVE;
+
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 

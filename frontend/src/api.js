@@ -237,6 +237,16 @@ export const submitReport = (targetType, targetId, reasons, description, token) 
   ).then((res) => res.data);
 };
 
+// Get my reports API
+export const getMyReports = (token) => {
+  return client.get(
+    '/api/reports/my',
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    }
+  ).then((res) => res.data);
+};
+
 // Like API
 export const toggleLike = (postId, token) => {
   return client.post(
