@@ -34,7 +34,7 @@ public class ReportModerationService {
     /**
      * Process a report asynchronously using AI moderation
      */
-    @Async
+    @Async("taskExecutor")
     @Transactional
     public void processReport(Long reportId) {
         try {
@@ -61,12 +61,22 @@ public class ReportModerationService {
 
             // Build AI prompt for report review
             String prompt = buildModerationPrompt(content, title, report.getReasons(), report.getDescription());
+            log.debug("AI moderation prompt built for report: id={}, promptLength={}", reportId, prompt.length());
             
             // Call AI for moderation
-            String aiResponse = qwenService.answerQuestion(prompt, "");
+            String aiResponse;
+            try {
+                log.info("Calling AI service for report moderation: id={}", reportId);
+                aiResponse = qwenService.answerQuestion(prompt, "");
+                log.info("AI service response received for report: id={}, responseLength={}", reportId, aiResponse != null ? aiResponse.length() : 0);
+            } catch (Exception e) {
+                log.error("AI service call failed for report: id={}, error={}", reportId, e.getMessage(), e);
+                throw new RuntimeException("AI moderation service unavailable: " + e.getMessage(), e);
+            }
             
             // Parse AI response
             ModerationResult result = parseAiResponse(aiResponse);
+            log.info("AI response parsed for report: id={}, isSafe={}, confidence={}", reportId, result.isSafe, result.confidence);
             
             // Update report with AI results
             report.setAiResult(aiResponse);
@@ -76,37 +86,63 @@ public class ReportModerationService {
             report.setReviewedAt(new Date());
             report.setStatus(result.isSafe ? Report.Status.DISMISSED : Report.Status.REVIEWED);
             reportRepository.save(report);
+            reportRepository.flush(); // Force immediate write to database
+            
+            log.info("Report status updated: id={}, status={}, isViolation={}, confidence={}", 
+                reportId, report.getStatus(), !result.isSafe, result.confidence);
 
-            // Handle based on result
-            if (result.isSafe) {
-                // Content is compliant - notify reporter only
-                notificationService.notifyReporterFailed(
-                    report.getReporter(),
-                    reportId,
-                    report.getTargetType().name(),
-                    report.getTargetId(),
-                    result.reason
-                );
-            } else {
-                // Content violates guidelines - take action
-                handleViolation(report, result);
+            // Handle based on result (outside transaction to avoid rollback if notification fails)
+            try {
+                if (result.isSafe) {
+                    // Content is compliant - notify reporter only
+                    notificationService.notifyReporterFailed(
+                        report.getReporter(),
+                        reportId,
+                        report.getTargetType().name(),
+                        report.getTargetId(),
+                        result.reason
+                    );
+                } else {
+                    // Content violates guidelines - take action
+                    handleViolation(report, result);
+                }
+            } catch (Exception notificationError) {
+                // Log notification error but don't fail the report processing
+                log.error("Failed to send notification for report: id={}, error={}", 
+                    reportId, notificationError.getMessage(), notificationError);
             }
 
             log.info("Report processed: id={}, isViolation={}, confidence={}", 
                 reportId, !result.isSafe, result.confidence);
 
         } catch (Exception e) {
-            log.error("Failed to process report: id={}", reportId, e);
+            log.error("Failed to process report: id={}, error={}", reportId, e.getMessage(), e);
+            
             // Mark report as reviewed with error
             try {
                 Report report = reportRepository.findById(reportId).orElse(null);
                 if (report != null) {
-                    report.setStatus(Report.Status.REVIEWED);
-                    report.setReviewNotes("Processing error: " + e.getMessage());
-                    reportRepository.save(report);
+                    // Only update if still in PENDING status (avoid overwriting successful processing)
+                    if (report.getStatus() == Report.Status.PENDING) {
+                        report.setStatus(Report.Status.REVIEWED);
+                        String errorMessage = e.getMessage();
+                        if (errorMessage == null || errorMessage.isEmpty()) {
+                            errorMessage = e.getClass().getSimpleName();
+                        }
+                        report.setReviewNotes("Processing error: " + errorMessage);
+                        report.setReviewedAt(new Date());
+                        report.setIsViolation(false); // Default to safe if processing failed
+                        reportRepository.save(report);
+                        reportRepository.flush(); // Force immediate write to database
+                        log.info("Report marked as reviewed with error: id={}, error={}", reportId, errorMessage);
+                    } else {
+                        log.warn("Report status already changed: id={}, currentStatus={}", reportId, report.getStatus());
+                    }
+                } else {
+                    log.warn("Report not found when trying to update error status: id={}", reportId);
                 }
             } catch (Exception ex) {
-                log.error("Failed to update report status", ex);
+                log.error("Failed to update report status after processing error: reportId={}", reportId, ex);
             }
         }
     }

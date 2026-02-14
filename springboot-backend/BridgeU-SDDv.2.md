@@ -275,16 +275,21 @@ It mirrors the physical database schema used by the Spring Boot backend and can 
 - **USERS** – Core identity table for all roles (students, merchants, admins). Stores login credentials (`username`, `password_hash`),
   contact info (`email`, `phone`), profile preferences (`preferred_language`, `languages`) and status flags (`enabled`, `created_at`).  
 - **VERIFICATION_CODE** – Stores email/phone‑based OTP codes for registration and password reset. `identifier` links logically to
-  a user’s email or phone, and each record includes type (EMAIL/SMS) and purpose (REGISTER/RESET_PASSWORD).  
+  a user’s email or phone, and each record includes the 6‑digit `code`, type (`EMAIL`/`SMS`), purpose (`REGISTER`/`RESET_PASSWORD`),
+  expiration time (`expiresAt`) and usage flag (`used`).  
 - **POSTS / COMMENTS / POST_LIKES** – Represent community content and interactions. `POSTS` contains multilingual content and
   AI‑moderation fields (`status`, `ai_confidence`, `ai_result`, `review_note`); `COMMENTS` and `POST_LIKES` reference `POSTS`
   and `USERS` to record who commented/liked what and when.  
 - **USER_FOLLOWS** – Many‑to‑many relation capturing who follows whom; used both for community features (mutual follow list)
   and as a permission gate for private messaging.  
 - **CONVERSATION / MESSAGE** – Model one‑to‑one private chats. `CONVERSATION` stores the pair of users and latest activity time,
-  while `MESSAGE` stores individual messages, including sender/receiver, content, read flag and timestamps.  
-- **REPORT** – Stores user reports against posts or comments (`targetId`, `targetType`), together with status and timestamps,
-  supporting the hybrid AI + human moderation flow.  
+ while `MESSAGE` stores individual messages, including sender/receiver, content, read flag and timestamps.  
+- **REPORT / REPORT_REASONS** – `REPORT` stores user reports against posts or comments (`targetType`, `targetId`), including
+  the selected reasons, free‑text description, AI moderation output (`ai_result`, `ai_confidence`, `violation_snippet`, `is_violation`),
+  status and review timestamps; `REPORT_REASONS` stores the normalized list of selected reasons per report.  
+- **NOTIFICATIONS** – Stores user‑facing notifications triggered by report processing and other events (e.g. report success/failure,
+  content penalties, restorations), including bilingual `title`/`content`, related `report_id`/`post_id`/`comment_id`, and read/unread
+  timestamps.  
 - **NEWS** – Stores crawled Thai news and their bilingual titles/summaries, as used by the Daily Briefing feature
   (`title_en/zh`, `summary_en/zh`, `original_url`, `source`, `publish_date`, `create_time`).  
 
@@ -306,10 +311,14 @@ erDiagram
     }
 
     VERIFICATION_CODE {
-        string id PK
-        string identifier
-        string type
-        string purpose
+        varchar36 id PK
+        varchar255 identifier
+        varchar10 type
+        varchar10 code
+        varchar20 purpose
+        datetime expiresAt
+        boolean used
+        datetime createdAt
     }
 
     POSTS {
@@ -380,11 +389,38 @@ erDiagram
 
     REPORT {
         long id PK
-        string reporter_id FK
-        string targetId
+        varchar36 reporter_id FK
         string targetType
+        string targetId
+        text description
         string status
+        text ai_result
+        double ai_confidence
+        text violation_snippet
+        bit is_violation
         datetime created_at
+        datetime reviewed_at
+        varchar36 reviewed_by_id FK
+    }
+
+    REPORT_REASONS {
+        long id PK
+        long report_id FK
+        string reason
+    }
+
+    NOTIFICATIONS {
+        long id PK
+        varchar36 user_id FK
+        string type
+        varchar500 title
+        text content
+        long report_id
+        varchar36 post_id
+        varchar36 comment_id
+        bit is_read
+        datetime created_at
+        datetime read_at
     }
 
     NEWS {
@@ -410,9 +446,16 @@ erDiagram
     USERS ||--o{ CONVERSATION : "user1/user2"
     USERS ||--o{ MESSAGE : "sends/receives"
     USERS ||--o{ VERIFICATION_CODE : "identifier (email/phone)"
+    USERS ||--o{ NOTIFICATIONS : "receives"
 
     POSTS ||--o{ COMMENTS : "has"
     POSTS ||--o{ POST_LIKES : "liked by"
+    POSTS ||--o{ NOTIFICATIONS : "related (optional)"
+
+    COMMENTS ||--o{ NOTIFICATIONS : "related (optional)"
+
+    REPORT ||--o{ REPORT_REASONS : "has reasons"
+    REPORT ||--o{ NOTIFICATIONS : "triggers (optional)"
 
     CONVERSATION ||--o{ MESSAGE : "contains"
 ```
@@ -441,10 +484,14 @@ erDiagram
 
 | Field | Data Type | Key | Description |
 |------|-----------|-----|-------------|
-| id | string | PK | Verification code record ID |
-| identifier | string |  | Email address or phone number |
-| type | string |  | Code type (EMAIL/SMS) |
-| purpose | string |  | Code purpose (REGISTER/RESET_PASSWORD) |
+| id | varchar(36) | PK | Unique ID of the verification code record (UUID) |
+| identifier | varchar(255) |  | Identifier to verify, e.g. email address or phone number |
+| type | varchar(10) |  | Channel type: `EMAIL` or `SMS` |
+| code | varchar(10) |  | Verification code value (6 digits) |
+| purpose | varchar(20) |  | Business purpose, e.g. `REGISTER`, `RESET_PASSWORD` |
+| expiresAt | datetime |  | Expiration time of the verification code |
+| used | boolean |  | Whether the code has already been used (default `false`) |
+| createdAt | datetime |  | Creation time of the verification code record |
 
 ##### 3.2.3 POSTS
 
@@ -529,11 +576,19 @@ erDiagram
 | Field | Data Type | Key | Description |
 |------|-----------|-----|-------------|
 | id | long | PK | Report ID |
-| reporter_id | string | FK | References `USERS.id` (reporter) |
-| targetId | string |  | Target entity ID (post/comment) |
-| targetType | string |  | Target type (POST/COMMENT) |
-| status | string |  | Report status |
-| created_at | datetime |  | Created time |
+| reporter_id | varchar(36) | FK | References `USERS.id` (user who submitted the report) |
+| targetType | string |  | Target type: `POST` or `COMMENT` |
+| targetId | string |  | Target entity ID (post ID or comment ID) |
+| status | string |  | Report status (`PENDING`, `REVIEWED`, `RESOLVED`, `DISMISSED`) |
+| description | text |  | Optional free text description from the reporter |
+| ai_result | text |  | Raw JSON string returned by the AI moderation model |
+| ai_confidence | double |  | AI confidence score in the range [0.0, 1.0] |
+| violation_snippet | text |  | Concrete snippet that violates the guidelines (as extracted by AI) |
+| is_violation | bit |  | Whether the reported content is considered a violation (true/false) |
+| created_at | datetime |  | Timestamp when the report was created |
+| reviewed_at | datetime |  | Timestamp when the report was reviewed (AI or admin) |
+| reviewed_by_id | varchar(36) | FK | References `USERS.id` (admin who performed the final review, if any) |
+| reviewNotes | text |  | Optional review notes from the admin or moderation system |
 
 ##### 3.2.10 NEWS
 
@@ -549,6 +604,30 @@ erDiagram
 | source | varchar(255) |  | Source website name |
 | publish_date | datetime |  | Publication time |
 | create_time | datetime |  | Insert time (when stored) |
+
+##### 3.2.11 REPORT_REASONS
+
+| Field | Data Type | Key | Description |
+|------|-----------|-----|-------------|
+| id | long | PK | Internal identifier of a single report reason entry |
+| report_id | long | FK | References `REPORT.id` (owning report) |
+| reason | string |  | One of the predefined reasons (Spam, Fraud or Scam, Abusive Language, etc.) |
+
+##### 3.2.12 NOTIFICATIONS
+
+| Field | Data Type | Key | Description |
+|------|-----------|-----|-------------|
+| id | long | PK | Notification ID |
+| user_id | varchar(36) | FK | References `USERS.id` (receiver of the notification) |
+| type | string |  | Type (`REPORT_SUCCESS`, `REPORT_FAILED`, `POST_VIOLATION_PENALTY`, `POST_RESTORED`, `COMMENT_VIOLATION_PENALTY`, `COMMENT_RESTORED`, etc.) |
+| title | varchar(500) |  | Notification title (often stored as bilingual text) |
+| content | text |  | Notification body content (often stored as bilingual text) |
+| report_id | long |  | Related report ID when applicable (logical link to `REPORT.id`) |
+| post_id | varchar(36) |  | Related post ID when applicable (logical link to `POSTS.id`) |
+| comment_id | varchar(36) |  | Related comment ID when applicable (logical link to `COMMENTS.id`) |
+| is_read | bit |  | Whether the notification has been read by the user |
+| created_at | datetime |  | Creation time of the notification |
+| read_at | datetime |  | Timestamp when the notification was marked as read |
 
 ---
 

@@ -13,6 +13,7 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\model\UserFollow.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\CommunityPostRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\service\VerificationCodeService.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\config\AsyncConfig.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\model\Notification.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\security\JwtAuthenticationFilter.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\controller\MessageController.java
@@ -40,6 +41,7 @@ C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalb
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\security\SecurityConfig.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\controller\CommunityController.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\UserDTO.java
+C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\scheduler\ReportScheduler.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\repository\CommentRepository.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\dto\SendVerificationCodeRequest.java
 C:\Users\pzy\Documents\java\work\hh\springboot-backend\src\main\java\com\globalbuddy\scheduler\NewsScheduler.java
