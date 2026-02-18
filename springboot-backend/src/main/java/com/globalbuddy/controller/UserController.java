@@ -19,8 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.StringUtils;
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -723,7 +721,15 @@ public class UserController {
     /**
      * Update current user's profile
      * PUT /api/users/me
-     * Allows updating: displayName, avatar, preferredLanguage
+     *
+     * Allows updating:
+     * - displayName (will also update username so that login uses the new name)
+     * - avatar
+     * - preferredLanguage
+     *
+     * This ensures we don't keep two different "names" (username vs displayName)
+     * from the user's perspective – changing the name in Profile also changes the
+     * login username.
      */
     @PutMapping("/me")
     public ResponseEntity<Map<String, Object>> updateMyProfile(@RequestBody Map<String, Object> updates) {
@@ -735,11 +741,27 @@ public class UserController {
         try {
             boolean updated = false;
 
-            // Update display name
+            // Update display name (and keep username in sync so it is used for login)
             if (updates.containsKey("displayName")) {
                 String displayName = (String) updates.get("displayName");
                 if (displayName != null && !displayName.trim().isEmpty()) {
-                    currentUser.setDisplayName(displayName.trim());
+                    String newName = displayName.trim();
+
+                    // If username will change, check for uniqueness to avoid conflicts
+                    String currentUsername = currentUser.getUsername();
+                    if (currentUsername == null || !currentUsername.equals(newName)) {
+                        boolean usernameTaken = userRepository.existsByUsername(newName);
+                        if (usernameTaken) {
+                            Map<String, Object> error = new HashMap<>();
+                            error.put("success", false);
+                            error.put("message", "用户名已被使用");
+                            return ResponseEntity.badRequest().body(error);
+                        }
+                        currentUser.setUsername(newName);
+                        log.info("Updated username for user {} to {}", currentUser.getId(), newName);
+                    }
+
+                    currentUser.setDisplayName(newName);
                     updated = true;
                     log.info("Updated display name for user: {}", currentUser.getId());
                 }
@@ -833,7 +855,6 @@ public class UserController {
         
         try {
             // 准备目录和文件名
-            String sanitized = sanitizeFileName(originalFilename);
             String newName = "avatar_" + currentUser.getId() + "_" + UUID.randomUUID() + "." + fileExtension;
             Path dir = Paths.get(uploadBasePath).toAbsolutePath().normalize();
             
@@ -894,14 +915,5 @@ public class UserController {
         }
     }
 
-    /**
-     * Sanitize file name to prevent security issues
-     */
-    private String sanitizeFileName(String original) {
-        if (!StringUtils.hasText(original)) {
-            return "avatar";
-        }
-        return original.replaceAll("[^a-zA-Z0-9\\.\\-_]", "_");
-    }
 }
 

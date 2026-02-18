@@ -285,7 +285,7 @@ const loadProfile = async () => {
     if (profileResponse.data.success) {
       profile.value = profileResponse.data.data;
       editForm.value = {
-        displayName: profile.value.displayName || '',
+        displayName: profile.value.displayName || profile.value.username || '',
         avatar: profile.value.avatar || '',
         preferredLanguage: profile.value.preferredLanguage || 'en'
       };
@@ -395,7 +395,7 @@ const cancelEditing = () => {
   // Reset form
   if (profile.value) {
     editForm.value = {
-      displayName: profile.value.displayName || '',
+      displayName: profile.value.displayName || profile.value.username || '',
       avatar: profile.value.avatar || '',
       preferredLanguage: profile.value.preferredLanguage || 'en'
     };
@@ -489,7 +489,9 @@ const saveProfile = async () => {
       const savedUser = localStorage.getItem('user');
       if (savedUser) {
         const userData = JSON.parse(savedUser);
-        userData.displayName = profile.value.displayName;
+        // Keep username and displayName in sync for the logged-in user
+        userData.username = profile.value.username;
+        userData.displayName = profile.value.displayName || profile.value.username;
         userData.avatar = profile.value.avatar;
         userData.preferredLanguage = profile.value.preferredLanguage;
         localStorage.setItem('user', JSON.stringify(userData));
