@@ -84,7 +84,7 @@ This Software Requirement Specification (SRS) document defines the requirements 
 
 - **Feature #3: Authentication and Profile System**
   
-  The authentication and profile system provides secure user registration and authentication supporting email and phone registration methods, with comprehensive profile management. Users can register via email or phone number with verification codes. The registration process includes: (1) Send verification code (`POST /api/auth/send-verification-code` with identifier and type: "email" or "phone"), (2) Verify code (`POST /api/auth/verify-code`), (3) Register with verified code (`POST /api/auth/register` with username, password, displayName, preferredLanguage, identifier, code, type). The system also supports phone registration via Firebase (`POST /api/auth/register/phone`) and merchant registration (`POST /api/auth/register/merchant`). Users log in using username/email and password (`POST /api/auth/login`), receiving a JWT token for authentication. The system supports password reset via verification codes (`POST /api/auth/forgot-password/send-code`, `POST /api/auth/forgot-password/reset`). Users can view their profile (`GET /api/users/me`), update profile information (`PUT /api/users/me` with displayName, avatar, preferredLanguage), and upload avatar images (`POST /api/users/me/avatar`). Users can view their own posts with all statuses including pending, approved, and rejected (`GET /api/users/me/posts`). The system supports user search (`GET /api/users/search?q=keyword`), viewing user profiles (`GET /api/users/{userId}`), following/unfollowing users (`POST /api/users/{userId}/follow`, `DELETE /api/users/{userId}/follow`), and viewing followers and mutual follows. Users can view all reports they have submitted from their profile page, including report status (PENDING, REVIEWED, RESOLVED, DISMISSED), target type (POST or COMMENT), reasons, description, review notes from administrators, AI analysis results, and timestamps (`GET /api/reports/my`). The system provides notification management (`GET /api/notifications`, `GET /api/notifications/unread-count`, `PUT /api/notifications/{id}/read`, `PUT /api/notifications/read-all`).
+  The authentication and profile system provides secure user registration and authentication supporting email and phone registration methods, with comprehensive profile management. Users can register via email or phone number with verification codes. The registration process includes: (1) Send verification code (`POST /api/auth/send-verification-code` with identifier and type: "email" or "phone"), (2) Verify code (`POST /api/auth/verify-code`), (3) Register with verified code (`POST /api/auth/register` with username, password, displayName, preferredLanguage, identifier, code, type). The system also supports phone registration via Firebase (`POST /api/auth/register/phone`) and merchant registration (`POST /api/auth/register/merchant`). Users log in using username/email and password (`POST /api/auth/login`), receiving a JWT token for authentication. The system supports password reset via verification codes (`POST /api/auth/forgot-password/send-code`, `POST /api/auth/forgot-password/reset`). Users can view their profile (`GET /api/users/me`), update profile information (`PUT /api/users/me` with displayName, avatar, preferredLanguage; when the user changes the displayName in the My Profile page, the backend also synchronizes the username/login name to this new displayName after trimming and checks for uniqueness, rejecting the update if the username is already taken), and upload avatar images (`POST /api/users/me/avatar`). Users can view their own posts with all statuses including pending, approved, and rejected (`GET /api/users/me/posts`). The system supports user search (`GET /api/users/search?q=keyword`), viewing user profiles (`GET /api/users/{userId}`), following/unfollowing users (`POST /api/users/{userId}/follow`, `DELETE /api/users/{userId}/follow`), and viewing followers and mutual follows. Users can view all reports they have submitted from their profile page, including report status (PENDING, REVIEWED, RESOLVED, DISMISSED), target type (POST or COMMENT), reasons, description, review notes from administrators, AI analysis results, and timestamps (`GET /api/reports/my`). The system provides notification management (`GET /api/notifications`, `GET /api/notifications/unread-count`, `PUT /api/notifications/{id}/read`, `PUT /api/notifications/read-all`).
 
 ### 1.3 User Characteristics
 
@@ -2820,7 +2820,7 @@ endif
 
 **URS-20**: The User can log in using username/email and password, receiving a JWT token for authentication.
 
-**SRS-89**: The system shall provide a login page (UI-Login) with fields for username/email and password.
+**SRS-89**: The system shall provide a login page (UI-Login) with fields for username/email and password, and a "Forgot Password" link.
 
 **SRS-90**: The system shall send login request to `POST /api/auth/login` with username (or email) and password.
 
@@ -2832,7 +2832,13 @@ endif
 
 **SRS-94**: If login fails (invalid credentials), the system shall display a localized error message: "Invalid username or password" (zh: "用户名或密码错误") and allow retry.
 
-**SRS-95**: The system shall support "Remember Me" functionality (optional) that extends token expiration time or stores token persistently.
+**SRS-95**: The system shall provide a "Forgot Password" link on the login page that allows users to reset their password via email or phone verification code.
+
+**SRS-96**: When user clicks "Forgot Password", the system shall display a password reset form where user can enter email/phone, receive a verification code, verify the code, and set a new password.
+
+**SRS-97**: The system shall send password reset verification code via `POST /api/auth/forgot-password/send-code` with identifier (email or phone) and type ("email" or "phone").
+
+**SRS-98**: The system shall reset password via `POST /api/auth/forgot-password/reset` (for email) or `POST /api/auth/forgot-password/reset/phone` (for phone) with identifier, verification code, and new password.
 
 ##### 2.3.20.2 Use Case Description
 
@@ -2854,7 +2860,6 @@ endif
 |-------|------|------------|---------|
 | Username/Email | String | Valid username or email address | "john_doe" or "user@example.com" |
 | Password | String | Not empty | "Password123" |
-| Remember Me | Boolean | Optional | true |
 
 **Post conditions**:
 - User is authenticated and receives a JWT token.
@@ -2865,19 +2870,40 @@ endif
 
 | User (Actions) | System (Responses) |
 |----------------|-------------------|
-| 1. User opens login page. | 2. System displays login form with username/email and password fields. |
-| 3. User enters username/email and password. | 4. System validates form fields (not empty).<br>   • `[A1: Validation failed]` |
+| 1. User opens login page. | 2. System displays login form with username/email and password fields, and a "Forgot Password" link. |
+| 3. User enters username/email and password. | 4. System validates form fields (not empty).<br>   • `[A1: Validation failed]`<br>   • `[A2: User clicks "Forgot Password"]` |
 | 5. User clicks "Log In". | 6. System sends login request to backend with credentials.<br>   • `[E1: Network timeout or connection error]` |
 | | 7. Backend authenticates credentials and generates JWT token.<br>   • `[E2: Invalid credentials]`<br>   • `[E3: Server error]` |
 | | 8. Backend returns 200 OK with JWT token and user information. |
 | 9. User views main application. | 10. System stores JWT token, updates user state, and redirects to main application (or previously requested page). |
 
-**Alternative Flow**
+**Alternative Flows**
 
 **`[A1: Validation failed]`**
 - A1.1 System detects empty username/email or password fields.
 - A1.2 System displays validation error: "Please enter username/email and password" (zh: "请输入用户名/邮箱和密码").
 - A1.3 User fills in missing fields and retries.
+
+**`[A2: User clicks "Forgot Password"]`**
+- A2.1 User clicks "Forgot Password" link on the login page.
+- A2.2 System displays password reset form with fields for email/phone selection, identifier input, verification code input, new password, and confirm password.
+- A2.3 User selects reset method (email or phone) and enters email/phone.
+- A2.4 User clicks "Send Code" button.
+- A2.5 System sends verification code request to `POST /api/auth/forgot-password/send-code` with identifier and type. `[E4: Send code failed]` may occur here.
+- A2.6 System displays success message: "Verification code sent" (zh: "验证码已发送") and enables code input field.
+- A2.7 User enters verification code.
+- A2.8 For email method, user clicks "Verify Code" button; system verifies code via `POST /api/auth/verify-code`. `[E5: Verification code invalid]` may occur here.
+- A2.9 User enters new password and confirms password.
+- A2.10 User clicks "Reset Password" button.
+- A2.11 System validates password (must contain uppercase and lowercase letters) and password match. If validation fails, `[A3: Password validation failed]` is triggered.
+- A2.12 System sends password reset request to `POST /api/auth/forgot-password/reset` (email) or `POST /api/auth/forgot-password/reset/phone` (phone) with identifier, code, and new password. `[E6: Reset password failed]` may occur here.
+- A2.13 System displays success message: "Password reset successfully" (zh: "密码重置成功") and redirects user back to login page.
+- A2.14 Use case continues with login flow.
+
+**`[A3: Password validation failed]`**
+- A3.1 System detects password does not meet requirements (must contain uppercase and lowercase) or passwords do not match.
+- A3.2 System displays validation error: "Password must contain uppercase and lowercase letters" (zh: "密码必须包含大写和小写字母") or "Passwords do not match" (zh: "密码不匹配").
+- A3.3 User corrects password and retries from A2.10.
 
 **Exception Flows**
 
@@ -2896,11 +2922,27 @@ endif
 - E3.2 System displays error message and allows retry.
 - E3.3 Use case end.
 
+**`[E4: Send code failed]`**
+- E4.1 Backend returns error when sending verification code.
+- E4.2 System displays error message: "Failed to send verification code, please try again" (zh: "发送验证码失败，请稍后重试").
+- E4.3 User can retry from A2.4.
+
+**`[E5: Verification code invalid]`**
+- E5.1 Backend returns error: verification code is incorrect or expired.
+- E5.2 System displays error message: "Invalid or expired verification code" (zh: "验证码错误或已过期").
+- E5.3 User can request a new code or retry from A2.7.
+
+**`[E6: Reset password failed]`**
+- E6.1 Backend returns error when resetting password (e.g., invalid code, user not found).
+- E6.2 System displays error message: "Failed to reset password" (zh: "重置密码失败").
+- E6.3 User can retry from A2.10 or go back to login page.
+
 **Note**:
 - Login supports both username and email address as credentials, providing flexibility for users who may prefer either method.
+- The username used for login is the same as the username shown on the profile page; when the user changes their display name in the profile and the update succeeds, the backend synchronizes the username to this new display name so that subsequent logins use the updated name.
 - Upon successful authentication, the backend generates a JWT token that is stored in localStorage or sessionStorage and included in the `Authorization: Bearer <token>` header for all subsequent authenticated API requests.
-- The system supports "Remember Me" functionality (optional) that extends token expiration time or stores the token persistently for convenience.
 - After successful login, the system redirects the user to the main application or to a previously requested page if the user was redirected to login from a protected route.
+- The login page includes a "Forgot Password" link that allows users to reset their password through email or phone verification. The password reset process requires: (1) entering email/phone and receiving a verification code, (2) verifying the code (for email method), (3) entering and confirming a new password that meets requirements (must contain uppercase and lowercase letters), and (4) submitting the reset request. After successful password reset, the user is redirected back to the login page to log in with the new password.
 
 ##### 2.3.20.3 Activity Diagram
 
@@ -2949,15 +2991,15 @@ endif
 
 **URS-21**: The User can log out to end the current session and clear authentication tokens.
 
-**SRS-96**: The system shall provide a "Log Out" action (button or menu item) accessible from the user profile menu or navigation bar.
+**SRS-99**: The system shall provide a "Log Out" action (button or menu item) accessible from the user profile menu or navigation bar.
 
-**SRS-97**: When the user clicks "Log Out", the system shall clear the stored JWT token (from localStorage/sessionStorage) and user session data.
+**SRS-100**: When the user clicks "Log Out", the system shall clear the stored JWT token (from localStorage/sessionStorage) and user session data.
 
-**SRS-98**: The system shall redirect the user to the login page or home page (if public access is allowed).
+**SRS-101**: The system shall redirect the user to the login page or home page (if public access is allowed).
 
-**SRS-99**: After logout, all subsequent API requests that require authentication shall fail with 401 Unauthorized, and the system shall redirect to login if needed.
+**SRS-102**: After logout, all subsequent API requests that require authentication shall fail with 401 Unauthorized, and the system shall redirect to login if needed.
 
-**SRS-100**: The system may optionally send a logout request to the backend (`POST /api/auth/logout`) to invalidate the token on the server side (if token blacklisting is implemented).
+**SRS-103**: The system may optionally send a logout request to the backend (`POST /api/auth/logout`) to invalidate the token on the server side (if token blacklisting is implemented).
 
 ##### 2.3.21.2 Use Case Description
 
@@ -3053,23 +3095,23 @@ endif
 
 ##### 2.3.22.1 User Requirement Specification (URS) and System Requirement Specification (SRS)
 
-**URS-22**: The User can view and update their profile information including display name, avatar, and preferred language.
+**URS-22**: The User can view and update their profile information including display name, avatar, and preferred language; when the User updates their display name in the profile, the system keeps the username used for login synchronized with this display name (subject to username uniqueness constraints).
 
-**SRS-101**: The system shall provide a profile page (UI-Profile) accessible from the user menu or navigation, showing current user information: username, display name, avatar, email, preferred language, and account creation date.
+**SRS-104**: The system shall provide a profile page (UI-Profile) accessible from the user menu or navigation, showing current user information: username, display name, avatar, email, preferred language, and account creation date.
 
-**SRS-102**: The system shall load current user profile via `GET /api/users/me` (requires authentication via JWT token).
+**SRS-105**: The system shall load current user profile via `GET /api/users/me` (requires authentication via JWT token).
 
-**SRS-103**: The system shall provide an "Edit Profile" action that allows users to update: display name (allows English characters), avatar (image upload), and preferred language (Chinese "zh" or English "en").
+**SRS-106**: The system shall provide an "Edit Profile" action that allows users to update: display name (allows English characters), avatar (image upload), and preferred language (Chinese "zh" or English "en"); when the display name is changed and is non-empty after trimming, the system shall also treat this new display name as the candidate username/login name.
 
-**SRS-104**: The system shall support avatar image upload via `POST /api/users/me/avatar` (accepts image files: JPEG, PNG, GIF, WebP) and returns the avatar URL.
+**SRS-107**: The system shall support avatar image upload via `POST /api/users/me/avatar` (accepts image files: JPEG, PNG, GIF, WebP) and returns the avatar URL.
 
-**SRS-105**: The system shall update profile information via `PUT /api/users/me` with updated fields (displayName, avatar URL, preferredLanguage).
+**SRS-108**: The system shall update profile information via `PUT /api/users/me` with updated fields (displayName, avatar URL, preferredLanguage). When the request contains a non-blank displayName, the backend shall also update the username to the trimmed displayName so that the new name becomes the login username. Before updating the username, the backend shall verify that no other user is using the same username; if a duplicate is found, it shall reject the update and return an appropriate error, and the frontend shall display a localized error message (e.g., "Username already taken", zh: "用户名已被使用").
 
-**SRS-106**: Upon successful update, the system shall refresh the profile display and update the user state throughout the application.
+**SRS-109**: Upon successful update, the system shall refresh the profile display and update the user state throughout the application.
 
-**SRS-107**: If the preferred language is changed, the system shall immediately update the interface language and persist the preference.
+**SRS-110**: If the preferred language is changed, the system shall immediately update the interface language and persist the preference.
 
-**SRS-108**: If profile update fails (network/server error, validation error), the system shall display a localized error message and allow retry.
+**SRS-111**: If profile update fails (network/server error, validation error), the system shall display a localized error message and allow retry.
 
 ##### 2.3.22.2 Use Case Description
 
@@ -3143,7 +3185,7 @@ endif
 - E4.3 Use case end.
 
 **Note**:
-- Profile information includes: username (read-only), display name (editable, allows English characters), avatar (image upload), email (read-only), preferred language (editable, "zh" or "en"), and account creation date (read-only).
+- Profile information includes: username (login name, displayed as read-only in the UI but automatically kept in sync with the display name when the user saves profile changes), display name (editable, allows English characters), avatar (image upload), email (read-only), preferred language (editable, "zh" or "en"), and account creation date (read-only).
 - Avatar image upload supports JPEG, PNG, GIF, and WebP formats, with a maximum file size limit enforced by the backend.
 - When the preferred language is changed, the system immediately updates the interface language throughout the application and persists the preference for future sessions.
 - Profile updates are performed via `PUT /api/users/me`, and upon successful update, the system refreshes the profile display and updates the user state throughout the application.
@@ -3215,19 +3257,19 @@ endif
 
 **URS-23**: The User can view all their own community posts with moderation status (pending, approved, rejected).
 
-**SRS-109**: The system shall provide a "View My Community Posts" link or button on the profile page (UI-Profile) that navigates to a dedicated posts list page (UI-MyPosts).
+**SRS-112**: The system shall provide a "View My Community Posts" link or button on the profile page (UI-Profile) that navigates to a dedicated posts list page (UI-MyPosts).
 
-**SRS-110**: The system shall load user's posts via `GET /api/users/me/posts` (requires authentication), which returns all posts created by the current user including all moderation statuses: PENDING_REVIEW, APPROVED, and REJECTED.
+**SRS-113**: The system shall load user's posts via `GET /api/users/me/posts` (requires authentication), which returns all posts created by the current user including all moderation statuses: PENDING_REVIEW, APPROVED, and REJECTED.
 
-**SRS-111**: UI-MyPosts shall display posts ordered by creation time (newest first), showing: post ID, title, body preview, tags, creation timestamp, moderation status badge (PENDING_REVIEW, APPROVED, REJECTED), and review note (if rejected).
+**SRS-114**: UI-MyPosts shall display posts ordered by creation time (newest first), showing: post ID, title, body preview, tags, creation timestamp, moderation status badge (PENDING_REVIEW, APPROVED, REJECTED), and review note (if rejected).
 
-**SRS-112**: The system shall display posts with appropriate status badges for easy identification: "Pending Review" (zh: "待审核"), "Approved" (zh: "已通过"), "Rejected" (zh: "已拒绝").
+**SRS-115**: The system shall display posts with appropriate status badges for easy identification: "Pending Review" (zh: "待审核"), "Approved" (zh: "已通过"), "Rejected" (zh: "已拒绝").
 
-**SRS-113**: If a post is rejected, the system shall display the review note (rejection reason) provided by administrators.
+**SRS-116**: If a post is rejected, the system shall display the review note (rejection reason) provided by administrators.
 
-**SRS-114**: If the user has not created any posts, the system shall display an empty state message: "No posts" (zh: "暂无帖子").
+**SRS-117**: If the user has not created any posts, the system shall display an empty state message: "No posts" (zh: "暂无帖子").
 
-**SRS-115**: If the request to fetch posts fails (network/server error), the system shall display a localized error message and provide a retry action.
+**SRS-118**: If the request to fetch posts fails (network/server error), the system shall display a localized error message and provide a retry action.
 
 ##### 2.3.23.2 Use Case Description
 
@@ -3257,7 +3299,7 @@ endif
 | User (Actions) | System (Responses) |
 |----------------|-------------------|
 | 1. User opens their profile page. | 2. System displays profile information and action buttons including "View My Community Posts". |
-| 3. User clicks "View My Community Posts". | 4. System navigates to UI-MyPosts page and sends request to `GET /api/users/me/posts` with JWT token.<br>   • `[E1: Network timeout or connection error]`<br>   • `[E2: Unauthorized]` |
+| 3. User clicks "View My Community Posts". | 4. System navigates to UI-MyPosts page and sends a request to the backend to load the current user's community posts based on the user's authenticated session.<br>   • `[E1: Network timeout or connection error]`<br>   • `[E2: Unauthorized]` |
 | | 5. Backend retrieves all posts created by the current user (including all statuses) and returns post list.<br>   • `[E3: Server error]` |
 | 6. User views the posts list. | 7. System displays posts ordered by creation time (newest first), showing:<br>   - Post ID<br>   - Title and body preview<br>   - Tags<br>   - Creation timestamp<br>   - Status badge (PENDING_REVIEW, APPROVED, REJECTED)<br>   - Review note (if rejected)<br>   • `[A1: No posts created]` |
 | 8. User can click on a post to view details or scroll through the list. | 9. System continues to display post cards with all available information. |
@@ -3305,7 +3347,7 @@ start
 
 |System|
 :frontend navigates to UI-MyPosts;
-:frontend sends GET /api/users/me/posts request;
+:frontend sends a request to the backend to load the current user's community posts;
 
 if () then ([Request failed])
   :shows error message\nand allows retry;
@@ -3336,13 +3378,13 @@ endif
 
 **URS-24**: The User can view their followers list and mutual follows (Friends) list, search/filter within these lists, manage follow/unfollow relationships, and, for mutual follows, start or continue private chats according to the messaging rules in Section 5.3 (Private Messaging Rules).
 
-**SRS-116**: The system shall provide "View Followers" and "View Mutual Follows" links or buttons on the profile page (UI-Profile) that open user list modals or navigate to dedicated pages.
+**SRS-119**: The system shall provide "View Followers" and "View Mutual Follows" links or buttons on the profile page (UI-Profile) that open user list modals or navigate to dedicated pages.
 
-**SRS-117**: The system shall load followers list via `GET /api/users/{userId}/followers` (returns users who follow the specified user).
+**SRS-120**: The system shall load followers list via `GET /api/users/{userId}/followers` (returns users who follow the specified user).
 
-**SRS-118**: The system shall load mutual follows list via `GET /api/users/mutual-follows` (returns users who mutually follow the current user, with optional search filter `q`).
+**SRS-121**: The system shall load mutual follows list via `GET /api/users/mutual-follows` (returns users who mutually follow the current user, with optional search filter `q`).
 
-**SRS-119**: UI-Followers and UI-MutualFollows shall display user cards showing: user ID, username, display name, avatar, and follow/unfollow action buttons (if applicable), and for mutual follows (Friends) a "Send Message" action that opens the private messaging interface.
+**SRS-122**: UI-Followers and UI-MutualFollows shall display user cards showing: user ID, username, display name, avatar, and follow/unfollow action buttons (if applicable), and for mutual follows (Friends) a "Send Message" action that opens the private messaging interface.
 
 **SRS-120**: The system shall support search/filter functionality for mutual follows list using the `q` query parameter.
 
@@ -3494,7 +3536,7 @@ endif
 
 **SRS-125**: UI-MyReports shall display all reports submitted by the current user, ordered by creation time (newest first), showing report ID, target type, target ID, reasons, description, status, creation timestamp, review timestamp (if reviewed), review notes (if available), AI analysis results, and violation snippets.
 
-**SRS-126**: The backend shall provide an endpoint `GET /api/reports/my` that returns all reports submitted by the authenticated user, including all report details and status information.
+**SRS-126**: The backend shall provide functionality to retrieve all reports submitted by the authenticated user, including all report details and status information.
 
 **SRS-127**: The system shall display reports with appropriate status badges (PENDING, REVIEWED, RESOLVED, DISMISSED) and target type indicators (POST/COMMENT) for easy identification.
 
@@ -3530,7 +3572,7 @@ endif
 | User (Actions) | System (Responses) |
 |----------------|-------------------|
 | 1. User opens their profile page. | 2. System displays profile information and action buttons including "View My Reports". |
-| 3. User clicks "View My Reports". | 4. System navigates to UI-MyReports page and sends request to `GET /api/reports/my`.<br>   • `[E1: Network timeout or connection error]` |
+| 3. User clicks "View My Reports". | 4. System navigates to UI-MyReports page and sends request to backend to retrieve current user's reports.<br>   • `[E1: Network timeout or connection error]` |
 | | 5. Backend retrieves all reports submitted by the current user and returns report list.<br>   • `[E2: Server error]` |
 | 6. User views the reports list. | 7. System displays reports ordered by creation time (newest first), showing:<br>   - Report ID<br>   - Target type (POST/COMMENT) badge<br>   - Target ID<br>   - Status badge (PENDING, REVIEWED, RESOLVED, DISMISSED)<br>   - Reasons (list of selected reasons)<br>   - Description (if provided)<br>   - Creation timestamp<br>   - Review timestamp (if reviewed)<br>   - Review notes (if available)<br>   - AI analysis results (if available)<br>   - Violation snippet (if available)<br>   • `[A1: No reports submitted]` |
 | 8. User can scroll through the list and view details of each report. | 9. System continues to display report cards with all available information. |

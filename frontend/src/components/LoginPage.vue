@@ -24,7 +24,7 @@
 
       <!-- Login Form -->
       <template v-if="!isRegister && !isForgotPassword">
-        <form class="login-form" @submit.prevent="handleLogin">
+        <form class="login-form" @submit.prevent="handleLogin" novalidate>
           <div v-if="error" class="error-message">
           {{ error }}
         </div>
@@ -70,7 +70,7 @@
       <!-- Registration Form -->
       <template v-else-if="isRegister">
         <!-- Registration: All fields in one page -->
-        <div class="login-form">
+        <div class="login-form" novalidate>
           <div v-if="error" class="error-message">
           {{ error }}
         </div>
@@ -218,7 +218,7 @@
       <!-- Forgot Password Form -->
       <template v-else-if="isForgotPassword">
         <!-- Forgot Password: All fields in one page (same as registration) -->
-        <div class="login-form">
+        <div class="login-form" novalidate>
           <div v-if="error" class="error-message">
             {{ error }}
           </div>
@@ -511,7 +511,22 @@ const handleLogin = async () => {
       }
       emit('login', data.user, data.token);
     } else {
-      error.value = data.error || data.message || (lang.value === 'zh' ? '登录失败' : 'Login failed');
+      // Normalize backend error message according to current UI language
+      const backendMsg = data.error || data.message || '';
+      
+      if (lang.value === 'en') {
+        // Map common Chinese backend messages to English when UI is English
+        if (backendMsg.includes('用户名或密码错误')) {
+          error.value = 'Incorrect username or password';
+        } else if (backendMsg.includes('请填写所有必填项')) {
+          error.value = 'Please fill in all required fields';
+        } else {
+          error.value = backendMsg || 'Login failed';
+        }
+      } else {
+        // Chinese UI: keep backend message or fallback to generic Chinese text
+        error.value = backendMsg || '登录失败';
+      }
     }
   } catch (err) {
     console.error('Login error:', err);
