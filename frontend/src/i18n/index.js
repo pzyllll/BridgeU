@@ -81,6 +81,16 @@ const translations = {
       student: 'Student',
       semanticScore: 'Semantic Match Score',
     },
+    // Community Page
+    community: {
+      title: 'Community Feed',
+      filterAll: 'All',
+      tagStudy: 'Study',
+      tagHousing: 'Housing',
+      tagTravel: 'Travel',
+      tagPartTimeJob: 'Part-time Job',
+      tagLifeServices: 'Life Services',
+    },
     // Post Detail
     postDetail: {
       loading: 'Loading post...',
@@ -424,6 +434,16 @@ const translations = {
       anonymous: '匿名',
       student: '学生',
       semanticScore: '语义匹配分数',
+    },
+    // Community Page
+    community: {
+      title: '社区动态',
+      filterAll: '全部',
+      tagStudy: '学习',
+      tagHousing: '住房',
+      tagTravel: '旅行',
+      tagPartTimeJob: '兼职工作',
+      tagLifeServices: '生活服务',
     },
     // Post Detail
     postDetail: {

@@ -26,14 +26,14 @@
           <!-- Community Page -->
           <template v-else-if="currentPage === 'community'">
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; padding: 0 32px 24px 32px">
-              <span>{{ lang === 'zh' ? '社区动态' : 'Community Feed' }}</span>
+              <span>{{ t('community.title') }}</span>
               <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
                 <span
                   :class="['pill', { active: selectedTag === 'all' }]"
                   @click="selectedTag = 'all'"
                   style="cursor: pointer"
                 >
-                  {{ lang === 'zh' ? '全部' : 'All' }}
+                  {{ t('community.filterAll') }}
                 </span>
                 <span
                   :class="['pill', { active: selectedTag === 'study' }]"
@@ -41,7 +41,7 @@
                   @click="selectedTag = 'study'"
                   style="cursor: pointer"
                 >
-                  📚 #{{ lang === 'zh' ? '学习' : 'Study' }}
+                  📚 #{{ t('community.tagStudy') }}
                 </span>
                 <span
                   :class="['pill', { active: selectedTag === 'housing' }]"
@@ -49,7 +49,7 @@
                   @click="selectedTag = 'housing'"
                   style="cursor: pointer"
                 >
-                  🏠 #{{ lang === 'zh' ? '住房' : 'Housing' }}
+                  🏠 #{{ t('community.tagHousing') }}
                 </span>
                 <span
                   :class="['pill', { active: selectedTag === 'travel' }]"
@@ -57,7 +57,7 @@
                   @click="selectedTag = 'travel'"
                   style="cursor: pointer"
                 >
-                  ✈️ #{{ lang === 'zh' ? '旅行' : 'Travel' }}
+                  ✈️ #{{ t('community.tagTravel') }}
                 </span>
                 <span
                   :class="['pill', { active: selectedTag === 'part-time-job' }]"
@@ -65,7 +65,7 @@
                   @click="selectedTag = 'part-time-job'"
                   style="cursor: pointer"
                 >
-                  💼 #{{ lang === 'zh' ? '兼职工作' : 'Part-time Job' }}
+                  💼 #{{ t('community.tagPartTimeJob') }}
                 </span>
                 <span
                   :class="['pill', { active: selectedTag === 'life-services' }]"
@@ -73,7 +73,7 @@
                   @click="selectedTag = 'life-services'"
                   style="cursor: pointer"
                 >
-                  🛍️ #{{ lang === 'zh' ? '生活服务' : 'Life Services' }}
+                  🛍️ #{{ t('community.tagLifeServices') }}
                 </span>
               </div>
             </div>
@@ -203,7 +203,7 @@ import ConversationList from './components/ConversationList.vue';
 import ChatWindow from './components/ChatWindow.vue';
 import { fetchMyRejectedPosts } from './api';
 import { setLanguagePreference, getLanguagePreference } from './utils/language';
-import { setLanguage, getCurrentLanguage } from './i18n';
+import { setLanguage, getCurrentLanguage, t } from './i18n';
 // Element Plus locale for dynamic language switching
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import en from 'element-plus/dist/locale/en.mjs';
