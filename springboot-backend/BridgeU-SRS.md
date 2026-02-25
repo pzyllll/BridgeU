@@ -190,7 +190,7 @@ This use case diagram describes the core interactive functions of the automated 
 
 graph TB
     subgraph DailyBriefingSystem["Daily Briefing System"]
-        UC01["UC-01<br/>Browse Daily Briefings"]
+        UC01["UC-01<br/>Find Daily Briefing"]
         UC02["UC-02<br/>View News Details"]
         UC03["UC-03<br/>Switch Interface Language"]
         UC04["UC-04<br/>Jump to Original Link"]
@@ -215,7 +215,7 @@ graph TB
 ```
 
 **Use Cases:**
-- UC-01: Browse Daily Briefings
+- UC-01: Find Daily Briefing
 - UC-02: View News Details (<<extend>> UC-01)
 - UC-03: Switch Interface Language (<<extend>> UC-01)
 - UC-04: Jump to Original Link (<<extend>> UC-01)
@@ -383,19 +383,19 @@ graph TB
 
 #### Feature 1: Daily Briefing System
 
-**URS-01**: The Administrator can manage or manually trigger the crawling task to ensure data real-time updates.
+URS01 – View Daily Briefings 
+User can open the Daily Briefing page and browse a paginated list of recent Daily Briefing items ordered from newest to oldest by publication time in their current interface language.
+URS02 – View Daily Briefing news details 
+User can select a Daily Briefing item from the list and view a news detail page that shows the complete information (title, AI generated summary of News, publication time,View Original button, "Back" button) for that item in their current interface language (English/Chinese).
+URS‑03 – Switch Interface Language
+User can click a language switch button at any time to change the interface language between Chinese and English and continue browsing Daily Briefing items in the newly selected language.
+URS‑04 – Jump to the original link
+User can click an “Open original article” button on a Daily Briefing item and read the full original news article on the external official website in a new browser tab.
+URS‑05 – Filter Daily Briefings News by Date
+The User can filter news based on specific criteria (start date and end date) while browsing.
+URS06 – Search for Daily Briefing News 
+User can type Chinese or English keywords into a search box on the Daily Briefing page and view only Daily Briefing items that match the entered keywords.
 
-**URS-02**: The User can browse the Daily Briefing to view the latest news summaries ordered from newest to oldest by publication time, with pagination support.
-
-**URS-02.1 (Implementation Alignment Note)**: The system shall use the original publication time from the source website (parsed from RSS or HTML and normalized to a unified timezone) to determine the ordering of Daily Briefing items. If the source publication time is unavailable, the system shall fall back to using the crawl timestamp for ordering.
-
-**URS-03**: The User can view news details including title, AI-generated summary, publication time, crawl timestamp, and source information in their current interface language (Chinese or English).
-
-**URS-04**: The User can search for specific news information within the Daily Briefing by entering keywords in Chinese or English. The system searches across both Chinese and English versions of titles and summaries.
-
-**URS-05**: The User can jump to the original text link to read the full report from the source website when viewing news details.
-
-**URS-06**: The User can filter news based on specific criteria (start date and end date) while browsing.
 
 #### Feature 2: Community Interaction Platform
 
@@ -458,7 +458,7 @@ graph TB
 
 ### 3.3 Use Case Description and Activity Diagram
 
-#### 3.3.1 UCD-01: Browse Daily Briefings
+#### 3.3.1 UCD-01: Find Daily Briefing
 
 ##### 2.3.1.1 User Requirement Specification (URS) and System Requirement Specification (SRS)
 
@@ -482,7 +482,7 @@ graph TB
 
 | Use Case ID | UC-01 |
 |------------|------|
-| Use Case Name | Browse Daily Briefings |
+| Use Case Name | Find Daily Briefing |
 | Created By | ZhiYi Pan |
 | Date Created | 04/01/2026 |
 | Last Update By | |
@@ -542,7 +542,7 @@ graph TB
 
 ```plantuml
 @startuml UC01_Activity_Diagram
-title UC01: Browse Daily Briefings - Activity Diagram
+title UC01: Find Daily Briefing - Activity Diagram
 
 |User|
 start
@@ -793,210 +793,92 @@ stop
 
 **URS-05**: The User can jump to the original text link to read the full report from the source website when viewing news details.
 
-**SRS-22**: The system shall display a "Read Original" button (or "阅读原文" in Chinese interface) on both the Daily Briefing list page and the News Detail page. The button shall be clearly visible and accessible to users.
+**SRS22**: The system shall display a "Read Original" button on both the Daily Briefing list page and the News Detail page. 
+**SRS23**: The system shall display the "Read Original" button to indicate that clicking it will open an external website in a new browser tab.
 
-**SRS-23**: The system shall display the "Read Original" button with an external link icon (e.g., "el-icon-top-right") to indicate that clicking it will open an external website in a new browser tab.
 
-**SRS-24**: The system shall disable the "Read Original" button if the news item does not have a valid originalUrl field (i.e., originalUrl is null, undefined, or empty string). When disabled, the button shall be visually distinct (e.g., grayed out) and non-clickable.
-
-**SRS-25**: When the user clicks the "Read Original" button, the system shall call the `openOriginalUrl(url)` method with the news item's originalUrl value. Inside the method, the system shall check if the url parameter is valid using `if (url)`. If the url is valid, the system shall execute `window.open(url, '_blank')` to open the original URL in a new browser tab, allowing the user to read the full report from the source website while maintaining their current browsing context in the BridgeU application. If the url is null, undefined, or empty (falsy), the method shall return without executing `window.open()`, and no new tab shall be opened.
-
-**SRS-26**: The system shall handle cases where the original URL is invalid or inaccessible. If the URL fails to load in the new tab, the browser's native error handling shall be used (e.g., browser displays "This site can't be reached" or similar error message). The BridgeU application shall not display additional error messages, as the external website loading is handled by the browser.
 
 ##### 2.3.4.2 Use Case Description
 
-| Use Case ID | UC04 |
-|------------|------|
-| Use Case Name | Jump to Original Link |
+##### 2.3.4.2 Use Case Description
+
+| Use Case ID | UC-04 |
+|------------|-------|
+| Use Case Name | Indicate External Original Link |
 | Created By | ZhiYi Pan |
-| Last Update By | ZhiYi Pan |
 | Date Created | 05/01/2026 |
+| Last Update By | |
 | Last Revision Date | |
 | Actors | User |
-| Description | User can click the "Read Original" button (or "阅读原文" in Chinese interface) on the Daily Briefing list page or News Detail page to open the original news article from the source website in a new browser tab. |
-| Trigger | User clicks the "Read Original" button on a Daily Briefing card (list page) or on the News Detail page |
-| Preconditions | 1. User is viewing the Daily Briefing list page (UI-01) or the News Detail page (UI-02).<br>2. The news item has a valid originalUrl field (not null, undefined, or empty string).<br>3. The user's browser supports opening new tabs (window.open API).<br>4. The user has internet connectivity to access external websites. |
+| Description | When viewing a news item, the user can see a "Read Original" button with an external link icon, clearly indicating that clicking it will open the original article on an external website in a new browser tab. |
+| Trigger | User is viewing a Daily Briefing item on the list page or News Detail page where a "Read Original" action is available. |
+| Preconditions | 1. User is viewing the Daily Briefing list page (UI-01) or the News Detail page (UI-02).<br>2. The UI has been rendered for the current interface language (Chinese or English).<br>3. The system has determined that the news item can provide a "Read Original" entry. |
 
 **Use Case Input Specification**
 
 | Input | type | Constraint | Example |
 |-------|------|------------|---------|
-| Original URL | String | Must be a valid HTTP/HTTPS URL | "https://www.bangkokpost.com/thailand/general/1234567/news-title" |
+| Interface Language | String | Must be "zh" or "en" | "en" |
+| Original Link Availability Flag | Boolean | Indicates whether the "Read Original" button should be shown for this item | true |
 
 **Post conditions**:
-- The original news article from the source website is opened in a new browser tab
-- The user's current browsing context in the BridgeU application remains unchanged (user stays on the same page)
-- The user can read the full report from the source website while maintaining access to the BridgeU application
+- The "Read Original" button is displayed with an external link icon.
+- The user understands that clicking the button will open an external website in a new browser tab.
 
 **Normal Flows**
 
 | User (Actions) | System (Responses) |
 |----------------|-------------------|
-| 1. User views a Daily Briefing item on the list page or News Detail page and identifies the "Read Original" button (displayed with an external link icon). The button is enabled and clickable (the news item has a valid originalUrl field).<br>   • `[A1: News item does not have a valid originalUrl field]` | 2. System displays the "Read Original" button as enabled and clickable (rendered with `:disabled="!news.originalUrl"` evaluating to false, meaning originalUrl is valid) |
-| 3. User clicks the enabled "Read Original" button<br>   • `[A2: User clicks "Read Original" button multiple times in quick succession]` | 4. System calls the `openOriginalUrl(url)` method with the news item's originalUrl value<br>   4a. System checks if the url parameter is valid using `if (url)` as a defensive check<br>   4b. System executes `window.open(url, '_blank')` to open the original URL in a new browser tab<br>   4c. The new tab opens (background or foreground depending on browser settings)<br>   4d. The BridgeU application tab remains active and unchanged<br>   <br>   *Note: For edge cases (invalid URL parameter, browser blocks popup, URL fails to load), see Exception Flows [E1], [E2], [E3]* |
-| 5. User views the original news article in the new browser tab | 6. System maintains the user's current browsing context in the BridgeU application (user remains on the same page, same scroll position, same language setting) |
+| 1. User views a Daily Briefing item on the list page or the News Detail page. | 2. System checks whether a "Read Original" action is available for the current news item. |
+| | 3. System renders the "Read Original" button in the current interface language ("Read Original" in English, "阅读原文" in Chinese). |
+| | 4. System displays an external link icon next to the button label to visually indicate that the action will open an external website in a new browser tab. |
+| 5. User sees the button text and external link icon. | 6. System keeps the visual style of the button and icon consistent across list and detail pages so that users can easily recognize it as an external link action. |
 
-**Alternative Flow**
+**Alternative Flows**
 
-**`[A1: News item does not have a valid originalUrl field]`**
-- A1.1 User views a Daily Briefing item on the list page or News Detail page
-- A1.2 System checks if the news item has a valid originalUrl field
-- A1.3 If originalUrl is null, undefined, or empty: System disables the button (rendered with `:disabled="!news.originalUrl"`)
-- A1.4 Button is visually distinct (grayed out) and non-clickable
-- A1.5 User cannot click the button (button is disabled)
-- A1.6 Use case end.
-
-**`[A2: User clicks "Read Original" button multiple times in quick succession]`**
-- A2.1 System may open multiple tabs with the same original URL (one tab per click)
-- A2.2 Each click triggers a new `window.open()` call, which may result in multiple tabs being opened
-- A2.3 Use case continues from Step 5
-- Note: The current implementation does not prevent multiple tabs from being opened. Browser settings may control whether multiple tabs are opened or if the existing tab is reused.
-
-**Exception Flow**
-
-**`[E1: URL parameter is invalid]`**
-- E1.1 System calls the `openOriginalUrl(url)` method with the news item's originalUrl value
-- E1.2 Inside the method, the system checks if the url parameter is valid using `if (url)`
-- E1.3 If the url is null, undefined, or empty (falsy), the method returns without executing `window.open()`
-- E1.4 No new tab is opened
-- E1.5 System does not display an error message to the user (as this is a client-side operation)
-- E1.6 Use case end.
-- Note: The current implementation uses a simple `if (url)` check before calling `window.open()`. If the URL is falsy (null, undefined, or empty string), the method returns without opening a tab. This aligns with the button's disabled state when `originalUrl` is invalid. However, if the button is enabled but the url parameter passed to the method is somehow invalid, this exception flow handles that case.
-
-**`[E2: Browser blocks popup]`**
-- E2.1 Browser's popup blocker prevents `window.open()` from opening a new tab (e.g., user has popup blocker enabled, or browser security settings block the action)
-- E2.2 Browser may display a notification to the user (e.g., "Pop-up blocked" message in browser UI)
-- E2.3 No new tab is opened
-- E2.4 User can manually allow popups for the BridgeU domain or disable popup blocker
-- E2.5 Use case end.
-
-**`[E3: URL fails to load]`**
-- E3.1 New tab opens successfully, but the original URL fails to load (e.g., website is down, URL is invalid, network error, CORS issue)
-- E3.2 Browser displays its native error message (e.g., "This site can't be reached", "404 Not Found", "ERR_CONNECTION_REFUSED")
-- E3.3 BridgeU application does not display additional error messages (external website loading is handled by the browser)
-- E3.4 User can see the browser's error message in the new tab
-- E3.5 User can close the error tab and return to the BridgeU application
-- E3.6 Use case end.
-
-**Note**:
-- The "Read Original" button is available on both the Daily Briefing list page and the News Detail page, providing consistent functionality across different views.
-- The button text is localized: "Read Original" in English interface and "阅读原文" in Chinese interface, with an external link icon (e.g., "el-icon-top-right") to indicate it opens an external website.
-- The button is automatically disabled if the news item does not have a valid originalUrl, preventing user confusion and unnecessary clicks.
-- Opening the original URL in a new tab allows users to read the full report from the source website while maintaining their browsing context in the BridgeU application. Users can easily switch between tabs to compare information or return to the BridgeU application.
-- The system does not track or log when users click the "Read Original" button, as this is a simple navigation action to an external website.
-- If the original URL is accessible, the user can read the full article, view images, and access additional content that may not be available in the Daily Briefing summary.
+**`[A1: No "Read Original" action available for this item]`**
+- A1.1 System determines that the current news item does not provide a "Read Original" action.
+- A1.2 System does not display the "Read Original" button or external link icon for this item.
+- A1.3 Use case end.
 
 ##### 2.3.4.3 Activity Diagram
-
-```plantuml
+uml
 @startuml UC04_Activity_Diagram
-title UC04: Jump to Original Link - Activity Diagram
+title UC04: Indicate External Original Link - Activity Diagram
 
 |User|
 start
 :views Daily Briefing item\non list page or News Detail page;
-:identifies "Read Original" button\n(displayed with external link icon);
-  note right
-    Preconditions: The news item has
-    a valid originalUrl field (not null,
-    undefined, or empty string).
-    The button is enabled and clickable.
-  end note
 
 |System|
-:displays "Read Original" button\nas enabled and clickable\n(rendered with :disabled="!news.originalUrl"\nevaluating to false, meaning originalUrl is valid);
-  
-  note right
-    Alternative Flow [A1]:
-    If originalUrl is invalid, the button
-    is disabled (grayed out and non-clickable).
-    This is handled by the :disabled binding.
-  end note
+:checks whether a "Read Original"\naction is available for this item;
+
+if () then ([No "Read Original" action])
+  :does not display "Read Original"\nbutton or external link icon;
+  stop
+else ([Action available])
+  :renders "Read Original" button\nin current interface language\n("Read Original" / "阅读原文");
+  :displays external link icon\nnext to button label to indicate\nit opens an external website\nin a new browser tab;
+endif
 
 |User|
-:clicks the enabled\n"Read Original" button;
-  
-  note right
-    Alternative Flow [A2]:
-    User may click the button multiple times
-    in quick succession. Each click triggers
-    a new window.open() call, which may result
-    in multiple tabs being opened (one tab per click).
-    Browser settings may control whether multiple
-    tabs are opened or if the existing tab is reused.
-  end note
-
-|System|
-:calls openOriginalUrl(url) method\nwith news item's originalUrl value;
-  
-  note right
-    Inside openOriginalUrl method:
-    System checks if url parameter is valid
-    using if (url) as a defensive check.
-    Since Preconditions guarantee a valid
-    originalUrl and the button is only
-    enabled when originalUrl is valid,
-    the url parameter should be valid
-    at this point.
-  end note
-  
-:Inside openOriginalUrl method:\nchecks if url parameter is valid\n(if (url) defensive check);
-  
-if () then ([URL parameter invalid])
-    note right
-      Edge case: [E1: URL parameter is invalid]
-      This should not happen under normal
-      circumstances since Preconditions
-      guarantee a valid originalUrl.
-    end note
-    :Method returns without executing window.open();
-    :No new tab is opened;
-  :does NOT display error message to user;
-    stop
-else ([URL parameter valid])
-  :executes window.open(url, '_blank')\nto open original URL in new browser tab;
-    :New tab opens in background or foreground\n(depending on browser settings);
-    :BridgeU application tab remains active and unchanged;
-    
-  if () then ([Browser blocks popup])
-      note right
-        [E2: Browser blocks popup]
-      end note
-      :Browser's popup blocker prevents\nwindow.open() from opening new tab;
-      :Browser may display notification to user\n(e.g., "Pop-up blocked" message);
-      :No new tab is opened;
-      stop
-  else ([Popup allowed])
-      :New tab opens successfully;
-      
-    if () then ([URL fails to load in new tab])
-        note right
-          [E3: URL fails to load]
-        end note
-        :Browser displays native error message\n(e.g., "This site can't be reached",\n"404 Not Found", "ERR_CONNECTION_REFUSED");
-        :BridgeU application does NOT display\nadditional error messages;
-      |User|
-      :can see browser's error message in new tab;
-        stop
-    else ([URL loads successfully])
-      |System|
-        :Original news article loads successfully\nin new browser tab;
-      endif
-    endif
-  endif
-
-|User|
-:views original news article\nin new browser tab;
-:can read full report from source website;
-:can switch between tabs\nto return to BridgeU application;
-
-|System|
-:maintains user's current browsing context\nin BridgeU application\n(user remains on same page, same scroll position,\nsame language setting);
+:sees the "Read Original" button\nwith external link icon;
+note right
+  The user can understand from the
+  text label and icon that clicking
+  the button will open an external
+  website in a new browser tab.
+end note
 
 stop
+@enduml##### 2.3.4.4 Activity Diagram Description
 
-@enduml
-```
+**The Activity Diagram for Indicate External Original Link** illustrates how the system visually communicates the external nature of the "Read Original" action to the user:
+
+- **User** views a Daily Briefing item on the list page or the News Detail page.
+- **System** decides whether a "Read Original" action is available for this item; if not, no button or icon is shown and the flow ends.
+- When the action is available, **System** renders a localized "Read Original" button with an external link icon next to the label, indicating that it opens an external website in a new browser tab.
+- **User** sees the button and icon and can understand, before clicking, that this action will navigate to an external site in a new tab while keeping the current BridgeU page available.
 
 ##### 2.3.4.4 Activity Diagram Description
 

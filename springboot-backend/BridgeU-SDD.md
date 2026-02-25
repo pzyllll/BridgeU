@@ -85,7 +85,7 @@ Axios is used for communication between the front-end and back-end.
 
 The Daily Briefing System allows users to:
 
-- Browse Daily Briefings.  
+- Find Daily Briefing.  
 - View Daily Briefing News Details.  
 - Switch Interface Language.  
 - Jump to Original Link.  
