@@ -33,15 +33,6 @@ public class DataSeeder implements CommandLineRunner {
             return;
         }
         
-        // Seed admin user
-        AppUser admin = AppUser.createAdmin("admin", "admin@globalbuddy.com", passwordEncoder.encode("admin123"), "管理员");
-        admin.setNationality("China");
-        admin.setStudyingInCountry("China");
-        admin.setInstitution("GlobalBuddy");
-        admin.setLanguages(Arrays.asList("zh", "en"));
-        admin.setInterests(Arrays.asList("管理", "审核"));
-        userRepository.save(admin);
-        
         // Seed users
         AppUser user1 = AppUser.create("lihua", "lihua@example.com", passwordEncoder.encode("password123"), "李华");
         user1.setNationality("China");

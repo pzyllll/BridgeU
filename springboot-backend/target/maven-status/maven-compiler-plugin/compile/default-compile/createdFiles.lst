@@ -13,7 +13,6 @@ com\globalbuddy\controller\PostController.class
 com\globalbuddy\controller\SearchController$PostResponseWithScore.class
 com\globalbuddy\model\Comment$CommentBuilder.class
 com\globalbuddy\model\News$NewsBuilder.class
-com\globalbuddy\controller\AdminController.class
 com\globalbuddy\dto\CommentRequest.class
 com\globalbuddy\controller\SearchController$CommunityResponseWithScore.class
 com\globalbuddy\model\CommunityPost$Status.class
