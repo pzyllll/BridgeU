@@ -78,7 +78,6 @@ const translations = {
       search: 'Search',
       loading: 'Loading...',
       anonymous: 'Anonymous',
-      student: 'Student',
       semanticScore: 'Semantic Match Score',
     },
     // Community Page
@@ -214,6 +213,11 @@ const translations = {
       noPosts: 'You have not posted anything yet',
       reviewedAt: 'Reviewed At',
       reviewNote: 'Review Note',
+      delete: 'Delete Post',
+      deleting: 'Deleting...',
+      confirmDelete: 'Are you sure you want to delete this post?',
+      deleted: 'Post deleted successfully',
+      deleteFailed: 'Failed to delete post. Please try again later.',
     },
     mutualFollowList: {
       title: 'Mutual Follows',
@@ -287,17 +291,7 @@ const translations = {
       success: '✅ Post published successfully, check it in Community Feed.',
       failed: '❌ Failed to publish, please check your input.',
     },
-    // Search Panel
-    search: {
-      title: '🔍 Semantic Linked Search',
-      placeholder: 'Enter keywords, e.g. cooking, accommodation, courses',
-      search: 'Search',
-      searching: 'Searching...',
-      postMatches: '📝 Post Matches',
-      communityMatches: '🌐 Community Matches',
-      noMatches: 'No matches',
-      score: 'Score',
-    },
+    
     // Daily Briefing
     briefing: {
       title: 'Daily Briefing',
@@ -432,7 +426,6 @@ const translations = {
       search: '搜索',
       loading: '加载中...',
       anonymous: '匿名',
-      student: '学生',
       semanticScore: '语义匹配分数',
     },
     // Community Page
@@ -540,6 +533,11 @@ const translations = {
       noPosts: '您还没有发布任何帖子',
       reviewedAt: '审核时间',
       reviewNote: '审核备注',
+      delete: '删除帖子',
+      deleting: '删除中...',
+      confirmDelete: '确定要删除这条帖子吗？',
+      deleted: '帖子删除成功',
+      deleteFailed: '删除帖子失败，请稍后重试。',
     },
     userProfile: {
       loading: '加载资料中...',
@@ -640,17 +638,7 @@ const translations = {
       success: '✅ 帖子发布成功，请在社区动态中查看。',
       failed: '❌ 发布失败，请检查您的输入。',
     },
-    // Search Panel
-    search: {
-      title: '🔍 语义关联搜索',
-      placeholder: '输入关键词，例如：做饭、住宿、课程',
-      search: '搜索',
-      searching: '搜索中...',
-      postMatches: '📝 帖子匹配',
-      communityMatches: '🌐 社区匹配',
-      noMatches: '无匹配结果',
-      score: '分数',
-    },
+   
     // Daily Briefing
     briefing: {
       title: '每日简报',
@@ -709,6 +697,11 @@ const translations = {
       noPosts: '您还没有发布任何帖子',
       reviewedAt: '审核时间',
       reviewNote: '审核备注',
+      delete: '删除帖子',
+      deleting: '删除中...',
+      confirmDelete: '确定要删除这条帖子吗？',
+      deleted: '帖子删除成功',
+      deleteFailed: '删除帖子失败，请稍后重试。',
     },
     common: {
       loading: '加载中...',

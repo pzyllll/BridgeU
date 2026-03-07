@@ -164,9 +164,17 @@
           >
             <div class="post-preview-header">
               <h3 class="post-preview-title">{{ post.title }}</h3>
-              <span :class="['status-badge', getStatusClass(post.status)]">
-                {{ getStatusText(post.status) }}
-              </span>
+              <div class="post-preview-actions">
+                <span :class="['status-badge', getStatusClass(post.status)]">
+                  {{ getStatusText(post.status) }}
+                </span>
+                <button
+                  class="btn btn-delete"
+                  @click.stop="confirmDelete(post)"
+                >
+                  {{ deletingPostId === post.id ? t('myPosts.deleting') : t('myPosts.delete') }}
+                </button>
+              </div>
             </div>
             <div class="post-preview-footer">
               <span class="post-preview-time">{{ formatTime(post.createdAt) }}</span>
@@ -242,6 +250,7 @@ const uploading = ref(false);
 const fileInput = ref(null);
 const showFollowersModal = ref(false);
 const showMutualFollowsModal = ref(false);
+const deletingPostId = ref(null);
 
 const editForm = ref({
   displayName: '',
@@ -524,6 +533,39 @@ const viewMyReports = () => {
   emit('viewMyReports');
 };
 
+const confirmDelete = (post) => {
+  const message = t('myPosts.confirmDelete');
+  if (window.confirm(message)) {
+    deletePost(post.id);
+  }
+};
+
+const deletePost = async (postId) => {
+  if (deletingPostId.value) {
+    return;
+  }
+
+  deletingPostId.value = postId;
+
+  try {
+    const response = await axios.delete(`/api/posts/${postId}`, {
+      headers: { Authorization: `Bearer ${props.token}` },
+    });
+
+    if (response.data && response.data.success) {
+      myPosts.value = myPosts.value.filter((p) => p.id !== postId);
+      alert(t('myPosts.deleted'));
+    } else {
+      alert(response.data?.message || t('myPosts.deleteFailed'));
+    }
+  } catch (err) {
+    console.error('Failed to delete post:', err);
+    alert(err.response?.data?.message || t('myPosts.deleteFailed'));
+  } finally {
+    deletingPostId.value = null;
+  }
+};
+
 const getStatusClass = (status) => {
   const statusMap = {
     'PENDING_REVIEW': 'status-pending',
@@ -798,7 +840,7 @@ onMounted(() => {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s;
@@ -823,6 +865,23 @@ onMounted(() => {
   color: var(--color-primary);
   text-decoration: underline;
   padding: 8px 0;
+}
+
+.btn-delete {
+  background: #a855f7; /* 紫色按钮 */
+  border: 1px solid #a855f7;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn-delete:hover {
+  background: #9333ea;
+  border-color: #9333ea;
+  box-shadow: 0 8px 24px rgba(148, 63, 255, 0.35);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {

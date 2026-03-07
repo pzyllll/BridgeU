@@ -5,6 +5,7 @@ com\globalbuddy\model\News.class
 com\globalbuddy\controller\PostController$PostResponseWithScore.class
 com\globalbuddy\model\Community.class
 com\globalbuddy\service\ImageModerationService.class
+com\globalbuddy\scheduler\ReportScheduler.class
 com\globalbuddy\model\Message$MessageBuilder.class
 com\globalbuddy\service\CrawlerService.class
 com\globalbuddy\dto\AuthRequest$AuthRequestBuilder.class

@@ -35,9 +35,17 @@
       >
         <div class="post-header">
           <h3 class="post-title">{{ post.title }}</h3>
-          <span :class="['status-badge', getStatusClass(post.status)]">
-            {{ getStatusText(post.status) }}
-          </span>
+          <div class="post-header-actions">
+            <span :class="['status-badge', getStatusClass(post.status)]">
+              {{ getStatusText(post.status) }}
+            </span>
+            <button
+              class="btn btn-delete"
+              @click.stop="confirmDelete(post)"
+            >
+              {{ deletingPostId === post.id ? t('myPosts.deleting') : t('myPosts.delete') }}
+            </button>
+          </div>
         </div>
         
         <div class="post-body-preview">
@@ -91,6 +99,7 @@ const posts = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const lang = ref(getCurrentLanguage());
+const deletingPostId = ref(null);
 
 const loadPosts = async () => {
   loading.value = true;
@@ -116,6 +125,39 @@ const loadPosts = async () => {
     }
   } finally {
     loading.value = false;
+  }
+};
+
+const confirmDelete = (post) => {
+  const message = t('myPosts.confirmDelete');
+  if (window.confirm(message)) {
+    deletePost(post.id);
+  }
+};
+
+const deletePost = async (postId) => {
+  if (deletingPostId.value) {
+    return;
+  }
+
+  deletingPostId.value = postId;
+
+  try {
+    const response = await axios.delete(`/api/posts/${postId}`, {
+      headers: { Authorization: `Bearer ${props.token}` },
+    });
+
+    if (response.data && response.data.success) {
+      posts.value = posts.value.filter((p) => p.id !== postId);
+      alert(t('myPosts.deleted'));
+    } else {
+      alert(response.data?.message || t('myPosts.deleteFailed'));
+    }
+  } catch (err) {
+    console.error('Failed to delete post:', err);
+    alert(err.response?.data?.message || t('myPosts.deleteFailed'));
+  } finally {
+    deletingPostId.value = null;
   }
 };
 
@@ -394,7 +436,7 @@ onMounted(() => {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s;
@@ -403,6 +445,22 @@ onMounted(() => {
 .btn-primary {
   background: var(--color-primary);
   color: white;
+}
+
+.btn-delete {
+  background: #a855f7; /* 紫色按钮 */
+  border: 1px solid #a855f7;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-weight: 500;
+}
+
+.btn-delete:hover {
+  background: #9333ea;
+  border-color: #9333ea;
+  box-shadow: 0 8px 24px rgba(148, 63, 255, 0.35);
+  transform: translateY(-1px);
 }
 
 .btn-primary:hover {

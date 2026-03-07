@@ -303,6 +303,57 @@ public class PostController {
         
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * Delete a post
+     * DELETE /api/posts/{postId}
+     * Only the post author or an admin can delete a post.
+     */
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Map<String, Object>> deletePost(@PathVariable String postId) {
+        AppUser currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<CommunityPost> postOpt = postRepository.findById(postId);
+        if (!postOpt.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        CommunityPost post = postOpt.get();
+
+        boolean isAuthor = post.getAuthor() != null && post.getAuthor().getId().equals(currentUser.getId());
+        boolean isAdmin = currentUser.isAdmin();
+
+        if (!isAuthor && !isAdmin) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "You can only delete your own posts");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
+
+        // Delete comments associated with this post
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        if (!comments.isEmpty()) {
+            commentRepository.deleteAll(comments);
+        }
+
+        // Delete likes associated with this post
+        List<PostLike> likes = postLikeRepository.findByPostId(postId);
+        if (!likes.isEmpty()) {
+            postLikeRepository.deleteAll(likes);
+        }
+
+        // Finally delete the post itself
+        postRepository.delete(post);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Post deleted successfully");
+
+        return ResponseEntity.ok(response);
+    }
     
     /**
      * Add a comment to a post

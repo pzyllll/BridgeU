@@ -1,0 +1,1191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.globalbuddy.NewsCrawlerSmokeTest" time="87.662" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.class.path" value="C:\Users\pzy\Documents\java\work\hh\springboot-backend\target\test-classes;C:\Users\pzy\Documents\java\work\hh\springboot-backend\target\classes;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.2.0\spring-boot-starter-web-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter\3.2.0\spring-boot-starter-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot\3.2.0\spring-boot-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.2.0\spring-boot-autoconfigure-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.2.0\spring-boot-starter-logging-3.2.0.jar;C:\Users\pzy\.m2\repository\ch\qos\logback\logback-classic\1.4.11\logback-classic-1.4.11.jar;C:\Users\pzy\.m2\repository\ch\qos\logback\logback-core\1.4.11\logback-core-1.4.11.jar;C:\Users\pzy\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.21.1\log4j-to-slf4j-2.21.1.jar;C:\Users\pzy\.m2\repository\org\apache\logging\log4j\log4j-api\2.21.1\log4j-api-2.21.1.jar;C:\Users\pzy\.m2\repository\org\slf4j\jul-to-slf4j\2.0.9\jul-to-slf4j-2.0.9.jar;C:\Users\pzy\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\pzy\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.2.0\spring-boot-starter-json-3.2.0.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.15.3\jackson-datatype-jdk8-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.3\jackson-datatype-jsr310-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.15.3\jackson-module-parameter-names-2.15.3.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.2.0\spring-boot-starter-tomcat-3.2.0.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.16\tomcat-embed-core-10.1.16.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.16\tomcat-embed-websocket-10.1.16.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-web\6.1.1\spring-web-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-beans\6.1.1\spring-beans-6.1.1.jar;C:\Users\pzy\.m2\repository\io\micrometer\micrometer-observation\1.12.0\micrometer-observation-1.12.0.jar;C:\Users\pzy\.m2\repository\io\micrometer\micrometer-commons\1.12.0\micrometer-commons-1.12.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-webmvc\6.1.1\spring-webmvc-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-context\6.1.1\spring-context-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-expression\6.1.1\spring-expression-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.2.0\spring-boot-starter-validation-3.2.0.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.16\tomcat-embed-el-10.1.16.jar;C:\Users\pzy\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\pzy\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\pzy\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\pzy\.m2\repository\com\fasterxml\classmate\1.6.0\classmate-1.6.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\3.2.0\spring-boot-starter-data-jpa-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-aop\3.2.0\spring-boot-starter-aop-3.2.0.jar;C:\Users\pzy\.m2\repository\org\aspectj\aspectjweaver\1.9.20.1\aspectjweaver-1.9.20.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.2.0\spring-boot-starter-jdbc-3.2.0.jar;C:\Users\pzy\.m2\repository\com\zaxxer\HikariCP\5.0.1\HikariCP-5.0.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-jdbc\6.1.1\spring-jdbc-6.1.1.jar;C:\Users\pzy\.m2\repository\org\hibernate\orm\hibernate-core\6.3.1.Final\hibernate-core-6.3.1.Final.jar;C:\Users\pzy\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\pzy\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\pzy\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\pzy\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\pzy\.m2\repository\net\bytebuddy\byte-buddy\1.14.10\byte-buddy-1.14.10.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.4\jaxb-runtime-4.0.4.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.4\jaxb-core-4.0.4.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\txw2\4.0.4\txw2-4.0.4.jar;C:\Users\pzy\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.2\istack-commons-runtime-4.1.2.jar;C:\Users\pzy\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\pzy\.m2\repository\org\antlr\antlr4-runtime\4.10.1\antlr4-runtime-4.10.1.jar;C:\Users\pzy\.m2\repository\org\springframework\data\spring-data-jpa\3.2.0\spring-data-jpa-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\data\spring-data-commons\3.2.0\spring-data-commons-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-orm\6.1.1\spring-orm-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-tx\6.1.1\spring-tx-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-aspects\6.1.1\spring-aspects-6.1.1.jar;C:\Users\pzy\.m2\repository\com\mysql\mysql-connector-j\8.1.0\mysql-connector-j-8.1.0.jar;C:\Users\pzy\.m2\repository\org\jsoup\jsoup\1.17.2\jsoup-1.17.2.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\client5\httpclient5\5.2.1\httpclient5-5.2.1.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\core5\httpcore5\5.2.3\httpcore5-5.2.3.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\core5\httpcore5-h2\5.2.3\httpcore5-h2-5.2.3.jar;C:\Users\pzy\.m2\repository\org\slf4j\slf4j-api\2.0.9\slf4j-api-2.0.9.jar;C:\Users\pzy\.m2\repository\com\rometools\rome\2.1.0\rome-2.1.0.jar;C:\Users\pzy\.m2\repository\com\rometools\rome-utils\2.1.0\rome-utils-2.1.0.jar;C:\Users\pzy\.m2\repository\org\jdom\jdom2\2.0.6.1\jdom2-2.0.6.1.jar;C:\Users\pzy\.m2\repository\com\alibaba\dashscope-sdk-java\2.8.0\dashscope-sdk-java-2.8.0.jar;C:\Users\pzy\.m2\repository\com\google\guava\guava\32.1.1-jre\guava-32.1.1-jre.jar;C:\Users\pzy\.m2\repository\com\google\guava\failureaccess\1.0.1\failureaccess-1.0.1.jar;C:\Users\pzy\.m2\repository\com\google\guava\listenablefuture\9999.0-empty-to-avoid-conflict-with-guava\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar;C:\Users\pzy\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\pzy\.m2\repository\org\checkerframework\checker-qual\3.33.0\checker-qual-3.33.0.jar;C:\Users\pzy\.m2\repository\com\google\errorprone\error_prone_annotations\2.18.0\error_prone_annotations-2.18.0.jar;C:\Users\pzy\.m2\repository\com\google\j2objc\j2objc-annotations\2.8\j2objc-annotations-2.8.jar;C:\Users\pzy\.m2\repository\io\reactivex\rxjava2\rxjava\2.2.21\rxjava-2.2.21.jar;C:\Users\pzy\.m2\repository\org\reactivestreams\reactive-streams\1.0.4\reactive-streams-1.0.4.jar;C:\Users\pzy\.m2\repository\com\google\code\gson\gson\2.10.1\gson-2.10.1.jar;C:\Users\pzy\.m2\repository\org\slf4j\slf4j-simple\2.0.9\slf4j-simple-2.0.9.jar;C:\Users\pzy\.m2\repository\com\squareup\okio\okio\3.5.0\okio-3.5.0.jar;C:\Users\pzy\.m2\repository\com\squareup\okio\okio-jvm\3.5.0\okio-jvm-3.5.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.9.20\kotlin-stdlib-common-1.9.20.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\logging-interceptor\4.12.0\logging-interceptor-4.12.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.9.20\kotlin-stdlib-jdk8-1.9.20.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.9.20\kotlin-stdlib-1.9.20.jar;C:\Users\pzy\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.9.20\kotlin-stdlib-jdk7-1.9.20.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\okhttp-sse\4.12.0\okhttp-sse-4.12.0.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\okhttp\4.12.0\okhttp-4.12.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-webflux\3.2.0\spring-boot-starter-webflux-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-reactor-netty\3.2.0\spring-boot-starter-reactor-netty-3.2.0.jar;C:\Users\pzy\.m2\repository\io\projectreactor\netty\reactor-netty-http\1.1.13\reactor-netty-http-1.1.13.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-http\4.1.101.Final\netty-codec-http-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-common\4.1.101.Final\netty-common-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-buffer\4.1.101.Final\netty-buffer-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport\4.1.101.Final\netty-transport-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec\4.1.101.Final\netty-codec-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-handler\4.1.101.Final\netty-handler-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-http2\4.1.101.Final\netty-codec-http2-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns\4.1.101.Final\netty-resolver-dns-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver\4.1.101.Final\netty-resolver-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-dns\4.1.101.Final\netty-codec-dns-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns-native-macos\4.1.101.Final\netty-resolver-dns-native-macos-4.1.101.Final-osx-x86_64.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns-classes-macos\4.1.101.Final\netty-resolver-dns-classes-macos-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-native-epoll\4.1.101.Final\netty-transport-native-epoll-4.1.101.Final-linux-x86_64.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-native-unix-common\4.1.101.Final\netty-transport-native-unix-common-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-classes-epoll\4.1.101.Final\netty-transport-classes-epoll-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\projectreactor\netty\reactor-netty-core\1.1.13\reactor-netty-core-1.1.13.jar;C:\Users\pzy\.m2\repository\io\netty\netty-handler-proxy\4.1.101.Final\netty-handler-proxy-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-socks\4.1.101.Final\netty-codec-socks-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-webflux\6.1.1\spring-webflux-6.1.1.jar;C:\Users\pzy\.m2\repository\io\projectreactor\reactor-core\3.6.0\reactor-core-3.6.0.jar;C:\Users\pzy\.m2\repository\org\projectlombok\lombok\1.18.30\lombok-1.18.30.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-security\3.2.0\spring-boot-starter-security-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-aop\6.1.1\spring-aop-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-config\6.2.0\spring-security-config-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-core\6.2.0\spring-security-core-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-crypto\6.2.0\spring-security-crypto-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-web\6.2.0\spring-security-web-6.2.0.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.3\jjwt-api-0.12.3.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.3\jjwt-impl-0.12.3.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.3\jjwt-jackson-0.12.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.3\jackson-databind-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.3\jackson-annotations-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.3\jackson-core-2.15.3.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-mail\3.2.0\spring-boot-starter-mail-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-context-support\6.1.1\spring-context-support-6.1.1.jar;C:\Users\pzy\.m2\repository\org\eclipse\angus\jakarta.mail\2.0.2\jakarta.mail-2.0.2.jar;C:\Users\pzy\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.2\jakarta.activation-api-2.1.2.jar;C:\Users\pzy\.m2\repository\org\eclipse\angus\angus-activation\2.0.1\angus-activation-2.0.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.2.0\spring-boot-starter-test-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-test\3.2.0\spring-boot-test-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.2.0\spring-boot-test-autoconfigure-3.2.0.jar;C:\Users\pzy\.m2\repository\com\jayway\jsonpath\json-path\2.8.0\json-path-2.8.0.jar;C:\Users\pzy\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.1\jakarta.xml.bind-api-4.0.1.jar;C:\Users\pzy\.m2\repository\net\minidev\json-smart\2.5.0\json-smart-2.5.0.jar;C:\Users\pzy\.m2\repository\net\minidev\accessors-smart\2.5.0\accessors-smart-2.5.0.jar;C:\Users\pzy\.m2\repository\org\ow2\asm\asm\9.3\asm-9.3.jar;C:\Users\pzy\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\pzy\.m2\repository\org\awaitility\awaitility\4.2.0\awaitility-4.2.0.jar;C:\Users\pzy\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.1\junit-jupiter-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.1\junit-jupiter-api-5.10.1.jar;C:\Users\pzy\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\pzy\.m2\repository\org\junit\platform\junit-platform-commons\1.10.1\junit-platform-commons-1.10.1.jar;C:\Users\pzy\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.1\junit-jupiter-params-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.1\junit-jupiter-engine-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\platform\junit-platform-engine\1.10.1\junit-platform-engine-1.10.1.jar;C:\Users\pzy\.m2\repository\org\mockito\mockito-core\5.7.0\mockito-core-5.7.0.jar;C:\Users\pzy\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.10\byte-buddy-agent-1.14.10.jar;C:\Users\pzy\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\pzy\.m2\repository\org\mockito\mockito-junit-jupiter\5.7.0\mockito-junit-jupiter-5.7.0.jar;C:\Users\pzy\.m2\repository\org\skyscreamer\jsonassert\1.5.1\jsonassert-1.5.1.jar;C:\Users\pzy\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-core\6.1.1\spring-core-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-jcl\6.1.1\spring-jcl-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-test\6.1.1\spring-test-6.1.1.jar;C:\Users\pzy\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;"/>
+    <property name="java.vm.vendor" value="Microsoft"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://www.microsoft.com"/>
+    <property name="user.timezone" value="Asia/Bangkok"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.boot.library.path" value="C:\Users\pzy\.jdks\ms-17.0.18\bin"/>
+    <property name="sun.java.command" value="C:\Users\pzy\AppData\Local\Temp\surefire173268810472216778\surefirebooter-20260301211617255_3.jar C:\Users\pzy\AppData\Local\Temp\surefire173268810472216778 2026-03-01T21-15-12_360-jvmRun1 surefire-20260301211617255_1tmp surefire_0-20260301211617255_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\pzy\Documents\java\work\hh\springboot-backend\target\test-classes;C:\Users\pzy\Documents\java\work\hh\springboot-backend\target\classes;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.2.0\spring-boot-starter-web-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter\3.2.0\spring-boot-starter-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot\3.2.0\spring-boot-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.2.0\spring-boot-autoconfigure-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.2.0\spring-boot-starter-logging-3.2.0.jar;C:\Users\pzy\.m2\repository\ch\qos\logback\logback-classic\1.4.11\logback-classic-1.4.11.jar;C:\Users\pzy\.m2\repository\ch\qos\logback\logback-core\1.4.11\logback-core-1.4.11.jar;C:\Users\pzy\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.21.1\log4j-to-slf4j-2.21.1.jar;C:\Users\pzy\.m2\repository\org\apache\logging\log4j\log4j-api\2.21.1\log4j-api-2.21.1.jar;C:\Users\pzy\.m2\repository\org\slf4j\jul-to-slf4j\2.0.9\jul-to-slf4j-2.0.9.jar;C:\Users\pzy\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\pzy\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.2.0\spring-boot-starter-json-3.2.0.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.15.3\jackson-datatype-jdk8-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.3\jackson-datatype-jsr310-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.15.3\jackson-module-parameter-names-2.15.3.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.2.0\spring-boot-starter-tomcat-3.2.0.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.16\tomcat-embed-core-10.1.16.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.16\tomcat-embed-websocket-10.1.16.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-web\6.1.1\spring-web-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-beans\6.1.1\spring-beans-6.1.1.jar;C:\Users\pzy\.m2\repository\io\micrometer\micrometer-observation\1.12.0\micrometer-observation-1.12.0.jar;C:\Users\pzy\.m2\repository\io\micrometer\micrometer-commons\1.12.0\micrometer-commons-1.12.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-webmvc\6.1.1\spring-webmvc-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-context\6.1.1\spring-context-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-expression\6.1.1\spring-expression-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.2.0\spring-boot-starter-validation-3.2.0.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.16\tomcat-embed-el-10.1.16.jar;C:\Users\pzy\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\pzy\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\pzy\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\pzy\.m2\repository\com\fasterxml\classmate\1.6.0\classmate-1.6.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\3.2.0\spring-boot-starter-data-jpa-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-aop\3.2.0\spring-boot-starter-aop-3.2.0.jar;C:\Users\pzy\.m2\repository\org\aspectj\aspectjweaver\1.9.20.1\aspectjweaver-1.9.20.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.2.0\spring-boot-starter-jdbc-3.2.0.jar;C:\Users\pzy\.m2\repository\com\zaxxer\HikariCP\5.0.1\HikariCP-5.0.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-jdbc\6.1.1\spring-jdbc-6.1.1.jar;C:\Users\pzy\.m2\repository\org\hibernate\orm\hibernate-core\6.3.1.Final\hibernate-core-6.3.1.Final.jar;C:\Users\pzy\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\pzy\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\pzy\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\pzy\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\pzy\.m2\repository\net\bytebuddy\byte-buddy\1.14.10\byte-buddy-1.14.10.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.4\jaxb-runtime-4.0.4.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.4\jaxb-core-4.0.4.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\txw2\4.0.4\txw2-4.0.4.jar;C:\Users\pzy\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.2\istack-commons-runtime-4.1.2.jar;C:\Users\pzy\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\pzy\.m2\repository\org\antlr\antlr4-runtime\4.10.1\antlr4-runtime-4.10.1.jar;C:\Users\pzy\.m2\repository\org\springframework\data\spring-data-jpa\3.2.0\spring-data-jpa-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\data\spring-data-commons\3.2.0\spring-data-commons-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-orm\6.1.1\spring-orm-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-tx\6.1.1\spring-tx-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-aspects\6.1.1\spring-aspects-6.1.1.jar;C:\Users\pzy\.m2\repository\com\mysql\mysql-connector-j\8.1.0\mysql-connector-j-8.1.0.jar;C:\Users\pzy\.m2\repository\org\jsoup\jsoup\1.17.2\jsoup-1.17.2.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\client5\httpclient5\5.2.1\httpclient5-5.2.1.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\core5\httpcore5\5.2.3\httpcore5-5.2.3.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\core5\httpcore5-h2\5.2.3\httpcore5-h2-5.2.3.jar;C:\Users\pzy\.m2\repository\org\slf4j\slf4j-api\2.0.9\slf4j-api-2.0.9.jar;C:\Users\pzy\.m2\repository\com\rometools\rome\2.1.0\rome-2.1.0.jar;C:\Users\pzy\.m2\repository\com\rometools\rome-utils\2.1.0\rome-utils-2.1.0.jar;C:\Users\pzy\.m2\repository\org\jdom\jdom2\2.0.6.1\jdom2-2.0.6.1.jar;C:\Users\pzy\.m2\repository\com\alibaba\dashscope-sdk-java\2.8.0\dashscope-sdk-java-2.8.0.jar;C:\Users\pzy\.m2\repository\com\google\guava\guava\32.1.1-jre\guava-32.1.1-jre.jar;C:\Users\pzy\.m2\repository\com\google\guava\failureaccess\1.0.1\failureaccess-1.0.1.jar;C:\Users\pzy\.m2\repository\com\google\guava\listenablefuture\9999.0-empty-to-avoid-conflict-with-guava\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar;C:\Users\pzy\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\pzy\.m2\repository\org\checkerframework\checker-qual\3.33.0\checker-qual-3.33.0.jar;C:\Users\pzy\.m2\repository\com\google\errorprone\error_prone_annotations\2.18.0\error_prone_annotations-2.18.0.jar;C:\Users\pzy\.m2\repository\com\google\j2objc\j2objc-annotations\2.8\j2objc-annotations-2.8.jar;C:\Users\pzy\.m2\repository\io\reactivex\rxjava2\rxjava\2.2.21\rxjava-2.2.21.jar;C:\Users\pzy\.m2\repository\org\reactivestreams\reactive-streams\1.0.4\reactive-streams-1.0.4.jar;C:\Users\pzy\.m2\repository\com\google\code\gson\gson\2.10.1\gson-2.10.1.jar;C:\Users\pzy\.m2\repository\org\slf4j\slf4j-simple\2.0.9\slf4j-simple-2.0.9.jar;C:\Users\pzy\.m2\repository\com\squareup\okio\okio\3.5.0\okio-3.5.0.jar;C:\Users\pzy\.m2\repository\com\squareup\okio\okio-jvm\3.5.0\okio-jvm-3.5.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.9.20\kotlin-stdlib-common-1.9.20.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\logging-interceptor\4.12.0\logging-interceptor-4.12.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.9.20\kotlin-stdlib-jdk8-1.9.20.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.9.20\kotlin-stdlib-1.9.20.jar;C:\Users\pzy\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.9.20\kotlin-stdlib-jdk7-1.9.20.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\okhttp-sse\4.12.0\okhttp-sse-4.12.0.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\okhttp\4.12.0\okhttp-4.12.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-webflux\3.2.0\spring-boot-starter-webflux-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-reactor-netty\3.2.0\spring-boot-starter-reactor-netty-3.2.0.jar;C:\Users\pzy\.m2\repository\io\projectreactor\netty\reactor-netty-http\1.1.13\reactor-netty-http-1.1.13.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-http\4.1.101.Final\netty-codec-http-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-common\4.1.101.Final\netty-common-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-buffer\4.1.101.Final\netty-buffer-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport\4.1.101.Final\netty-transport-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec\4.1.101.Final\netty-codec-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-handler\4.1.101.Final\netty-handler-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-http2\4.1.101.Final\netty-codec-http2-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns\4.1.101.Final\netty-resolver-dns-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver\4.1.101.Final\netty-resolver-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-dns\4.1.101.Final\netty-codec-dns-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns-native-macos\4.1.101.Final\netty-resolver-dns-native-macos-4.1.101.Final-osx-x86_64.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns-classes-macos\4.1.101.Final\netty-resolver-dns-classes-macos-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-native-epoll\4.1.101.Final\netty-transport-native-epoll-4.1.101.Final-linux-x86_64.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-native-unix-common\4.1.101.Final\netty-transport-native-unix-common-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-classes-epoll\4.1.101.Final\netty-transport-classes-epoll-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\projectreactor\netty\reactor-netty-core\1.1.13\reactor-netty-core-1.1.13.jar;C:\Users\pzy\.m2\repository\io\netty\netty-handler-proxy\4.1.101.Final\netty-handler-proxy-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-socks\4.1.101.Final\netty-codec-socks-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-webflux\6.1.1\spring-webflux-6.1.1.jar;C:\Users\pzy\.m2\repository\io\projectreactor\reactor-core\3.6.0\reactor-core-3.6.0.jar;C:\Users\pzy\.m2\repository\org\projectlombok\lombok\1.18.30\lombok-1.18.30.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-security\3.2.0\spring-boot-starter-security-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-aop\6.1.1\spring-aop-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-config\6.2.0\spring-security-config-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-core\6.2.0\spring-security-core-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-crypto\6.2.0\spring-security-crypto-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-web\6.2.0\spring-security-web-6.2.0.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.3\jjwt-api-0.12.3.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.3\jjwt-impl-0.12.3.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.3\jjwt-jackson-0.12.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.3\jackson-databind-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.3\jackson-annotations-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.3\jackson-core-2.15.3.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-mail\3.2.0\spring-boot-starter-mail-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-context-support\6.1.1\spring-context-support-6.1.1.jar;C:\Users\pzy\.m2\repository\org\eclipse\angus\jakarta.mail\2.0.2\jakarta.mail-2.0.2.jar;C:\Users\pzy\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.2\jakarta.activation-api-2.1.2.jar;C:\Users\pzy\.m2\repository\org\eclipse\angus\angus-activation\2.0.1\angus-activation-2.0.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.2.0\spring-boot-starter-test-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-test\3.2.0\spring-boot-test-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.2.0\spring-boot-test-autoconfigure-3.2.0.jar;C:\Users\pzy\.m2\repository\com\jayway\jsonpath\json-path\2.8.0\json-path-2.8.0.jar;C:\Users\pzy\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.1\jakarta.xml.bind-api-4.0.1.jar;C:\Users\pzy\.m2\repository\net\minidev\json-smart\2.5.0\json-smart-2.5.0.jar;C:\Users\pzy\.m2\repository\net\minidev\accessors-smart\2.5.0\accessors-smart-2.5.0.jar;C:\Users\pzy\.m2\repository\org\ow2\asm\asm\9.3\asm-9.3.jar;C:\Users\pzy\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\pzy\.m2\repository\org\awaitility\awaitility\4.2.0\awaitility-4.2.0.jar;C:\Users\pzy\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.1\junit-jupiter-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.1\junit-jupiter-api-5.10.1.jar;C:\Users\pzy\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\pzy\.m2\repository\org\junit\platform\junit-platform-commons\1.10.1\junit-platform-commons-1.10.1.jar;C:\Users\pzy\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.1\junit-jupiter-params-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.1\junit-jupiter-engine-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\platform\junit-platform-engine\1.10.1\junit-platform-engine-1.10.1.jar;C:\Users\pzy\.m2\repository\org\mockito\mockito-core\5.7.0\mockito-core-5.7.0.jar;C:\Users\pzy\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.10\byte-buddy-agent-1.14.10.jar;C:\Users\pzy\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\pzy\.m2\repository\org\mockito\mockito-junit-jupiter\5.7.0\mockito-junit-jupiter-5.7.0.jar;C:\Users\pzy\.m2\repository\org\skyscreamer\jsonassert\1.5.1\jsonassert-1.5.1.jar;C:\Users\pzy\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-core\6.1.1\spring-core-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-jcl\6.1.1\spring-jcl-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-test\6.1.1\spring-test-6.1.1.jar;C:\Users\pzy\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\pzy"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-01-20"/>
+    <property name="java.home" value="C:\Users\pzy\.jdks\ms-17.0.18"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\pzy\Documents\java\work\hh\springboot-backend"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="GBK"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="C:\Users\pzy\AppData\Local\Temp\surefire173268810472216778\surefirebooter-20260301211617255_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.18+8-LTS"/>
+    <property name="user.name" value="pzy"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="GBK"/>
+    <property name="sun.net.http.allowRestrictedHeaders" value="true"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Microsoft-13106358"/>
+    <property name="localRepository" value="C:\Users\pzy\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/microsoft/openjdk/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\pzy\AppData\Local\Temp\"/>
+    <property name="idea.version" value="2025.1.1.1"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
+    <property name="java.version" value="17.0.18"/>
+    <property name="user.dir" value="C:\Users\pzy\Documents\java\work\hh\springboot-backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="30600"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="CONSOLE_LOG_CHARSET" value="GBK"/>
+    <property name="native.encoding" value="GBK"/>
+    <property name="java.library.path" value="C:\Users\pzy\.jdks\ms-17.0.18\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;D:\environment\nodejs\;C:\Program Files\Git\cmd;C:\Users\pzy\AppData\Local\Microsoft\WindowsApps;C:\Users\pzy\AppData\Roaming\npm;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Microsoft"/>
+    <property name="java.vm.version" value="17.0.18+8-LTS"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="maven.repo.local" value="C:\Users\pzy\.m2\repository"/>
+    <property name="java.class.version" value="61.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[global-buddy-backend] "/>
+  </properties>
+  <testcase name="crawlAllThaiNews_smokeTest" classname="com.globalbuddy.NewsCrawlerSmokeTest" time="72.702">
+    <system-out><![CDATA[21:16:18.757 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.globalbuddy.NewsCrawlerSmokeTest]: NewsCrawlerSmokeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+21:16:18.963 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.globalbuddy.GlobalBuddyApplication for test class com.globalbuddy.NewsCrawlerSmokeTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.0)
+
+2026-03-01T21:16:19.762+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.NewsCrawlerSmokeTest     : Starting NewsCrawlerSmokeTest using Java 17.0.18 with PID 30600 (started by pzy in C:\Users\pzy\Documents\java\work\hh\springboot-backend)
+2026-03-01T21:16:19.763+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.NewsCrawlerSmokeTest     : Running with Spring Boot v3.2.0, Spring v6.1.1
+2026-03-01T21:16:19.764+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.NewsCrawlerSmokeTest     : No active profile set, falling back to 1 default profile: "default"
+2026-03-01T21:16:20.867+07:00  INFO 30600 --- [global-buddy-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-01T21:16:21.174+07:00  INFO 30600 --- [global-buddy-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 293 ms. Found 12 JPA repository interfaces.
+2026-03-01T21:16:22.645+07:00  INFO 30600 --- [global-buddy-backend] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-03-01T21:16:22.996+07:00  INFO 30600 --- [global-buddy-backend] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.3.1.Final
+2026-03-01T21:16:23.218+07:00  INFO 30600 --- [global-buddy-backend] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-03-01T21:16:23.776+07:00  INFO 30600 --- [global-buddy-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-01T21:16:23.827+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-01T21:16:24.123+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@40863800
+2026-03-01T21:16:24.126+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-01T21:16:24.212+07:00  WARN 30600 --- [global-buddy-backend] [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-03-01T21:16:26.074+07:00  INFO 30600 --- [global-buddy-backend] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    create table comments (
+        id varchar(36) not null,
+        content TEXT not null,
+        content_en TEXT,
+        content_zh TEXT,
+        created_at datetime(6),
+        original_language varchar(10),
+        status enum ('ACTIVE','REPORTED_REMOVED') not null,
+        updated_at datetime(6),
+        author_id varchar(36) not null,
+        post_id varchar(36) not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table communities (
+        id varchar(36) not null,
+        country varchar(255) not null,
+        created_at datetime(6),
+        description TEXT,
+        language varchar(255),
+        tags TEXT,
+        title varchar(255) not null,
+        created_by varchar(36),
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table conversations (
+        id varchar(36) not null,
+        created_at datetime(6),
+        last_message_at datetime(6),
+        deleted_by_id varchar(36),
+        user1_id varchar(36) not null,
+        user2_id varchar(36) not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table messages (
+        id varchar(36) not null,
+        content TEXT not null,
+        created_at datetime(6),
+        is_read bit not null,
+        read_at datetime(6),
+        conversation_id varchar(36) not null,
+        receiver_id varchar(36) not null,
+        sender_id varchar(36) not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table news (
+        id bigint not null auto_increment,
+        cover_image_url varchar(1000),
+        create_time datetime(6),
+        original_content TEXT,
+        original_url varchar(1000),
+        publish_date datetime(6),
+        source varchar(255),
+        summary TEXT,
+        summary_en TEXT,
+        summary_zh TEXT,
+        title varchar(255),
+        title_en varchar(500),
+        title_zh varchar(500),
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table notifications (
+        id bigint not null auto_increment,
+        comment_id varchar(36),
+        content TEXT not null,
+        created_at datetime(6) not null,
+        is_read bit not null,
+        post_id varchar(36),
+        read_at datetime(6),
+        report_id bigint,
+        title varchar(500) not null,
+        type enum ('REPORT_SUCCESS','REPORT_FAILED','POST_VIOLATION_PENALTY','POST_RESTORED','COMMENT_VIOLATION_PENALTY','COMMENT_RESTORED') not null,
+        user_id varchar(36) not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table post_likes (
+        id varchar(36) not null,
+        created_at datetime(6),
+        post_id varchar(36) not null,
+        user_id varchar(36) not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table posts (
+        id varchar(36) not null,
+        ai_confidence float(53),
+        ai_result TEXT,
+        body TEXT not null,
+        category varchar(255),
+        content_en TEXT,
+        content_zh TEXT,
+        created_at datetime(6),
+        embedding TEXT,
+        image_url varchar(255),
+        original_language varchar(10),
+        review_note TEXT,
+        reviewed_at datetime(6),
+        reviewed_by varchar(255),
+        status enum ('PENDING_REVIEW','APPROVED','REJECTED','REPORTED_REMOVED') not null,
+        tags TEXT,
+        title varchar(255) not null,
+        title_en varchar(500),
+        title_zh varchar(500),
+        updated_at datetime(6),
+        author_id varchar(36) not null,
+        community_id varchar(36),
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table report_reasons (
+        report_id bigint not null,
+        reason varchar(255)
+    ) engine=InnoDB
+Hibernate: 
+    create table reports (
+        id bigint not null auto_increment,
+        ai_confidence float(53),
+        ai_result TEXT,
+        created_at datetime(6) not null,
+        description TEXT,
+        is_violation bit,
+        review_notes TEXT,
+        reviewed_at datetime(6),
+        status enum ('PENDING','REVIEWED','RESOLVED','DISMISSED') not null,
+        target_id varchar(255) not null,
+        target_type enum ('POST','COMMENT') not null,
+        violation_snippet TEXT,
+        reporter_id varchar(36) not null,
+        reviewed_by_id varchar(36),
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table user_follows (
+        id varchar(36) not null,
+        created_at datetime(6),
+        follower_id varchar(36) not null,
+        following_id varchar(36) not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table users (
+        id varchar(36) not null,
+        avatar varchar(500),
+        business_name varchar(255),
+        created_at datetime(6),
+        display_name varchar(255) not null,
+        email varchar(255) not null,
+        enabled bit not null,
+        id_number varchar(100),
+        institution varchar(255),
+        interests TEXT,
+        languages TEXT,
+        merchant_doc_type varchar(50),
+        merchant_doc_url varchar(500),
+        merchant_status enum ('PENDING','APPROVED','REJECTED'),
+        nationality varchar(255) not null,
+        password varchar(255),
+        password_hash varchar(255) not null,
+        phone varchar(50),
+        preferred_language varchar(10),
+        role enum ('USER','ADMIN','MERCHANT') not null,
+        studying_in_country varchar(255) not null,
+        username varchar(255) not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    create table verification_codes (
+        id varchar(36) not null,
+        code varchar(10) not null,
+        created_at datetime(6) not null,
+        expires_at datetime(6) not null,
+        identifier varchar(255) not null,
+        purpose enum ('REGISTER','RESET_PASSWORD') not null,
+        type enum ('EMAIL','SMS') not null,
+        used bit not null,
+        primary key (id)
+    ) engine=InnoDB
+Hibernate: 
+    alter table post_likes 
+       drop index UK5l2rj28vw5oj6f7ox746grokg
+Hibernate: 
+    alter table post_likes 
+       add constraint UK5l2rj28vw5oj6f7ox746grokg unique (post_id, user_id)
+Hibernate: 
+    alter table user_follows 
+       drop index UKac5tvpn8oynln4njypmqycil3
+Hibernate: 
+    alter table user_follows 
+       add constraint UKac5tvpn8oynln4njypmqycil3 unique (follower_id, following_id)
+Hibernate: 
+    alter table users 
+       drop index UK_6dotkott2kjsp8vw4d0m25fb7
+Hibernate: 
+    alter table users 
+       add constraint UK_6dotkott2kjsp8vw4d0m25fb7 unique (email)
+Hibernate: 
+    alter table users 
+       drop index UK_r43af9ap4edm43mmtq01oddj6
+Hibernate: 
+    alter table users 
+       add constraint UK_r43af9ap4edm43mmtq01oddj6 unique (username)
+Hibernate: 
+    create index idx_identifier_type 
+       on verification_codes (identifier, type)
+Hibernate: 
+    create index idx_expires_at 
+       on verification_codes (expires_at)
+Hibernate: 
+    alter table comments 
+       add constraint FKn2na60ukhs76ibtpt9burkm27 
+       foreign key (author_id) 
+       references users (id)
+Hibernate: 
+    alter table comments 
+       add constraint FKh4c7lvsc298whoyd4w9ta25cr 
+       foreign key (post_id) 
+       references posts (id)
+Hibernate: 
+    alter table communities 
+       add constraint FKhu58kqkbabws9cbbptc6n6534 
+       foreign key (created_by) 
+       references users (id)
+Hibernate: 
+    alter table conversations 
+       add constraint FKefhv7h8fpltvq1li06bjjsvuh 
+       foreign key (deleted_by_id) 
+       references users (id)
+Hibernate: 
+    alter table conversations 
+       add constraint FK8wv0rmd8jb3cqcbyng15ubrmk 
+       foreign key (user1_id) 
+       references users (id)
+Hibernate: 
+    alter table conversations 
+       add constraint FKe7w0k1xem21pp85wxh5moodnk 
+       foreign key (user2_id) 
+       references users (id)
+Hibernate: 
+    alter table messages 
+       add constraint FKt492th6wsovh1nush5yl5jj8e 
+       foreign key (conversation_id) 
+       references conversations (id)
+Hibernate: 
+    alter table messages 
+       add constraint FKt05r0b6n0iis8u7dfna4xdh73 
+       foreign key (receiver_id) 
+       references users (id)
+Hibernate: 
+    alter table messages 
+       add constraint FK4ui4nnwntodh6wjvck53dbk9m 
+       foreign key (sender_id) 
+       references users (id)
+Hibernate: 
+    alter table notifications 
+       add constraint FK9y21adhxn0ayjhfocscqox7bh 
+       foreign key (user_id) 
+       references users (id)
+Hibernate: 
+    alter table post_likes 
+       add constraint FKa5wxsgl4doibhbed9gm7ikie2 
+       foreign key (post_id) 
+       references posts (id)
+Hibernate: 
+    alter table post_likes 
+       add constraint FKkgau5n0nlewg6o9lr4yibqgxj 
+       foreign key (user_id) 
+       references users (id)
+Hibernate: 
+    alter table posts 
+       add constraint FK6xvn0811tkyo3nfjk2xvqx6ns 
+       foreign key (author_id) 
+       references users (id)
+Hibernate: 
+    alter table posts 
+       add constraint FK7rk45ficmsfhe8n1dojvqt6ui 
+       foreign key (community_id) 
+       references communities (id)
+Hibernate: 
+    alter table report_reasons 
+       add constraint FK4e50501swptpkh7g3pgocws1 
+       foreign key (report_id) 
+       references reports (id)
+Hibernate: 
+    alter table reports 
+       add constraint FKd3qiw2om5d2oh5xb7fbdcq225 
+       foreign key (reporter_id) 
+       references users (id)
+Hibernate: 
+    alter table reports 
+       add constraint FKn1iu2ses25aoxypgjeym3owpl 
+       foreign key (reviewed_by_id) 
+       references users (id)
+Hibernate: 
+    alter table user_follows 
+       add constraint FKqx9mu1fniaua5jfe1cdyspxdt 
+       foreign key (follower_id) 
+       references users (id)
+Hibernate: 
+    alter table user_follows 
+       add constraint FKp1rxuw1ulwo6mu84qaajuttrk 
+       foreign key (following_id) 
+       references users (id)
+2026-03-01T21:16:26.968+07:00  INFO 30600 --- [global-buddy-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-01T21:16:28.261+07:00  INFO 30600 --- [global-buddy-backend] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-01T21:16:29.739+07:00  WARN 30600 --- [global-buddy-backend] [           main] o.s.aop.framework.CglibAopProxy          : Unable to proxy interface-implementing method [public final void org.springframework.web.filter.OncePerRequestFilter.doFilter(jakarta.servlet.ServletRequest,jakarta.servlet.ServletResponse,jakarta.servlet.FilterChain) throws jakarta.servlet.ServletException,java.io.IOException] because it is marked as final, consider using interface-based JDK proxies instead.
+2026-03-01T21:16:29.740+07:00  WARN 30600 --- [global-buddy-backend] [           main] o.s.aop.framework.CglibAopProxy          : Unable to proxy interface-implementing method [public final void org.springframework.web.filter.GenericFilterBean.init(jakarta.servlet.FilterConfig) throws jakarta.servlet.ServletException] because it is marked as final, consider using interface-based JDK proxies instead.
+2026-03-01T21:16:30.880+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.globalbuddy.controller.PostController  : Using existing upload directory: C:\Users\pzy\Documents\java\work\hh\pictures
+2026-03-01T21:16:30.887+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.globalbuddy.controller.PostController  : Upload directory is writable
+2026-03-01T21:16:30.962+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.config.AsyncConfig       : Async task executor initialized with corePoolSize=5, maxPoolSize=10, queueCapacity=100
+2026-03-01T21:16:30.983+07:00  WARN 30600 --- [global-buddy-backend] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-01T21:16:31.446+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.config.WebMvcConfig      : Registering resource handler for /pictures/** -> file:C:/Users/pzy/Documents/java/work/hh/pictures/
+2026-03-01T21:16:31.472+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.config.WebMvcConfig      : Resource handlers registered: true
+2026-03-01T21:16:32.007+07:00  INFO 30600 --- [global-buddy-backend] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@40009de0, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@270d54ea, org.springframework.security.web.context.SecurityContextHolderFilter@1a7ca7a3, org.springframework.security.web.header.HeaderWriterFilter@55d79f32, org.springframework.web.filter.CorsFilter@4c0ac628, org.springframework.security.web.authentication.logout.LogoutFilter@622ec92a, com.globalbuddy.security.JwtAuthenticationFilter@1ce4f3ac, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@289bc75c, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4c6c2473, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3c9d5578, org.springframework.security.web.session.SessionManagementFilter@534a5e70, org.springframework.security.web.access.ExceptionTranslationFilter@3d9e2b59, org.springframework.security.web.access.intercept.AuthorizationFilter@7ef32321]
+2026-03-01T21:16:32.695+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.NewsCrawlerSmokeTest     : Started NewsCrawlerSmokeTest in 13.462 seconds (process running for 15.301)
+Hibernate: 
+    select
+        count(*) 
+    from
+        users au1_0
+Hibernate: 
+    select
+        au1_0.id,
+        au1_0.avatar,
+        au1_0.business_name,
+        au1_0.created_at,
+        au1_0.display_name,
+        au1_0.email,
+        au1_0.enabled,
+        au1_0.id_number,
+        au1_0.institution,
+        au1_0.interests,
+        au1_0.languages,
+        au1_0.merchant_doc_type,
+        au1_0.merchant_doc_url,
+        au1_0.merchant_status,
+        au1_0.nationality,
+        au1_0.password,
+        au1_0.password_hash,
+        au1_0.phone,
+        au1_0.preferred_language,
+        au1_0.role,
+        au1_0.studying_in_country,
+        au1_0.username 
+    from
+        users au1_0 
+    where
+        au1_0.id=?
+Hibernate: 
+    select
+        au1_0.id,
+        au1_0.avatar,
+        au1_0.business_name,
+        au1_0.created_at,
+        au1_0.display_name,
+        au1_0.email,
+        au1_0.enabled,
+        au1_0.id_number,
+        au1_0.institution,
+        au1_0.interests,
+        au1_0.languages,
+        au1_0.merchant_doc_type,
+        au1_0.merchant_doc_url,
+        au1_0.merchant_status,
+        au1_0.nationality,
+        au1_0.password,
+        au1_0.password_hash,
+        au1_0.phone,
+        au1_0.preferred_language,
+        au1_0.role,
+        au1_0.studying_in_country,
+        au1_0.username 
+    from
+        users au1_0 
+    where
+        au1_0.id=?
+Hibernate: 
+    select
+        au1_0.id,
+        au1_0.avatar,
+        au1_0.business_name,
+        au1_0.created_at,
+        au1_0.display_name,
+        au1_0.email,
+        au1_0.enabled,
+        au1_0.id_number,
+        au1_0.institution,
+        au1_0.interests,
+        au1_0.languages,
+        au1_0.merchant_doc_type,
+        au1_0.merchant_doc_url,
+        au1_0.merchant_status,
+        au1_0.nationality,
+        au1_0.password,
+        au1_0.password_hash,
+        au1_0.phone,
+        au1_0.preferred_language,
+        au1_0.role,
+        au1_0.studying_in_country,
+        au1_0.username 
+    from
+        users au1_0 
+    where
+        au1_0.id=?
+Hibernate: 
+    insert 
+    into
+        users
+        (avatar, business_name, created_at, display_name, email, enabled, id_number, institution, interests, languages, merchant_doc_type, merchant_doc_url, merchant_status, nationality, password, password_hash, phone, preferred_language, role, studying_in_country, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (avatar, business_name, created_at, display_name, email, enabled, id_number, institution, interests, languages, merchant_doc_type, merchant_doc_url, merchant_status, nationality, password, password_hash, phone, preferred_language, role, studying_in_country, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (avatar, business_name, created_at, display_name, email, enabled, id_number, institution, interests, languages, merchant_doc_type, merchant_doc_url, merchant_status, nationality, password, password_hash, phone, preferred_language, role, studying_in_country, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.country,
+        c1_0.created_at,
+        c1_0.created_by,
+        c1_0.description,
+        c1_0.language,
+        c1_0.tags,
+        c1_0.title 
+    from
+        communities c1_0 
+    where
+        c1_0.id=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.country,
+        c1_0.created_at,
+        c1_0.created_by,
+        c1_0.description,
+        c1_0.language,
+        c1_0.tags,
+        c1_0.title 
+    from
+        communities c1_0 
+    where
+        c1_0.id=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.country,
+        c1_0.created_at,
+        c1_0.created_by,
+        c1_0.description,
+        c1_0.language,
+        c1_0.tags,
+        c1_0.title 
+    from
+        communities c1_0 
+    where
+        c1_0.id=?
+Hibernate: 
+    insert 
+    into
+        communities
+        (country, created_at, created_by, description, language, tags, title, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        communities
+        (country, created_at, created_by, description, language, tags, title, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        communities
+        (country, created_at, created_by, description, language, tags, title, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        cp1_0.id,
+        cp1_0.ai_confidence,
+        cp1_0.ai_result,
+        cp1_0.author_id,
+        cp1_0.body,
+        cp1_0.category,
+        cp1_0.community_id,
+        cp1_0.content_en,
+        cp1_0.content_zh,
+        cp1_0.created_at,
+        cp1_0.embedding,
+        cp1_0.image_url,
+        cp1_0.original_language,
+        cp1_0.review_note,
+        cp1_0.reviewed_at,
+        cp1_0.reviewed_by,
+        cp1_0.status,
+        cp1_0.tags,
+        cp1_0.title,
+        cp1_0.title_en,
+        cp1_0.title_zh,
+        cp1_0.updated_at 
+    from
+        posts cp1_0 
+    where
+        cp1_0.id=?
+Hibernate: 
+    select
+        cp1_0.id,
+        cp1_0.ai_confidence,
+        cp1_0.ai_result,
+        cp1_0.author_id,
+        cp1_0.body,
+        cp1_0.category,
+        cp1_0.community_id,
+        cp1_0.content_en,
+        cp1_0.content_zh,
+        cp1_0.created_at,
+        cp1_0.embedding,
+        cp1_0.image_url,
+        cp1_0.original_language,
+        cp1_0.review_note,
+        cp1_0.reviewed_at,
+        cp1_0.reviewed_by,
+        cp1_0.status,
+        cp1_0.tags,
+        cp1_0.title,
+        cp1_0.title_en,
+        cp1_0.title_zh,
+        cp1_0.updated_at 
+    from
+        posts cp1_0 
+    where
+        cp1_0.id=?
+Hibernate: 
+    select
+        cp1_0.id,
+        cp1_0.ai_confidence,
+        cp1_0.ai_result,
+        cp1_0.author_id,
+        cp1_0.body,
+        cp1_0.category,
+        cp1_0.community_id,
+        cp1_0.content_en,
+        cp1_0.content_zh,
+        cp1_0.created_at,
+        cp1_0.embedding,
+        cp1_0.image_url,
+        cp1_0.original_language,
+        cp1_0.review_note,
+        cp1_0.reviewed_at,
+        cp1_0.reviewed_by,
+        cp1_0.status,
+        cp1_0.tags,
+        cp1_0.title,
+        cp1_0.title_en,
+        cp1_0.title_zh,
+        cp1_0.updated_at 
+    from
+        posts cp1_0 
+    where
+        cp1_0.id=?
+Hibernate: 
+    select
+        cp1_0.id,
+        cp1_0.ai_confidence,
+        cp1_0.ai_result,
+        cp1_0.author_id,
+        cp1_0.body,
+        cp1_0.category,
+        cp1_0.community_id,
+        cp1_0.content_en,
+        cp1_0.content_zh,
+        cp1_0.created_at,
+        cp1_0.embedding,
+        cp1_0.image_url,
+        cp1_0.original_language,
+        cp1_0.review_note,
+        cp1_0.reviewed_at,
+        cp1_0.reviewed_by,
+        cp1_0.status,
+        cp1_0.tags,
+        cp1_0.title,
+        cp1_0.title_en,
+        cp1_0.title_zh,
+        cp1_0.updated_at 
+    from
+        posts cp1_0 
+    where
+        cp1_0.id=?
+Hibernate: 
+    select
+        cp1_0.id,
+        cp1_0.ai_confidence,
+        cp1_0.ai_result,
+        cp1_0.author_id,
+        cp1_0.body,
+        cp1_0.category,
+        cp1_0.community_id,
+        cp1_0.content_en,
+        cp1_0.content_zh,
+        cp1_0.created_at,
+        cp1_0.embedding,
+        cp1_0.image_url,
+        cp1_0.original_language,
+        cp1_0.review_note,
+        cp1_0.reviewed_at,
+        cp1_0.reviewed_by,
+        cp1_0.status,
+        cp1_0.tags,
+        cp1_0.title,
+        cp1_0.title_en,
+        cp1_0.title_zh,
+        cp1_0.updated_at 
+    from
+        posts cp1_0 
+    where
+        cp1_0.id=?
+Hibernate: 
+    insert 
+    into
+        posts
+        (ai_confidence, ai_result, author_id, body, category, community_id, content_en, content_zh, created_at, embedding, image_url, original_language, review_note, reviewed_at, reviewed_by, status, tags, title, title_en, title_zh, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        posts
+        (ai_confidence, ai_result, author_id, body, category, community_id, content_en, content_zh, created_at, embedding, image_url, original_language, review_note, reviewed_at, reviewed_by, status, tags, title, title_en, title_zh, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        posts
+        (ai_confidence, ai_result, author_id, body, category, community_id, content_en, content_zh, created_at, embedding, image_url, original_language, review_note, reviewed_at, reviewed_by, status, tags, title, title_en, title_zh, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        posts
+        (ai_confidence, ai_result, author_id, body, category, community_id, content_en, content_zh, created_at, embedding, image_url, original_language, review_note, reviewed_at, reviewed_by, status, tags, title, title_en, title_zh, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        posts
+        (ai_confidence, ai_result, author_id, body, category, community_id, content_en, content_zh, created_at, embedding, image_url, original_language, review_note, reviewed_at, reviewed_by, status, tags, title, title_en, title_zh, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        n1_0.id,
+        n1_0.cover_image_url,
+        n1_0.create_time,
+        n1_0.original_content,
+        n1_0.original_url,
+        n1_0.publish_date,
+        n1_0.source,
+        n1_0.summary,
+        n1_0.summary_en,
+        n1_0.summary_zh,
+        n1_0.title,
+        n1_0.title_en,
+        n1_0.title_zh 
+    from
+        news n1_0 
+    where
+        n1_0.source=?
+创建测试用的清迈大学新闻数据...
+Hibernate: 
+    insert 
+    into
+        news
+        (cover_image_url, create_time, original_content, original_url, publish_date, source, summary, summary_en, summary_zh, title, title_en, title_zh) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        news
+        (cover_image_url, create_time, original_content, original_url, publish_date, source, summary, summary_en, summary_zh, title, title_en, title_zh) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        news
+        (cover_image_url, create_time, original_content, original_url, publish_date, source, summary, summary_en, summary_zh, title, title_en, title_zh) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+已创建 3 条测试用的清迈大学新闻
+2026-03-01T21:16:34.264+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : Starting to fetch news from Google News RSS (Thailand)...
+2026-03-01T21:16:34.265+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : Step 1: Fetching trending keywords from Google Trends RSS (Thailand)...
+2026-03-01T21:16:34.265+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Fetching trending keywords from Google Trends RSS: https://trends.google.com/trending/rss?geo=TH
+2026-03-01T21:16:35.787+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Successfully parsed Google Trends RSS: https://trends.google.com/trending/rss?geo=TH (title: Daily Search Trends, entries: 10)
+2026-03-01T21:16:35.787+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: ??????????????
+2026-03-01T21:16:35.788+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: monomax
+2026-03-01T21:16:35.788+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: manu
+2026-03-01T21:16:35.788+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: tv ??????? ??????
+2026-03-01T21:16:35.788+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: ??????? ???????
+2026-03-01T21:16:35.788+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: ????????
+2026-03-01T21:16:35.788+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: ????????? vs ?????
+2026-03-01T21:16:35.788+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: brighton vs nottm forest
+2026-03-01T21:16:35.788+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: west indies vs india
+2026-03-01T21:16:35.789+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Extracted trending keyword: ????? ?? ????????????
+2026-03-01T21:16:35.789+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Successfully extracted 10 trending keywords from Google Trends RSS
+2026-03-01T21:16:35.789+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : ? Fetched 10 trending keywords from Google Trends: [??????????????, monomax, manu, tv ??????? ??????, ??????? ???????, ????????, ????????? vs ?????, brighton vs nottm forest, west indies vs india, ????? ?? ????????????]
+2026-03-01T21:16:35.789+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : Step 2: Fetching news from Google News RSS (Thailand)...
+2026-03-01T21:16:35.790+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Starting to fetch news from RSS feed: https://news.google.com/rss?ceid=TH:th&hl=th&gl=TH (source: Google News (Thailand))
+2026-03-01T21:16:35.793+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Using trust-all SSL context for HTTPS connection: https://news.google.com/rss?ceid=TH:th&hl=th&gl=TH
+2026-03-01T21:16:36.933+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Attempting direct parse for Google News RSS (Atom format)...
+2026-03-01T21:16:36.996+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : ? Successfully parsed Google News RSS (Atom format) directly
+2026-03-01T21:16:37.691+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????? “???? 2,000 ???” ???????????????????????????? - ????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:37.692+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????? “???? 2,000 ???” ???????????????????????????? - ????????? -> https://news.google.com/rss/articles/CBMiU0FVX3lxTE8tZWJEWmlQb2s3MUpDTmplamZWM01TTkZaRmUxVEhjTE01Q2xpU2dzejlySFRGVmlXQVdoTFc3RHVsQUk1SUdnQWk0U0ZvNm9JYzkw?oc=5
+2026-03-01T21:16:38.331+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????? ?????????????? ???. 21 ??????????????????? - Thaipost.net -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:38.331+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????? ?????????????? ???. 21 ??????????????????? - Thaipost.net -> https://news.google.com/rss/articles/CBMiWkFVX3lxTE1XbFZ1VEVwSURnSWhvZUZmOTFyeXM2OTFUTmVDaXdYaUJwM0Jzd3pjREdXbVNOaFY3NmNMQTFlYUY3a0p4TFZaRFdzRGx3cVhQLUhrWE1kMm5TUQ?oc=5
+2026-03-01T21:16:39.039+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????? ???????????????? “???????????????” ?????????????????????? - Thairath -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:39.039+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????? ???????????????? “???????????????” ?????????????????????? - Thairath -> https://news.google.com/rss/articles/CBMiW0FVX3lxTE91Uk96VVJ4VC1ZQ1FzdjNNcmZfejl1d3ZBRm44R2tWNm53c0hLbkVFRFlYdEFueXZucmpUd1IweEIyM05HSG5oWUVRUVVkNkE3U1Fja1VXUXRBS00?oc=5
+2026-03-01T21:16:40.293+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????? ???. ??????????????? 6 ?? ?????????????????????? - ????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:40.293+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????? ???. ??????????????? 6 ?? ?????????????????????? - ????????? -> https://news.google.com/rss/articles/CBMiU0FVX3lxTFBrdVdOUGJ5SkZpYXIzZ0djeFAxWWx4bTlYMjR1RDNtTEtrNUlZVFhyY0xjclNoT015UDFnMmVkRVJGamFYeE9UTmViSlFvVEM5NFRB?oc=5
+2026-03-01T21:16:41.278+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????! ????????? ??????? ????????-???????-??????? | Play Now Thailand - LINE TODAY -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:41.279+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????! ????????? ??????? ????????-???????-??????? | Play Now Thailand - LINE TODAY -> https://news.google.com/rss/articles/CBMiVkFVX3lxTE9UUkI0NjZGb29JRWhSTTZxVkU0WGhZMW1jcDduX081TVNoOENjekFHUVZ2OVdqeUEwS1ZhVUZZZktkdWFDYkpRQXRpc1B3U3pTejRIeDRn?oc=5
+2026-03-01T21:16:41.927+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????? : ???????? ... ????????? ???????? ???????? ???? ?????????? ????? 0-0 - Siamsport -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:41.927+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????? : ???????? ... ????????? ???????? ???????? ???? ?????????? ????? 0-0 - Siamsport -> https://news.google.com/rss/articles/CBMidEFVX3lxTE9NZFVDN0prX3U3cmcwTC12WmxhZXRUX2VJUm40di11YVlQREVCa3J2bndmc2x2Y0dEX0ZDbHVPdkZ4bEVXWDlFUElWdHRfdkhseVBHWWhucHlIR3N1UjVXT3QzZl9VTlBVMDBLRXZ6b2ZnN2dk?oc=5
+2026-03-01T21:16:43.288+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????? 2 ????? "???????????" ?????????? 3–6 ??.?.??? ????????????????? - Thairath -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:43.289+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????? 2 ????? "???????????" ?????????? 3–6 ??.?.??? ????????????????? - Thairath -> https://news.google.com/rss/articles/CBMiWEFVX3lxTE5yeGFQWXItOTNyRWZZYjhHclV5YnFHYy1FSjB1Ulo3dFFXbzJXejIwOFM5aF9lcFlLTExjSEtJcDN4YlQ2RlRxaGVQOFpYUHQwNGFOQ3NZekk?oc=5
+2026-03-01T21:16:43.964+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????? ?????????????? ???? 4 ??????? ??? ‘??????’ ??????? ???????? ???. - Matichon Online -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:43.964+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????? ?????????????? ???? 4 ??????? ??? ‘??????’ ??????? ???????? ???. - Matichon Online -> https://news.google.com/rss/articles/CBMiXEFVX3lxTE03bHJTcmZvMlFGcm5SYlJfNmJZVXplb1habUpCei1ncGhieW1jT2J0aFYtYUVxM3JiTnJjRGd5eGhYWnFieHdYd1hqaWt2XzJPVUZYT2lHeHVFUFhQ?oc=5
+2026-03-01T21:16:44.945+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????? ????????????????????? 3 ???? ????????????????????????????????? - Matichon Online -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:44.945+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????? ????????????????????? 3 ???? ????????????????????????????????? - Matichon Online -> https://news.google.com/rss/articles/CBMiXEFVX3lxTFBoVWdlREdTbklJTkRXSWZFQXRNRFpMOE1BRXBoeWdBUW5QMUlLTXlSdTJSbjlIOUFaZ1Zxa3NvZ2dZX21qNGpMSVFXTnQtcG5WZmItVnF3eWU4S01h?oc=5
+2026-03-01T21:16:46.150+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????????? ??????????????????? ???????????? 70 ?????????????? - Matichon Online -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:46.151+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????????? ??????????????????? ???????????? 70 ?????????????? - Matichon Online -> https://news.google.com/rss/articles/CBMiW0FVX3lxTE16Ync4dVRvX2ZlZlRnRVl2YzVjX0JFVGc4U3JzX3pWd2tkbHNKTGlmay1WbWRFVVZOVy1LOWxwZE9qdk9iOWZpY0RSRHNUWTkybHFJd0s4UV9sOWM?oc=5
+2026-03-01T21:16:46.865+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????.???.???? ?????????????? ??????? ?????????????? ???????????????? (????) - Matichon Online -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:46.865+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????.???.???? ?????????????? ??????? ?????????????? ???????????????? (????) - Matichon Online -> https://news.google.com/rss/articles/CBMiWkFVX3lxTE5MckdoUk9BN3NmWTBRUzI5OHV1eG1oSzlxR2pTOFk1endRSUczS1dRNm5XUm1KV1NVUHAxZUxxZ0dNM3ZJQmhSN3FOR3RVREJ5Qld3NmVqX2pzZw?oc=5
+2026-03-01T21:16:47.400+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????! ????????????????????????????????????? ??????? 9 - Matichon Online -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:47.400+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????! ????????????????????????????????????? ??????? 9 - Matichon Online -> https://news.google.com/rss/articles/CBMiW0FVX3lxTE1OclhOMjlpYXJXcS1jMHNXakt0a3BhRmdsWTdJS3VXbEZ5UmEtOUlZX3lWUzVoX0FONlBjOTVkS0xWRGFKYnJQZW5ydjZIYlRhQVNzaFNtOHN0Nkk?oc=5
+2026-03-01T21:16:48.032+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: SET mai TFEX LiVEx ???????????????????????? 2 ??.? ??????????????????????????? | ????????????? - LINE TODAY -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:48.032+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: SET mai TFEX LiVEx ???????????????????????? 2 ??.? ??????????????????????????? | ????????????? - LINE TODAY -> https://news.google.com/rss/articles/CBMiVkFVX3lxTFBMTzRqR0dhNFc2SVNndUFTNEhWbDVoUHM3R2xtNTNjbnA2dVZUaC03VTNCdUtFNHYtT3FnSkpFNXFLN05kWGNhb3NxeUh5cml4T25JOVRB?oc=5
+2026-03-01T21:16:49.332+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ‘?????????’ ??????? TRUE 10% ???? 5 ???????.?????????????? 20% - Hoonsmart -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:49.332+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ‘?????????’ ??????? TRUE 10% ???? 5 ???????.?????????????? 20% - Hoonsmart -> https://news.google.com/rss/articles/CBMiTkFVX3lxTE5obTg0ZW1xMTN0SE5YYUlZVUtQdHJuZmNnUDVHUVh5MW1NWTN0ZE1rUjZ4ZzFwMzdMbHZjdktyaS1EcEVfeGtIYjAyel9Vdw?oc=5
+2026-03-01T21:16:49.997+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: Sony ??????? AMD ????????????? PS5 Pro ?????????????????????????? AI - Thisisgame Thailand -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:49.997+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: Sony ??????? AMD ????????????? PS5 Pro ?????????????????????????? AI - Thisisgame Thailand -> https://news.google.com/rss/articles/CBMifEFVX3lxTE01TlR5M1pFcEs1U0lLNjFxbUlIUXhUSF9ORGhUc2xBSFliNlR0d0twZ0ZPV1p3Y29QVDFXa05tLUN4Z0NGcDUya25XRGVRM2J3cXJzbUV3aUc3ck1CTzdtMENoaWsyU2ZqRk9yYjg2TXNPazVqOVFNNVJ6VXA?oc=5
+2026-03-01T21:16:50.582+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????! Monster Hunter Rise ???????? PlayStation Plus ??????????????? 2026 - Thisisgame Thailand -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:50.582+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????! Monster Hunter Rise ???????? PlayStation Plus ??????????????? 2026 - Thisisgame Thailand -> https://news.google.com/rss/articles/CBMi4wJBVV95cUxNZzNTV2c1c0ZsbkxTV0pVZ3JjcExVX3NKdW4ya0ZqMVNhTnBFREkwZV9tVU9Ed2dzM21uS0R6QzduSVdyaVFZQjR2OUgzQV8xVDlYczNsLURKekdLQk44RmVzVXc1OXM5bWJLUTR2REdFR2k5bmhoRTBJQ1E2a2NYZ2llQ2NWSjdYempxcGpYc0VSUmlFNzhUYmt3anRrWTRrUnU5YjltcVpydE9SNURiamtiWW52bER5SjFFdkJsaXljMVZ4eUtfRm1jYzg4eHhxUDZRcUpadjJJYnM5dlRyZTZ1VkJ6OXV3SWR6ZW9IaEhEalNXUjE5M0RabkpvbUhybk1PUWVKTnowY2M5NXZSUjNXcDUtN0RMRWpzSW1kajZYYVRnYzVFeXZRd3BiMHFnT045LXBkZTlvZGpETDRRTkg0cVVYSC1SeXhDOWpzNmNzNEJtU0Y0MVFwZkxPVXEtVktB?oc=5
+2026-03-01T21:16:51.307+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??? Ubisoft ?????????????? Watch Dogs ????????? Openworld ???????????????????????????????? - AppDisqus -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:51.307+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??? Ubisoft ?????????????? Watch Dogs ????????? Openworld ???????????????????????????????? - AppDisqus -> https://news.google.com/rss/articles/CBMifEFVX3lxTE5sOWRRRWFocHpycEU2dktLM3h4M1pFV1ZGSGNNR3V3MXFad0J1dmNGaTRTSlhPZkZIVXl1V3ZIdVZaUWs3ay00QVNFMUVRcVUwajFZNFV1WDJhWnFFQUN2UEVMeXotc0tSYjdhM2dUbVdveks4TTM5RHBxa2PSAYIBQVVfeXFMTU5nUExnTUI1ZDFZV1ZUbV9LYTZvT3BRU0pqQmw1V21PdERIVnR4dFlZNmRzZ3I4Nks4RVNOVUpKeUR2VjlJbDRfN3FUTlprdTZlcnpLX1NNQWNXUWZDemJHbFlCUXBYbHFoUkhfbFFLNUNzV3JEaldSMjhvdTdkLW1RUQ?oc=5
+2026-03-01T21:16:52.386+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????????????? Resident Evil 2 Leon ?????????????????????? Umbrella ?? 220 ??????????? - 4gamers.co.th -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:52.386+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????????????? Resident Evil 2 Leon ?????????????????????? Umbrella ?? 220 ??????????? - 4gamers.co.th -> https://news.google.com/rss/articles/CBMi3gFBVV95cUxPUmU2dUhnX2RzNXdLcXh3UTJpM1djT3hhbG1wM1lvM2Q4Nk16a2FqZmUtTW96U1g3UGZsQzNydlZPTTRIbndXTWdsMWd3LXdwdWttMUJaNGI2VENEX3Zsa3JZcnVmTEU3SDhiSXp1TkVVZVV3bFZXSDJsWUlrdHZfWEFXNmF3QXA3cnBSUGdLU0VKSXNuU0tmWFp6bnpja3BDdlYyTnhJcG9Ybmx4TjYxdy10OXNNZnNtYXZTM3h1a1JKQjNITW01RFdMTXhVMXNEMUlwcVNoRWM5aTlzWFE?oc=5
+2026-03-01T21:16:53.100+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????! AF 2026 , ????????? ???? ???????? ?????????????? ?????? ????? ?????? ?????? ???? 12 ??????? - Matichon Online -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:53.101+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????! AF 2026 , ????????? ???? ???????? ?????????????? ?????? ????? ?????? ?????? ???? 12 ??????? - Matichon Online -> https://news.google.com/rss/articles/CBMiY0FVX3lxTE5DaXJMOUZPNG5PeXhvR3lMbmlueXJYeGQ3cURlMUVBTW1zMnd0bS1ueG5MZlBabWtaSGFWQ2RXb1dZeGN4cVlfN040dHNtdVpCbkozWV80dG5HZzk3V0xsNkYzOA?oc=5
+2026-03-01T21:16:53.886+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????????? ???????? ????????? - Ch7.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:53.886+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????????? ???????? ????????? - Ch7.com -> https://news.google.com/rss/articles/CBMiSkFVX3lxTE9MbGI5R2dDWGF1dVJlVmZOTlk4ZFpnOXhZalNxdmx0WnRjYldjS0pTeXpKeVF1RXVaMmJJd2VoRzZrUmtsRGRaWVl3?oc=5
+2026-03-01T21:16:54.575+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????! ????????? ??????????????? 1 ????????????????? ?????????????????????????? | ??????? - LINE TODAY -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:54.575+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????! ????????? ??????????????? 1 ????????????????? ?????????????????????????? | ??????? - LINE TODAY -> https://news.google.com/rss/articles/CBMiVkFVX3lxTE5RS0JjRlRvRTVWYy1tT2NZcFZXQjVrWmJVSWVXcTBNdGRfVThnT0UxdnpybDNjdFItbFdxdnhXSFdEUGY3MFYwLXZQYWZ6QTc1Vjg5S1Zn?oc=5
+2026-03-01T21:16:55.934+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????????????? ??????????? ???????? ???? - Ch7.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:55.935+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????????????? ??????????? ???????? ???? - Ch7.com -> https://news.google.com/rss/articles/CBMiSkFVX3lxTE1xbHNyRzYybjlCaEZ0NVpRdnMzeGhXNUt3WUNFcG13djRQQ1dodjV6bkdiLXlORU53SkUwLVdZbm9jZzZONUIyZTJ3?oc=5
+2026-03-01T21:16:56.812+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: LIVE ???????????? "???????? ?? ?????????????" ???????????? ?????? 19:30 ?. - komchadluek -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:56.813+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: LIVE ???????????? "???????? ?? ?????????????" ???????????? ?????? 19:30 ?. - komchadluek -> https://news.google.com/rss/articles/CBMiWEFVX3lxTE1kOUZsNlNzSXFIWXAwZGstRl9kaTkzTmhqQmJubk5ubGd0TzA4QmpMWEVKNEFhWjVIUWZ2VExqZDRzVnQtWTVERUxPMnJOaDQyN0ZIWGRhM2M?oc=5
+2026-03-01T21:16:57.496+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????????! ??????????????? "????????" ????????????????? ??????????????????????? - Sanook.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:57.496+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????????! ??????????????? "????????" ????????????????? ??????????????????????? - Sanook.com -> https://news.google.com/rss/articles/CBMiTEFVX3lxTE5qMVotWEh0MmRtejJXZUNyODhCWmdud2lYTS01Z1Ryb1NhbnNGYktyTUlRRl9MNm9pUDR1MWpwenFLWTZzQkdpTVR5bnQ?oc=5
+2026-03-01T21:16:59.109+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: '??????????' ?????????????? ???????????????????? ???????????????? ?????????? - bangkokbiznews -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:59.109+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: '??????????' ?????????????? ???????????????????? ???????????????? ?????????? - bangkokbiznews -> https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1SM01NQmdGTTlhaWktTmpTLXl6ZkpHcUZCZVVUcEh3aHhxU1RQRWQwYUJ5YUFjaWVzRUdQd1NVdDJuRFFaQmJXZFo0ZnlKbnpQWTFtQTlqS1c4ZG5UbjNaNnNHMWYxSGs?oc=5
+2026-03-01T21:16:59.673+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????????? "??????????????????????" ????????????????–??????????????????? - Hfocus.org -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:16:59.673+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????????? "??????????????????????" ????????????????–??????????????????? - Hfocus.org -> https://news.google.com/rss/articles/CBMiV0FVX3lxTFB4ZzItTVgyVWtFaEcxenI5M25wYl9vRG4taGhoLUtDUUZ2bElVamcxb1NOcWdPNXRDY3JKR1JYWWZRNG5vM3NRajFZeVg5ZHk5VXc0NlJlMA?oc=5
+2026-03-01T21:17:00.534+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????? ?????????????????????? ??? 1 ????? ????????????? 2 ?????????????? | Khaosod - LINE TODAY -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:00.534+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????? ?????????????????????? ??? 1 ????? ????????????? 2 ?????????????? | Khaosod - LINE TODAY -> https://news.google.com/rss/articles/CBMiVkFVX3lxTE5URVFOVk04d0JYLXZQc2w2YlJFeER4c1dqSHhMd3lObENsTTlqUmVnaHVGZDhyN2U2TnZNdzNBRXMtN3dtNzdiYWlQR3l3Z0U4NHB4NWVR?oc=5
+2026-03-01T21:17:01.101+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????????????????? ??????????????????? ???? 6 ????? ?????????-?? ??????????????????? - Ch7.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:01.102+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????????????????? ??????????????????? ???? 6 ????? ?????????-?? ??????????????????? - Ch7.com -> https://news.google.com/rss/articles/CBMiSkFVX3lxTFBMSDk1a0hpSFEyRFJobFUxaUZiV3J0eHFEZ0l6VE1ILXlkQ0x6SDNmVngxVk81VmZ0NXY3M3ZGYlQtQkNJY3dqWnBn?oc=5
+2026-03-01T21:17:01.102+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : ? Successfully fetched 28 news items from Google News RSS
+2026-03-01T21:17:01.102+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : Step 2.3: Fetching news from Google News RSS (International Students in Thailand)...
+2026-03-01T21:17:01.102+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Starting to fetch news from RSS feed: https://news.google.com/rss/search?q=(%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%97%E0%B8%B8%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%88%E0%B8%B5%E0%B8%99)+when:30d&ceid=TH:th&hl=th&gl=TH (source: Google News (International Students))
+2026-03-01T21:17:01.103+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Using trust-all SSL context for HTTPS connection: https://news.google.com/rss/search?q=(%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%95%E0%B9%88%E0%B8%B2%E0%B8%87%E0%B8%8A%E0%B8%B2%E0%B8%95%E0%B8%B4+OR+%E0%B8%97%E0%B8%B8%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2+OR+%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%88%E0%B8%B5%E0%B8%99)+when:30d&ceid=TH:th&hl=th&gl=TH
+2026-03-01T21:17:02.188+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Attempting direct parse for Google News RSS (Atom format)...
+2026-03-01T21:17:02.230+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : ? Successfully parsed Google News RSS (Atom format) directly
+2026-03-01T21:17:04.551+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: IND ???? ???.???? 47 ?????????????? ???????? ??.????????????????? ?.??????? - Share2Trade -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:04.551+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: IND ???? ???.???? 47 ?????????????? ???????? ??.????????????????? ?.??????? - Share2Trade -> https://news.google.com/rss/articles/CBMisAZBVV95cUxPWlFXNF9HWk03eTNTN000R19ZMG1JdlRzUUhlV0F6QnRrTWdqRS1WUUZCQVJtY2F3SHBEV2xqWkFGSnd5X0ktVVJ3NDd5YUw5WE1sNDB5R3lralZtS3p5dm1GdmRqanA3OFRvYk1fUktYT0h6d1VoN3pJUkJadFhSaUNDbzZYV3Z3U2ZudU5MeHUxTlpkenFKT291UldpQzJleUIwaDhEOHI2S08tQm9OUVF0Wi1JbFZfRExsMGxrMU1ha0VmRDJiQmt2OWkwR25nWUxmaVBjQi1sUUtZTzVSSFdhUUtnc2dleU95N1ZzR0NKYTBQNXFSdGdvQVBJTEhWMHVRdzFPaVFTRG9hMm83U1REczA0ZGxSN2FGcS1FTWtjZWM4aHBtRmtILVNIZmZZNlRYSzN3dDdEMmV5Z3NyYk52MXpreEZYeFJyVXBCcjVmUVd5ek1zYnRTaW5KY3RaTjc2T1U3Y0NWM2lrcTNGYWk0cjBMLTlScVhQcmFTTDE3OHJFR1NmemdldnUxdVU4UF85cVJGNFlEMHNQMkJKcU5FRXFYcVBOY0JmVG5kQUNuX3FRdFpIME1ZMnNFNHowd3dFZ21ENDA5UzMxc0Y1TURiMzNuNEhuVVotTnNEM2kyVm5xZGNVN1c5WGhxZ1Vla0hMa1hhdUNkTEs4NVE3aHNiUV9CTF9NZVcwdEcwZGF0QWVGN0NYaUhmSGxBaG9kOHNFOWtOMG82S0I0TGtxcDNQVmlaR3RoSnE0VVJIejhNSXFZOERQU09lQVFSUjNweEh0dXZRUUNJQ3htbGs5ODBRRDBydkNTemlub0szWGVVelQ3V29BZG96OWFxaXJDOGpzWC1MSkEwejdNa1gybmhwUFhXS29STXVwNVY1blNpUW42RzFBZm1zdkQ1WktBLUZ1aW5GX0xNUmlOSXlxSnFSbUt6NVBMQkdIZ2ktbWsweTd1UWdRb04wYm5fMjNOWTkwU1JENDdnNjFCSjR5b24xUERveHBpWmE5V1BFQlpnUG44NGRLTjFyS05DQXRYZDY1endmT0VET3FUNm53UDFBYlUtOGpWaXNNbHRhbG4?oc=5
+2026-03-01T21:17:05.351+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????????????????? ?????????????? - autoinfo.co.th -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:05.351+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????????????????? ?????????????? - autoinfo.co.th -> https://news.google.com/rss/articles/CBMiUkFVX3lxTE9pYlY0eG5lNzBmQmhaVkxpQlJCZHRSOVVRZ2FwVkxqaDJmNllZbnRMdEpKc2JtWEw2MzNBbGZyUEFudEpRdFV1YjNxQ21QbTlIREE?oc=5
+2026-03-01T21:17:06.388+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????????? "???????????????????" - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:06.388+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????????? "???????????????????" - Vietnam.vn -> https://news.google.com/rss/articles/CBMia0FVX3lxTE96Qlp4VG9tOG5XRGxiM1BKcHhIMmFXcHRzSUFmVzByaDdORDlCeU9tUVZJbmNWNHE1WVpUanRuMFBIT280dENESUJRWEhXXzFja1FGTE9GNFNmUFZkWm5GLWJ1Vnd4a2RSWGtj?oc=5
+2026-03-01T21:17:07.029+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????? ???????????? ????????????????????????????????????? 2,500,000 ??? ??????????????? 13 - ThaiPR.NET -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:07.029+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????? ???????????? ????????????????????????????????????? 2,500,000 ??? ??????????????? 13 - ThaiPR.NET -> https://news.google.com/rss/articles/CBMiT0FVX3lxTFBSN3BvNmJDb0pEYVdlY0EwcVBWc1pWOVlNUVBCV3VfS251TkdBYW91dlRWSWFEcVJtQnp1UVRtNmE1WUlycFpJX3BNeGRIdjQ?oc=5
+2026-03-01T21:17:08.384+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: 7 ???????????????????? SPU ??????????????! ???????????????? ????????????????????????????? ??? ??????????? ????? ??? ?????? ?????????????????? - news-update - spu.ac.th -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:08.384+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: 7 ???????????????????? SPU ??????????????! ???????????????? ????????????????????????????? ??? ??????????? ????? ??? ?????? ?????????????????? - news-update - spu.ac.th -> https://news.google.com/rss/articles/CBMizwJBVV95cUxQdVV0TmlYZXNYa2JDWHkyd1RpUkpGaUJxbC1obFV4VnYzdHlhMTNfMldoZnkzWHJWbzRpZGhqWm12d05CUDQ5UzhNY1l2MWFCRF80a3hyMVdJdUFJalllX0hIY2hCc2M4UFJBYlNxTGRTeHR0MUxmQlFWWUVTVGVjUXdDZDZPTmlsT2pYbHNuNkxvU2FMUkZhU296cmNtc3dTRk5MV0ZfU1REcm1TUnFJdVktdTNVMGhrZTA1eDhvVnhocVFkUGUxaTQ5MWxUSURfSXY0TGZYa1gtUi1QVHlja19Pa3hEdWM5bXhXZlVZMVpXZTVNbl9GdUpOR2x0ZzY2NmVyRU0tdEEzZDlhQXdLNkt2NndXSUR1VWgxakJnVERuSFBCZjB0UU1hMjZaY2FXeWxvNWU4Tk9iV3BYQmc2WWRucWxGc040NEVyVlF6SQ?oc=5
+2026-03-01T21:17:09.663+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????? - ??????????? ??????????? ??????????????879??? ????????????????19??. - ??????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:09.664+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????? - ??????????? ??????????? ??????????????879??? ????????????????19??. - ??????? -> https://news.google.com/rss/articles/CBMiS0FVX3lxTE5rUXpQUlBiWGozS2ZISk5aRm56SUgydlFmYXVSUThlS01McEIxRnRoaTV5YmVwRmYzYlZBX05HR05FTlZGMjFMYkhHOA?oc=5
+2026-03-01T21:17:10.811+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ‘???????’ ?????????????????? ‘??????????? ???????????’ ?? 2569 - ????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:10.812+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ‘???????’ ?????????????????? ‘??????????? ???????????’ ?? 2569 - ????????? -> https://news.google.com/rss/articles/CBMiU0FVX3lxTE44YlQydThKS1c2RlZVVlIycDZxTmZUek15TElGSDEyaDBrMzJ4TVdEZzVuVm02Mm5UMlV6QzhIWmNVeldQdmRqQmhqOWxOcEUwS1Nz?oc=5
+2026-03-01T21:17:11.938+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???? ????? ???? 1,678 ???? ????????????????????? ??????????????????????-???????? - Matichon Online -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:11.938+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???? ????? ???? 1,678 ???? ????????????????????? ??????????????????????-???????? - Matichon Online -> https://news.google.com/rss/articles/CBMiWEFVX3lxTFBhZVNod2xpZTFJTXJvM3htY2J1SGVyOUNkVEtVbF9GUHptY3NQX1JMWGhsa1Jsc2lzMW9OdEVpYlJZZ1B2eFN6VzN0SHlxQUwxbHp0MGxhT3k?oc=5
+2026-03-01T21:17:12.509+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????-???.27 ?????????????? ??????????? ??????????? ??????? 2569 ??????????????????????????????????? - NBT CONNEXT -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:12.509+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????-???.27 ?????????????? ??????????? ??????????? ??????? 2569 ??????????????????????????????????? - NBT CONNEXT -> https://news.google.com/rss/articles/CBMibEFVX3lxTE5hYlo1NFF5Wjh0NG4yWTNXT0N4cGVzempBLXJxUjROS0hsNmc2TV9PT25MeUsza20tZ0wydjNHWk41Tk1pWHBadFdJdEpqREVfaW82bzR3WmNZTmg3XzNDRV9qM1l3YkdTTHc5dA?oc=5
+2026-03-01T21:17:13.609+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????? ???????????????????????? ??.???????????? ???????????????????? - ?????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:13.610+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????? ???????????????????????? ??.???????????? ???????????????????? - ?????? -> https://news.google.com/rss/articles/CBMiYkFVX3lxTE1HNmJnR1N4U1p0SlF5QjF1YTZuX0VFUmw1dFR6aHdJUHAzWkMtTmVkcjZjaktQUTVvZ1Ffbzl4WGZCcGpKSzRjTlJyVFl3bFk2TXQ5SXdBRHpmZVhiUDJHVFV3?oc=5
+2026-03-01T21:17:14.371+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?.?????? ??????? ????????????????????????? ??????????????????????????????????????????????????????? ??????????????????????????????????? - ??????? ??????? 2568 - ????????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:14.371+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?.?????? ??????? ????????????????????????? ??????????????????????????????????????????????????????? ??????????????????????????????????? - ??????? ??????? 2568 - ????????????? -> https://news.google.com/rss/articles/CBMihA5BVV95cUxQX2V0TmdncUdIOEdCZFdiQ19RVnBVMERZMVlXaWtUem1ubXJFdF82MTQ3aGdFN3NfbGhhUzFxMDdad1F6YmkyRW9ENC0wMUNmRTFBUGFDT2txNTZCVVYzeDVFSUtiQ1ZWaEhQWW1ic25LNU92ZGFqOXFyb1M2Zjl4SmN2YWtYMlkwcW1wenJ4bmM5VXFfTWU2ZWF0YWs0eE05SFJnamk3N3F4R2Y2aDg3djd6T0liSVJraUtHeG9rS09vb1dsX0ZCMHFxRUZ1R0g1VE91WUlhM2RwbXdMajZMdWlxR19OZ0dQQTlRcXJ0SjlMc3gwSnA5MlZidlZNaGZCc0ozWmxrcGpldnc2VGtpV2Z6bDZEQUEwNjAwVlh3UHBQNDRfWEhGOXRJWGE4U2tGMHB3NDl1NVZwVnhCTWV2Z2dZUmxhLW54ZkF5YnpCUTNGa0xmTW5ncjNSR05yWmVvRkptQ1BtM0hSVWtBTS1WUnBtQXA3NU9sZnhpQnBHUTNBT1Q3TjVGZkF1SHN0VFNiLURBNVA2djliX09XTHl0UHBVQWFLbnl5ZC1SbnpUcnhVSEVQM2xuaFNveU9rcTFHX1FfWW1qNGMyR19TZ2I0Z2hhV3pyN09oR2xvYTJfcm9NSXphdUtaWlJxRG0weFhKM0RfeHlPWXlGZkdMYTlrend2YTlONmdRYmduVGI2bkhqWGtMZFo5RmZITkVMdDBSaGNSWXVnQ0JmekRUaVJfN3lNZ1VsVDZQM0QtajgxWHJQclZEYnJLV1QyV2pXXzBMOXl3ZTQzZm1GckZVMmNfTk9KSWpyOHpoR2o5RDMySTUxMFRORGpmUXF6THVtbFNMOV9UNUpqV2JMMlpaZ0VsUmRDdjBZbHR4WUhMbTBYWWZfWDQxa3FNNU1NOEx1RDhyVnJBUVZzTTBwVnNic0Ywd3B3eGV0RzRCWFlsZnZJcmFPRkJlMlVnLXdHNUFjcDFfd0ZPdTFscXFDMURoT1Vrdmw3dWxMVGJET2VSdlo3Z3BTVDlYWUZGVW5TSU1aUFVzVDg5anpBdy1hRHhfbFNvNmlvZUNQZ0RFQUF1VkctY2ZCUHdBTlJiVkRzME9rbk1ON21MREktN1UwSmhoY3pXaTM2ODdoaTlwWjg0R1hLS2lRdzlaSS1ENThhaWN1YXNIOHNycE1NMGhFTnVzSjlNMWF6RnlrUUxJbjI1M0V5TDBsVG9YakpmZ0swblpwbVRUUUt2dFpBODRSejdpZjVBS3htUk1XNVU3cWtJSUZZcXg4aU41RDBQejRIOEx1d29iNmxiTkhrb25vcDVkZlJCRThkRXRUYWcxcWpUUHduRHIxSlhQR20zV1ROeUxENXRuSmlqSDdLZUEzM2R2U0NEX1JSbXZLdlBoaDgxSGk3aGM2WjZld20zTHJNeFNjZG9hNHE1cjBrTXZ3VHdoV0stdUhkT19TenFyT29DZy0wSmNGcXQ0ZXBWcURMQ1FMa25WUkYwckE1M0NZSDJCWF9lYkVkMnJNNFZhaThVS1d0MTdmckE5TjF1TW1laEJUUG5NTjVhTkNXc0xiamhUQ0hZLTJOUmh2em56UFhId1hGREVfZXZfSjdiajVtekpydGtVa0Y4Qmk5aVkzMlVsVnhFZnpWLUg3Ty1yQnNHeXdxN1ltQ2tkU2NpbGNkUlRDYk1LcGxPNVJhRGk0TWtMT1NRZHZOVk56UzJzY19ZSTVvdnJVLWNRc3VIa2hYc1dwSHRXVXVpdFUtd0FEM3JqbjNRU2RzeWx0NXd4cXFFeXRlLU5iT2NSMjRHSFptYTV6Tk9xb2o1emV3eHI0dXo3ekZBMVd6NE91SFhFMzJBTk5XcWxnZGFFZWJpQ1Y5R1gyZVUyZ1ZiMWN3cWFsTm9HeWV5X21FVFR6cHQxQmtDSWF3XzB5NjV0bmFVeWZXdENGa25lNTNOejY3UUl5V1JFYWxraHJxSEVmcHk5Z3VuX2c0bVlPLXozcFM1Yk1WNnVMeUlXT2NhM0JSZEFzMVFNdGZJRzl5TFVEdDNUYnoyQkllT08yWEIzS00zM2xGbWJkRHBRSVdFdHFYbXFLa0VQUllZdTVKOTlaek9zY3N0LThBY0c0azJGVWF6TkxNdHoxT2xOc0R0OWpLd05IX3hVOW81MXloTVp4eGE0SklzU1pOTU9iMlQtZm4yQlpKVHFsZmk5SFZKVjFSOTh1bTJQdGFRUnZURHdKcFBMVldPQTRFenhvcXZiRVBsVnhhUHFGdTVCZFp6X3lNT051TW1nR3dva0dnSGFjLXJyV0FCUk10MHM1TG5jeU42V0dkTkg4NXpSSlFER1FadXFfM2pxQlVKeGo3eVAwdzI2MVJNTWpsUzhjaWlWSGZRTURuV2VyMTE5Zkp6Vg?oc=5
+2026-03-01T21:17:15.308+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????? ???????????????????????????????????????????????????????????? - Ch7.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:15.309+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????? ???????????????????????????????????????????????????????????? - Ch7.com -> https://news.google.com/rss/articles/CBMiREFVX3lxTE1sbzRHZkJvdzQtdG04c1VkNDkzbnJpVHJibDRNelMybjNmTUc0a2RHc1pocVdqbjZrazNKdElQZUJ5aEdj0gFEQVVfeXFMTWxvNEdmQm93NC10bThzVWQ0OTNucmlUcmJsNE16UzJuM2ZNRzRrZEdzWmhxV2puNmtrM0p0SVBlQnloR2M?oc=5
+2026-03-01T21:17:15.914+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????????????????????????? ??????????????????????????????????????????????????????? ??????????????????????????????? ????????????????????????????? ????????? ?????????????????? ????????????????????? - ????????????????????????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:15.914+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????????????????????????? ??????????????????????????????????????????????????????? ??????????????????????????????? ????????????????????????????? ????????? ?????????????????? ????????????????????? - ????????????????????????????? -> https://news.google.com/rss/articles/CBMiR0FVX3lxTE0zaEtPVzU4UEM3eEZRUG5QVjZXbDhodVhoNm1kYng1ZERheWs0Y0dHbjdmUTBwOUw1djE4ZXVCWkdhT25Vd2M4?oc=5
+2026-03-01T21:17:16.776+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????? ??????????????????????????? ??????????????????? - ????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:16.777+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????? ??????????????????????????? ??????????????????? - ????????? -> https://news.google.com/rss/articles/CBMiU0FVX3lxTE5XZDZTSkg4eWt2WldhTHVDSGZEcG9CeWV4bU1PdWhoZThjV19PdmoybUlwemZZaU9RLUdVUUxZallqQl9Mb0ZfMnlObGx2RVpwUFNj?oc=5
+2026-03-01T21:17:17.724+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????????????????????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:17.724+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????????????????????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMikAFBVV95cUxQanEySjBTam5HbHE1Y2VkWHZhX0huTk0zbWdOZzd4cGd3VnNqeVpTVWxfOFpDMEpmSUoyNkdoTEN5ZmpVMnVjVnBUUnVpYkVjR1RkLXVnMmFFaVJKQl9kWVBncDVrT05OY05iREE5T19EN2xuM1poZ1VyREhKQjlzUGxBMUQydTVTWGgxNERPYzE?oc=5
+2026-03-01T21:17:18.497+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????????????????? 150 ?????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:18.498+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????????????????? 150 ?????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMimwFBVV95cUxPUVdHRm5nTTM4UE4tQlRnQW94MDFXUTN3cUNrSk5QbVptNXBzR3NOcnRtcTBrdjRaNFo1NEhQbURNWFlPWXFKMkJEWmxQWlVzLXM1cVZlOWdvYkFKaUhSc0xpWTZrNlJNdVRVVV9YVHZPVnBzWkZadHB4MndaY2ZwTEh6dWZoWnZsNWNWbjRRYjRlWHUtaXdlU0dXWQ?oc=5
+2026-03-01T21:17:19.063+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???.2-???.-?.?.?????????.?????????? ??????????? ???????? ???.???????????? - Matichon Online -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:19.063+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???.2-???.-?.?.?????????.?????????? ??????????? ???????? ???.???????????? - Matichon Online -> https://news.google.com/rss/articles/CBMiWEFVX3lxTE1Xdkk0ZjNKODlabW1rd2tGYzdvcWxjeHZtSmJadlJ6VGN2Y2xLX3lmbmpaQnd5U3BETmtXSm51RnY0SmFKSXNBd21QdlpjR1U1WjJJVld4VDE?oc=5
+2026-03-01T21:17:20.067+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????????????????????????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:20.067+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????????????????????????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMifkFVX3lxTE1hVVcyWkMzUDIyeXZwc1czMGF5S1RzUV9BZWVNODhfcGlYR3dOZ2ZRUVpEN1c3UXI3Qy1WdDJ5UkQ2Z0ZLYnMxYXFBYjM2d2haUmlTdzFFNVF1TUE5VlFDSnB3REhZbUVGM0lOZ3hzd3VnSzYxRWxvTUozNDBTdw?oc=5
+2026-03-01T21:17:21.028+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????????? 10 ?????????????????????????????????? 5 ?????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:21.028+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????????? 10 ?????????????????????????????????? 5 ?????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMiiwFBVV95cUxNWWZCdi0teFlNbFhyR1VLTGVxSFZULVFOZEZOQ1BwVzhYUVB5cDlmSTRjd19RbDhfVU4xZ05YRjJYQUVoZER5MzU0ckVMUllISHRBMzFhTThBUGJfbzRvTVotR3VtTHhEU2dLUE9wb1BQMnNrbzhIT3VQVU5wNS1nNmZ5bHlVT29ySWxZ?oc=5
+2026-03-01T21:17:21.579+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????? ????????????????????????????????????????? ??????????????????? - Ch7.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:21.579+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????? ????????????????????????????????????????? ??????????????????? - Ch7.com -> https://news.google.com/rss/articles/CBMiREFVX3lxTE5OWGM0c1BKclMxWWM0N3FPbDVmbUZIZnFKX2Z1T2czc092bVFTa2l6aUdxWWpSbG1Jb0VFeWU4M0dsZVho0gFEQVVfeXFMTk5YYzRzUEpyUzFZYzQ3cU9sNWZtRkhmcUpfZnVPZzNzT3ZtUVNraXppR3FZalJsbUlvRUV5ZTgzR2xlWGg?oc=5
+2026-03-01T21:17:22.149+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????? ???????????? ????????????????????????????????????????????????????’69 - ??????????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:22.150+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????? ???????????? ????????????????????????????????????????????????????’69 - ??????????????? -> https://news.google.com/rss/articles/CBMiW0FVX3lxTE1XUXF2amJzUXhxbi1WY1BkclhvQU43RklhNzVmSnBiY0ZScWszckg1RXdlaGNPNWdJMTRBd2NZc21oRnRnWUZyZVd1a0VTQWZkcVZlZkM0d09kU0E?oc=5
+2026-03-01T21:17:22.730+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????????????????? ?? 2026: ????????????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:22.731+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????????????????? ?? 2026: ????????????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMilwFBVV95cUxQMHRBamNJcnh4aXprT1FGdGxJMWhSM3RpdlM1U2xyblgtRkFJU1NLeDFUOGpydkViTUFNcS1uWG9IMVg1RlB4SktPNzlDaFFEd0pvNlVNMktkQ2RCT1lTWTZpR1RsWWh6clFXS09pYVozWjZsdkh1QklTYXg3aVQzSkdEeHdIYXZSTGNMM0ZUc0ZEZVBpZmgw?oc=5
+2026-03-01T21:17:23.261+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: “??????????????? 8” ?????????? ??????? ??????????????????? 19 ???????????????????????????? ?????????-??????????? ????????? 300,000 ??? - news-update - spu.ac.th -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:23.262+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: “??????????????? 8” ?????????? ??????? ??????????????????? 19 ???????????????????????????? ?????????-??????????? ????????? 300,000 ??? - news-update - spu.ac.th -> https://news.google.com/rss/articles/CBMisgJBVV95cUxORW9iVG81V2dZYkJXVFlUdFh1aGNrVkhFbkl3YVVONC1CMXF1VEJjZ3VKZVJ6Mjk1QmcyaGRRd29MSWN0cHoyTzI3eUFhek5KLVZ6WF9lOVAxaXlneXBydk5vN0JvX1R6NkU1QUZhSm1nR3ZBQjI2eWhHLXZscjAxVm9SdjZGajZTUjNZT2VQaWpxTkhxbWVHN2pDVzIyekFobjFhRDRlbnptUFI0QmNPQk5KallGY1dpSFhCM0thS2Y0Y254YVllYUU4amwyVGN5TkE4allkb3BONU43VmtDOWdDaUJCdkZmSTNWVG5hWXdmYm9SVTdSTXRrbXVjeS11RXhwTE5jOUg2b1pmbko5MC02dDBmTURISGJZTzJkckJyQnJFUmdlTlR0a3M4NGI0Q1E?oc=5
+2026-03-01T21:17:24.033+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????????????????????????????? 523 ????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:24.034+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????????????????????????????? 523 ????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMiiAFBVV95cUxNcjJmRHd3VXRYMG1ONWs0UTA0Wk5ZTGM0Zk1RWHptVU9ZNVVlRk9sdnV2bmRyNTlIUnJyQWlVam5Ya3lFd0czWW01bHlhdkp2Uzk0WHE0YjYxYy03X0l4TjhqRndHSG9EaWh0bnVYWnhVcHhCQ0JsR1FXdDMyTlNBQ0tFalAxNExV?oc=5
+2026-03-01T21:17:25.574+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????????? ??????????? ?????????????????????????????????????????????????????????????????????????????? ??????????????? - Ch7.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:25.575+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????????? ??????????? ?????????????????????????????????????????????????????????????????????????????? ??????????????? - Ch7.com -> https://news.google.com/rss/articles/CBMiSkFVX3lxTE1YYkJKeG1OQnVVVEpRcFRNYlJidVBrYkhGcWg1LXN4VXpOREtVdHY5clhFS3ZnX1oxeGNBdzdoWHZVWnBKbnVMM1Jn?oc=5
+2026-03-01T21:17:26.310+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????????????? ?????????????? ???????????????????????????????????????????????????? ?????????????????????????????????????????????????????? ? ???????????? 1 - - WeAreCP -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:26.310+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????????????? ?????????????? ???????????????????????????????????????????????????? ?????????????????????????????????????????????????????? ? ???????????? 1 - - WeAreCP -> https://news.google.com/rss/articles/CBMiT0FVX3lxTE9iWjZ2dWVTa1lHR3JQRGhaQUxLaXUtcmpPdEUyWnlhVEpyRXdGc0ZDOEd2cDlndzNuc2JacXc5TmpXRHYxeEdqanlJNXo3NjA?oc=5
+2026-03-01T21:17:26.990+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????????? ??????????????????????????????????????????? - Ch7.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:26.990+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????????? ??????????????????????????????????????????? - Ch7.com -> https://news.google.com/rss/articles/CBMiSkFVX3lxTE1ycmE3QUw5TTJrcE5ybFRYemk1WUtIZVQ0enExRjY2OEpGUWpIdEE3d19vbjYzSmgxVU5OeVUyb2xXSk0yVFUxbU1B?oc=5
+2026-03-01T21:17:27.617+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:27.617+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMib0FVX3lxTE5leHo0UjBKTXd4NmJrV0NjNVdYOUlZTDdYOUdUMG1Wa2xQMHhlYkdfSW5RaTZFSkZyYkJiVVdPUVhVcXZQN3dGWlRzS0ZHS0FEZlJBQUpaM0swMFJ6Zm15YXU1d19QVzcxb2pmNzlUWQ?oc=5
+2026-03-01T21:17:28.630+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????? ??????????????????????????????????????????? ??????????????? - Ch7.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:28.630+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????? ??????????????????????????????????????????? ??????????????? - Ch7.com -> https://news.google.com/rss/articles/CBMiSkFVX3lxTE5uSU9ZTU1TV25QWGFleFVJVXpnclZqYkpQbEpvLTAtU3BrRmJpWlcxc1VfX1p4eEZNZGFWX0hXRmlQVGEzSW1tQUFB?oc=5
+2026-03-01T21:17:29.301+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: 4 ?????????????????????????: ‘??????????????????????????’ ?????????????????????????????????????????? - ??????????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:29.301+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: 4 ?????????????????????????: ‘??????????????????????????’ ?????????????????????????????????????????? - ??????????????? -> https://news.google.com/rss/articles/CBMiYEFVX3lxTE55SlR4eVpZRVQ1M1N3TzJjaDdFcTUxREdjd19oRHFrRVU0SmlJYWljdndLM2Qzd3F1Z3RXRlo5Zm9vQ0g1Y3RFYTBVQlpSYnVQOUcwZlN1c1g0UWtBNFp4Yw?oc=5
+2026-03-01T21:17:29.848+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????? ??????? ????????-??????????? ??.?????????????? ????? ??????? 3.3 ?????? - ??????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:29.849+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????? ??????? ????????-??????????? ??.?????????????? ????? ??????? 3.3 ?????? - ??????? -> https://news.google.com/rss/articles/CBMiVkFVX3lxTFA1SnVVX2pwVW9iM1ZDcmxMSWlhNHR0U3gtWjJzajhKTGNhaHY5Q3RPRVFNM2FFT0JwV3E0Y0dEbWJsOVo4dGhZMi1kU1Mydm85b3pfREFn?oc=5
+2026-03-01T21:17:30.654+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????????????? ?????????? Gen Z ??????????????????????????????? ?? 2 (Youth Groundwater Guardian) ?????????????????????????????????? ??????????????????????????? 60,000 ??? https://www.fm91bkk.com/newsarticle/67238 #??????????????????? #??????????? - facebook.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:30.654+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????????????? ?????????? Gen Z ??????????????????????????????? ?? 2 (Youth Groundwater Guardian) ?????????????????????????????????? ??????????????????????????? 60,000 ??? https://www.fm91bkk.com/newsarticle/67238 #??????????????????? #??????????? - facebook.com -> https://news.google.com/rss/articles/CBMi8gZBVV95cUxOZG55LWtudHBHY2dCMDYxVUlvNmRyTkRwWlgwZi13eXdvcFFVNkNkWklBMVBoV2YydkF3b0s0Z20zaVJOZlNoSmVfN1dzczVkOXo5TGdzeThyMHhTMlBWbTF0TlZ4MjN5QXRRUXBxczVMZHB3U1QyODIxMDRBeWUxV1UwYk53cnJxYV84S19LZHprOGRQV1RzSU91eGswMmw2aEZZOGNhNlo0OUUxTTRkZ0hXeVpsRklUSXQ3RWZIMjBGcDNhOUNSazg3TzNhV3J6TXBweERIZ1p6LXdYU2FCM2ItN0RIRHpqVmsyODQ0aUhhOVJBc2RNUklmaFBXQUFBLXItN1pUeU9rbW1jYlVaYUJWQXlnQ2tDZHY0Y29NM3ZJa0pNSVdCbnZxYzhUNWVjanNxZGNmajRxN0pqVTJfTUZ0bHFUVS1EaVlLbnMtMXExc281ZG1sdTJ5QnhYajJUcVA4ZUFLTlhManFBRWVnTXdoaDU1MWxqSlRiRjV2SGRUSFJOR3ZBdTE2dVBQcVhTbzhPdUtVbkV6SFBTb1hCUHkxbmpFYlRxaUNvVHJ1bnBlVzNlV0ZYTXlMZmRLS1ZReFdlQnJFSFN1OFUySWVzVHdxMVNBMVRiNjRkYnVlNU11cXF3bV9LVl9hSTlybERiUWZKZ21MeGtxXzRmclJqWGZHRWZ2RFFENVFXRlhDSVExMHZiNzFJcnFlQWZFZGhvaGkyZmQtU2p4a3Jxc3IxQU05WmlvOFd3bWw5X0ExVWZESHI2MGEwUS03c0FwM3pGdjFwSG8tR09zbWpobmxMbFVpZzkzMk81NU9rUUstQ3BMd1JVNkNKQVE5YXFuRXJzT0xKNGtwYmlEalpSVmhWYkZweVV2cWVNX1k1cEVobVJsaVJKSHl5TkgxNFlmT3hLMXR6emFJaElqaFQ1a0hLZWNKbE5DVktnbDlJbEZCVm8xTkZRVlh1WF8zMGNyLWVQMzRNZzZzMkhBeko2MTgxNC04Q2lKQmsyZGdqVVd1TTZsSWVtS1dOM2FjNk5Edk1JV3dWRWF1OUI2eEV1NV83UTVyWEhReHRoSUJtUlVBb2dCUkNWYVdzRlJpb2RuNHZ2N1N5T2REMzNrTzF4ZG0zR09CZU9qV1JjVTl5d0ZWLTdlakxmRk9pY2R2S0w5bUY2QWc?oc=5
+2026-03-01T21:17:31.208+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????? ??????????????????????????????????????????? 2026 ???????????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:31.208+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????? ??????????????????????????????????????????? 2026 ???????????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMinAFBVV95cUxObVdDcVZBTWxveUlMYkd0Ukh6UnBQa1d3RGt5OUcwU2dLZUVCUG5HMU5CNGNLd2dFdDZodkJ5QTluUTFFTkdaLVZLY2hoanpsOGNSNzc5UWlZUU9ZUkhJWkFMVm5fdDdDcE9UaWxsYmJiQ1pTMzlZSmxyN2lBY0Q3MWpVOXhzTmZ1cTRDUXdHdnpKM25HeWVIQXhoX1E?oc=5
+2026-03-01T21:17:31.864+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????????????? "????????" ????????????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:31.864+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????????????? "????????" ????????????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMioAFBVV95cUxNMFNIMXpuMElLSVVrUzZQV1FTSUJMRE9KZnNCMVVkVXkwek9VVVJDbDRPUHJXVi1jMnVHMHRyS0Z4eGd4TE5Ea2VhdW9BdHpIWm5tNHJVbGpWY3lIVkZEakZGV1JTd2RUNndLRUNXdUtleUdISmZDUG81V1RhV1o2LVk5b09WWjBsNGZvTVFaWjNuZmp6T1NfbVpObkVaU0Zf?oc=5
+2026-03-01T21:17:32.975+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????????????????????????????? ????? 2026 - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:32.975+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????????????????????????????? ????? 2026 - Vietnam.vn -> https://news.google.com/rss/articles/CBMid0FVX3lxTE9vQXFQTWlEaS1YRXRHdGh2TTU5aXpQRF9JS2hvTWVzaEFaUmlham9UTlMxT2c2V3QxV2xQX2J5dHdFY3c3bVBrZmxPUDdKek9udkdvQzVlSlpVRmhHdHVwUUk0ejJ6WjVwNVJETXNBeExOS2VOZmRr?oc=5
+2026-03-01T21:17:33.596+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????????????????????????????? ?????????????? ????????????? ???????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:33.597+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????????????????????????????? ?????????????? ????????????? ???????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMirgFBVV95cUxNOU1RdmZoWVdfZHhaTnBSRzlXQmdHSmxOV1d3MW91N3o0ekR6ekVLeU1fNkk0VGJtNnNxNE1MclRUcWE4ZndSWkFvT3hiT2pvZGRDUE44clZiaUpoNDNWX29LZ1cxN29hYy0zMjBnTGhCNE5LX0ZoTWNHZXRDczVpMmZFRkNNMkhmc1YwT2Y0Z2VFVWx2MHJjbnF0amdybDlSSWVjSzJISzFETjlRTkE?oc=5
+2026-03-01T21:17:34.189+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?????????????????????! ‘SCG New Gen Scholarship 2026’ ??????????? MBA ?????? ???????????????? - Dek-D.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:34.189+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?????????????????????! ‘SCG New Gen Scholarship 2026’ ??????????? MBA ?????? ???????????????? - Dek-D.com -> https://news.google.com/rss/articles/CBMiUkFVX3lxTE1tWU5iWHJzcUMxdWFYU2FDb05DM1ljWmh3dUVzMVYydGlrRWhKT25zMTZDU3JqYVZjSHlIcVBmblFHemFtN0JINC1CXzk3enZ1Ync?oc=5
+2026-03-01T21:17:34.991+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ?.??????? ??????? ?????? ??.?????? ?????????? ????????????????????????????????????? - ????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:34.991+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ?.??????? ??????? ?????? ??.?????? ?????????? ????????????????????????????????????? - ????????? -> https://news.google.com/rss/articles/CBMiU0FVX3lxTE9fSFNpdG54cENwcDVMZ204VndlcXhCY1lNYTY2Y09yMUVwLU5yU3piN3FwcGl0MGNEeXAtcHhuU3kzbENoZ0otcXl4V21ubUd5Z05N?oc=5
+2026-03-01T21:17:36.217+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ????????????????????????????????????????????????????????????????? "??????????????" - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:36.218+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ????????????????????????????????????????????????????????????????? "??????????????" - Vietnam.vn -> https://news.google.com/rss/articles/CBMipgFBVV95cUxPWmV0OFVxdndRNWRDNjY0Um9KejVSNjl3TzN0ajlnQWJxVTlrTWhNejJCYUVfVkg5WWRtWm5SN2xSeEVpdE5xZldsYl8yQUNUUmRnbnYtZThnUmZMa1lPekl6aFlMdjEyUzlNQUNZeUVlQmdHVjQ1dkF3eUZDOEhhdHpFRkRMZXhLTXZKYVFGSFhreTg3amY0VklWMWs1TlM2c1ltV1hR?oc=5
+2026-03-01T21:17:37.190+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????????????? ?????????????????????? ????????????????????????????? ?????????????????? - ?????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:37.191+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????????????? ?????????????????????? ????????????????????????????? ?????????????????? - ?????? -> https://news.google.com/rss/articles/CBMidkFVX3lxTFBDSHEwQTV6eDJ5RGtBZHJlUEdYSTk2OFVhOWUtYkNlTWY0dGs1bk5TMVg0YmtxRTBsVlFud0ZIOXozcmNTVU5XYmpTbW5BTkVoVHp6RExJcXVSazVDbjNlbmxnWjNnWkRGT0YteHhDcXdZWG93cVE?oc=5
+2026-03-01T21:17:37.856+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????????????? ?????????????????????? 16 ???????????????????? - Siamsport -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:37.857+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????????????? ?????????????????????? 16 ???????????????????? - Siamsport -> https://news.google.com/rss/articles/CBMiVEFVX3lxTE5YSWpoUGtfS0UxMmc3OGN5LVliUWtjYXppUTl1YzFCQW5XTkl0eXcyNFhYVkx4cHdmUE5XOWJPOVZySE9uclZQZXk0S243bzdheW5EMQ?oc=5
+2026-03-01T21:17:38.573+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: “???????????????????”??????????????????-???? ???????? 16 ??????? 3.3 ?????? ???????????????????? ???????????????? - ??????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:38.574+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: “???????????????????”??????????????????-???? ???????? 16 ??????? 3.3 ?????? ???????????????????? ???????????????? - ??????? -> https://news.google.com/rss/articles/CBMiVkFVX3lxTFA0Y1l3a2YyczY2alM2Z1REd1EyQnRzNW1pSFpnV0V6U3htamVCT1FFYWNPcHVpZHh6Q1l0SnhPd3BXQUdpVHdnZ2xOZnhkT3JubEw4RFJn?oc=5
+2026-03-01T21:17:39.260+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????????????: ???????????? AU ????????????????????????????????? ????????????????????????????????? ???????????????????????? - ???????????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:39.261+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????????????: ???????????? AU ????????????????????????????????? ????????????????????????????????? ???????????????????????? - ???????????????? -> https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1Ud08yZXRqTTNMaWp1UTJkcUFmWVFUUjg4RHFWaVBOc3lhVTUtTUhobzVYU1JqZU1rN0VxYUZqUHpWZ281X2t0LUxhSE5vVU0tdjFyRERBbFU5TnpmYnJ2aUNyR2Q5aHc?oc=5
+2026-03-01T21:17:39.976+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????????????????????????????? 2569 ???????????????????????????????? ??????????????–??????????? - NBT CONNEXT -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:39.976+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????????????????????????????? 2569 ???????????????????????????????? ??????????????–??????????? - NBT CONNEXT -> https://news.google.com/rss/articles/CBMibEFVX3lxTE5yWGcyRnNGMTVfTUxEaEV1RlZXT1Vjc1ZNbWl2LWh1czM4S291R3Jac0VyWDFsa21PWTVPaVRLYU5UaU0wYVkxMVNZZzJvRklIM055NkpWY0pyci1BMlJpSmlNTFRaT0J5SXZwaw?oc=5
+2026-03-01T21:17:40.653+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: #?????????????????????????? ??????????????????????????????????? ??? #?????????? #???????????? ??????? #?????????? ????????? : : ?????????????????????????? ???????????????????? ????????????????????????????????????????????? ???????????????????? ??????? 69 ???????? 2 - facebook.com -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:40.653+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: #?????????????????????????? ??????????????????????????????????? ??? #?????????? #???????????? ??????? #?????????? ????????? : : ?????????????????????????? ???????????????????? ????????????????????????????????????????????? ???????????????????? ??????? 69 ???????? 2 - facebook.com -> https://news.google.com/rss/articles/CBMihAhBVV95cUxNWWRRSmtGX3ZWTHpKaGZRbndqaW5RRkZpVUtkaTE3SkNQNVdjNERwNWljbnFOVHhzR3RSYjFRVUZ6X2xRTFhVcFFydzJlRGZ0SFlpdUJtUVZPdmpIeDA0bG8yN1d1Z1JpSV9DZERUcVh6dUZmSDlIc0tBZkNWSGQ5Y1hQOTFWSC0zSDR5MzQ3ZEp5aW03N1JJSnFkQWZPa1BXWXJnSFBsOVR0NkRRcmRMVFpmdEV1LVhrbndsaS0zc1hTRkgtWUM0emNsV0xnSXA5V1dzb3FPbVdBSS16ejY1cVJ4dGpVVV9MbkxKYWcxdlpua21ocU1fbGprZndTVGhUMXhsYnY0VVg2ZG9ZbzNzaVhoM2EzRkxlNXNuaGwwaFcyVkJkeHctYzFTb21JaHR6blFsdEdJa2tlUVdfbnJZcnRYejlRNWFoa0pTYVY4MXFPckFrSXU4bzRMc0QtNGFzYnk4MTlOR0diT3llUFJ5WmNPTUNVck15RmZNaHRzLVVkZGNZLWREOTU2RmxUaVR0VW4yN0ExY2FEU01ISnpPQVA2V0NucXpQUHhXQmdwaHpUeGZsQ2FKNlZFR05rOFUtOGt1Q2d0WkRIU0FkcGxOU0x2WjJpTGJ0OFRETU5TNHRfSUR0NGJULXFGdTN3cV9RYVBUd3hmMU9jOEtYTVFDVW9BNzRRYmtVNUFzekpfRmlNQldnX2RqVktZUFBLcEVvLUs5cTJMaGUwcVBoeTNXTm1MQld2LWZHeWpVenl5em9oem1faDNSdWpTdk9JLWphSXBzd3FkY2hfdjhaUnBwRzZ3ejgzVWlKUHhRM2dfczdWanNtcnZ5VXNuLUl5UDRGZ2RtUmowaFhSU1hEVnZiZExrTzZpWEM0eFdSSWFuby02VGtHVTdCQzBsN0xZUmlXY3REYUVuYl9PdE5ZOVJXd284Ymw3MERuMUhlcWJ1djVCRmZmVXBmMi1EUGU0aUJLSUFEMjJKWnRnTWE2OXQzYXRwUnQ1Yks1SG91czZlanJqZHRVbWdTaGVYTjNLR2UzaFN1X19YR2V0cVQxa05ZaEVEVmFVU2psUFdKVXY5Ym1WX0FJT3hGYzg3cmlCMEIwdEJJT3RNbEZPV0RRZWI2VXVWcmVfX0Zkblljei1OUW11MmthcVM3S3RoNkEwZVA1VXFMXzZyVmk3a3FWRnVDTnhJbDdyM3FLZjBJYS1idTdjSHdVWTBqc2ZVb3lxNnljcjU3TmhDWEVhVjQzQzhGWEtXNjhmM1JUZ0xHOFA2SEd3dnlkb1FuZk9RT1IxZnpqY0t1OFcyQmNseVNiTTBKWnJzLTJZOGN0RjFNUU9lMGdYRHZwb3d4dnJCMC0xcDRBc0pFSA?oc=5
+2026-03-01T21:17:41.637+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ??????? ????????????? ?????????????? ?????????????????????????????????????? ? ???????????????? - ????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:41.637+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ??????? ????????????? ?????????????? ?????????????????????????????????????? ? ???????????????? - ????????? -> https://news.google.com/rss/articles/CBMiU0FVX3lxTE1DRUhsa3d1ZW45MnVxRmdab0hFZVVISnJudHBPMkplZnVldTQzb1ZhNXBUc1RFZlgzUThDM1Z1a0wtQTBiSVh0TkJvNlppcWxiRG40?oc=5
+2026-03-01T21:17:42.515+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????????????????????????????????????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:42.515+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????????????????????????????????????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMiqgFBVV95cUxOWC0tLThlWldrTUNUWVlaaVZSdWxTVGd2c0NSTThxdGI1LUY5dFJhQWNRRllaTzhhZFJIRnB0amRtT2diQXlxc25xenNuVDIzUGItenJTNU1Vb00yd3ktNjh5VVRjTkVLMGdWNDV3WW5ib0h1Nnh4M1ZtUjNkVXJiTEhkVVJJN25OY1dlZHUtbzVYbVVVR0ZhZS1VNFc0aXpmaklzcUNtOFBUQQ?oc=5
+2026-03-01T21:17:43.263+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????? ?????????????????????????????????????? ??????????????? ???????????????????????????????????????????????????? ?????????? CSR ?????????????? - topnews.co.th -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:43.264+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????? ?????????????????????????????????????? ??????????????? ???????????????????????????????????????????????????? ?????????? CSR ?????????????? - topnews.co.th -> https://news.google.com/rss/articles/CBMiT0FVX3lxTE5HaDJZMGZnbllLSld4UkhBNl9JTWw2S2dQZXJPRUFqemE5QW1PS2tSNXN3WWZZZDFZclEtYWFNMFlTSjBsd2NpNW9nX3EzUFU?oc=5
+2026-03-01T21:17:44.061+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????? AU ????????????????????????????????? ????????????????????????????????? ???????????????????????? - ?????????? -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:44.061+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????? AU ????????????????????????????????? ????????????????????????????????? ???????????????????????? - ?????????? -> https://news.google.com/rss/articles/CBMioApBVV95cUxQNjhCMWpaMWRyazY1QmhhVm5YMXFuNGo4UERDQUQ2aUUxQldGRTZiWGU0dm4yMU5QdXBQdjlEd0RjcmczNVpaWkkxUTBhMnQzSmFXb0VKU3VfT3Y5WTR0cTlBNlgtY0hkb1NhMVBSZlg2Qlh0MDQyU0pxa3dwWDJ4SVhJYlFlMXNSTEJGYlR2R0MyVnN6LUZSbmtWWGs2NHhjWjFhejFUTElzVkRDRHh5N1g3bVpoaDR3R3ZkQkRzVEFPMUowbk1KNG5Yem9aQUNiOVV2VFFHRXA1Vm1vVnFRMzZMVFpHUFhZLUJibHh4d3NuTmFJbW4xaGRXWWM2UHY3c254bUtQdlVYS3dmeVM1eEMxRV9sVXR2M2VfWE9TNUNLbHh1YTRIczNLNDEtbE1xc28zS2NyLWt1Q2pKS21WMklHQmgxdzgxLWhoV1VwbnQwRmtpdTRaWG02bmh0TGtPeVlvODY0OW5Gei1MTTFDdFQ3R3B6SW9VRnp0MkNwM3NjdWdrNUdMSGRIRWpydXczVTBUTnlILU5xSFUxUjg4N0MxYlAwV2VMMWVDdjJ3UHM5a2xqZzN2eXhyYUpqYjNlOE5HbFlkcjU0WGI5alI1b3YySlZ3all0OTZIbXh4OEk5c3o4RWhqX1d0bVJNeTFqYXZTVmF6Um5QRGNrRFdSaWVITElXRFNiZTVjNjN2azVSMEc2bTFkc3pnUWVRcDRPUHU5bjN0R09LdEhFaGw1NTAwSGhDRHJDUjNETHVlWE5fdFRxRGdMV1RGcXhsbzNIbDdIN0xIckp1VG5fajJCUnM5bHZ1S2haUHpuSy1GZGllU1dxdlhucGVXSjVfOGFBNFc2LTRqRzlFYWswTDVBOXVVUzBaZ1NwYkNYTzFHQU8tVGUzT1U5U3ZhMUVMQVIzMndfZ2pjaS1yVWFTemVFUkdUM0ZPY1hWMmRCeVh6LXNWLXQ3UHFJb1JFUzYxV1VzSEI4Qkd0SUJLc0xaUUdGcU9HMnVkR2c3d1pORjRDczdwVkJjSXJ0X1IzN3phZTVqSkdka2dfTFZGNC15Z2hLT1JDbElYVEpOUUNYRjRWTnppRHBpdTBEWnFIRUNkNUc4R0VxamwxRDUyOE11UlJLektYWnJWbllERGNxNXBTMnprMkQzMFA3ZzF1Znp2NU1nclpPVDdRSzhhcGxucjZ2el9NelZZS0ZLcWdvTTJUZWtqTVA2cFNaY1NfMm52ZUNlOGJTWDlFaUFrSnBvbllIb3lKUjJSaGR1ekN3Mno0RE9SZmZlalFBaTI1MlFpbVhFd1NxbkRfempidHdaSlduWnpZMEZOZEt6NDFtc2JRU3hCdVJTNDQ5ZW5PUldFU1lwRV91Q25vb093T2FpbDZrZXZLY1dINHJfeWZteEtJY3g1OFRyTDBJZjh0X2ZHa0ozSDhrcjRjX1pVTGN2MlRqbm1YZWQxbHRiaHY5UnZ4UmVURHhjYlhnd2RSbm9yTXRZYUtYdGZqSko1OGxzZzNWdUhCVkFMOFNIN2hMMXJEb2E3bWxpRDdVVEliRm1mVFFwemJ3QnJBQVI0SzZ6QkFSY0NQQmJuNmFjNWRhQWgxejZZOTdLdzRnbjlBTEJWSGFGbzZxR2pZYmFZS1lnUUYxZEtZdXowdHh2UjEycXkwb25pLVdKSGprUzE5aHpmNWpGZDVVVUY3QldUc1RBQ21zRjF3X1cwWTFqSHpWNVdBUGROek95TzlKMVRZS1VYOU9i?oc=5
+2026-03-01T21:17:45.364+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Fetched cover image for news: ???????????????????????????????????????????????????????????????????????????????????????????????? - Vietnam.vn -> https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300-rw
+2026-03-01T21:17:45.364+07:00 DEBUG 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.RssFeedService   : Added news from RSS: ???????????????????????????????????????????????????????????????????????????????????????????????? - Vietnam.vn -> https://news.google.com/rss/articles/CBMitAFBVV95cUxOZmNqQzlJNG4zZDRIU3Z5cWFsNjRFVjJfRDJJYXJ0aVVlYXdZazBFWU9XbGZYSXRZRHJrcnVDMktaT1dDazA2VVdsWWVueVY0VW1YZXVianlaRC15NUY1ZXZqWkZNcjlITGc2NHpvc2IybFpyM2VhOUFRQmlHUElRWWZLTjVRel9hcWtDdlhOM0FGcXJ4dzlrSnc2dk9KMjBGeTJuVlJQWHhqTUtjNDEwaHFBZkw?oc=5
+2026-03-01T21:17:45.364+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : ? Successfully fetched 50 news items from Google News RSS (International Students)
+2026-03-01T21:17:45.364+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : Total news items after adding International Students news: 78
+2026-03-01T21:17:45.364+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : Step 2.5: Fetching news from NewsAPI.org (Thailand) as supplement...
+2026-03-01T21:17:45.375+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.NewsApiService   : Fetching news from NewsAPI.org (Thailand): https://newsapi.org/v2/top-headlines?country=th&pageSize=30&apiKey=***
+2026-03-01T21:17:46.072+07:00  INFO 30600 --- [global-buddy-backend] [           main] com.globalbuddy.service.NewsApiService   : Successfully fetched 0 articles from NewsAPI.org (Thailand)
+2026-03-01T21:17:46.072+07:00  WARN 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : ?? No news items fetched from NewsAPI.org (service may be unavailable or rate limited).
+2026-03-01T21:17:46.072+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : Step 3: Prioritizing news based on 10 trending keywords...
+2026-03-01T21:17:46.092+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.GoogleTrendsRssService       : Prioritized 78 news items based on 10 trending keywords (0 trending, 78 non-trending)
+2026-03-01T21:17:46.093+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : News prioritized: 78 items total (trending items appear first)
+2026-03-01T21:17:46.093+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : Step 4: Analyzing news sources...
+2026-03-01T21:17:46.096+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : ? Source statistics (37 unique sources):
+2026-03-01T21:17:46.097+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - Vietnam.vn: 15 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Matichon Online: 6 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - Ch7.com: 5 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ?????????: 4 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - LINE TODAY: 4 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Ch7.com: 3 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - NBT CONNEXT: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ??????: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ???????: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ???????????????: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - Matichon Online: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - spu.ac.th: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Thisisgame Thailand: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Thairath: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - facebook.com: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - ?????????: 2 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - WeAreCP: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - Share2Trade: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - AppDisqus: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ???????: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - Dek-D.com: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - autoinfo.co.th: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Siamsport: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ?????????????????????????????: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - 4gamers.co.th: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - topnews.co.th: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Hfocus.org: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ??????????: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Sanook.com: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ThaiPR.NET: 1 articles
+2026-03-01T21:17:46.098+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Thaipost.net: 1 articles
+2026-03-01T21:17:46.099+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ?????????????: 1 articles
+2026-03-01T21:17:46.099+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - komchadluek: 1 articles
+2026-03-01T21:17:46.099+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - ????????????????: 1 articles
+2026-03-01T21:17:46.099+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (International Students) - Siamsport: 1 articles
+2026-03-01T21:17:46.099+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - bangkokbiznews: 1 articles
+2026-03-01T21:17:46.099+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   - Google News (Thailand) - Hoonsmart: 1 articles
+2026-03-01T21:17:46.104+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           :   Total: 78 articles
+2026-03-01T21:17:46.104+07:00  INFO 30600 --- [global-buddy-backend] [           main] c.g.service.NewsCrawlerService           : ? Total news items fetched: 78
+==== NewsCrawlerSmokeTest ====
+TOTAL items fetched: 78
+
+Source: Google News (International Students) - NBT CONNEXT | count = 2
+  - ร้อยเอ็ด-มทบ.27 มอบทุนการศึกษา มูลนิธิเปรม ติณสูลานนท์ ประจำปี 2569 แก่บุตรทหารผู้เสียสละชีวิตเพื่อชาติ - NBT CONNEXT | https://news.google.com/rss/articles/CBMibEFVX3lxTE5hYlo1NFF5Wjh0NG4yWTNXT0N4cGVzempBLXJxUjROS0hsNmc2TV9PT25MeUsza20tZ0wydjNHWk41Tk1pWHBadFdJdEpqREVfaW82bzR3WmNZTmg3XzNDRV9qM1l3YkdTTHc5dA?oc=5
+  - มุกดาหารจัดงานวันสหกรณ์แห่งชาติ 2569 น้อมรำลึกพระบิดาแห่งการสหกรณ์ไทย มอบเกียรติบัตร–ทุนการศึกษา - NBT CONNEXT | https://news.google.com/rss/articles/CBMibEFVX3lxTE5yWGcyRnNGMTVfTUxEaEV1RlZXT1Vjc1ZNbWl2LWh1czM4S291R3Jac0VyWDFsa21PWTVPaVRLYU5UaU0wYVkxMVNZZzJvRklIM055NkpWY0pyci1BMlJpSmlNTFRaT0J5SXZwaw?oc=5
+
+Source: Google News (International Students) - Vietnam.vn | count = 15
+  - ดึงดูดนักเรียนด้วย "ทุนการศึกษาก้อนใหญ่" - Vietnam.vn | https://news.google.com/rss/articles/CBMia0FVX3lxTE96Qlp4VG9tOG5XRGxiM1BKcHhIMmFXcHRzSUFmVzByaDdORDlCeU9tUVZJbmNWNHE1WVpUanRuMFBIT280dENESUJRWEhXXzFja1FGTE9GNFNmUFZkWm5GLWJ1Vnd4a2RSWGtj?oc=5
+  - สถาบันอุดมศึกษาหลายแห่งเสนอทุนการศึกษาจำนวนมากเพื่อดึงดูดผู้สมัคร - Vietnam.vn | https://news.google.com/rss/articles/CBMikAFBVV95cUxQanEySjBTam5HbHE1Y2VkWHZhX0huTk0zbWdOZzd4cGd3VnNqeVpTVWxfOFpDMEpmSUoyNkdoTEN5ZmpVMnVjVnBUUnVpYkVjR1RkLXVnMmFFaVJKQl9kWVBncDVrT05OY05iREE5T19EN2xuM1poZ1VyREhKQjlzUGxBMUQydTVTWGgxNERPYzE?oc=5
+  - มีการมอบทุนการศึกษาจำนวน 150 ทุนให้แก่นักเรียนด้อยโอกาสในเมืองดานัง - Vietnam.vn | https://news.google.com/rss/articles/CBMimwFBVV95cUxPUVdHRm5nTTM4UE4tQlRnQW94MDFXUTN3cUNrSk5QbVptNXBzR3NOcnRtcTBrdjRaNFo1NEhQbURNWFlPWXFKMkJEWmxQWlVzLXM1cVZlOWdvYkFKaUhSc0xpWTZrNlJNdVRVVV9YVHZPVnBzWkZadHB4MndaY2ZwTEh6dWZoWnZsNWNWbjRRYjRlWHUtaXdlU0dXWQ?oc=5
+  - นักศึกษาต่างชาติจำนวนมากเลือกเรียนในสาขาที่เกี่ยวข้องกับด้านสุขภาพ - Vietnam.vn | https://news.google.com/rss/articles/CBMifkFVX3lxTE1hVVcyWkMzUDIyeXZwc1czMGF5S1RzUV9BZWVNODhfcGlYR3dOZ2ZRUVpEN1c3UXI3Qy1WdDJ5UkQ2Z0ZLYnMxYXFBYjM2d2haUmlTdzFFNVF1TUE5VlFDSnB3REhZbUVGM0lOZ3hzd3VnSzYxRWxvTUozNDBTdw?oc=5
+  - ชายหนุ่มคนนั้นใช้เวลา 10 ปีในการคว้าทุนการศึกษาเต็มจำนวนจาก 5 ประเทศ - Vietnam.vn | https://news.google.com/rss/articles/CBMiiwFBVV95cUxNWWZCdi0teFlNbFhyR1VLTGVxSFZULVFOZEZOQ1BwVzhYUVB5cDlmSTRjd19RbDhfVU4xZ05YRjJYQUVoZER5MzU0ckVMUllISHRBMzFhTThBUGJfbzRvTVotR3VtTHhEU2dLUE9wb1BQMnNrbzhIT3VQVU5wNS1nNmZ5bHlVT29ySWxZ?oc=5
+
+Source: Google News (International Students) - Ch7.com | count = 5
+  - องคมนตรี ตรวจเยี่ยมโรงเรียนในโครงการกองทุนการศึกษาที่จังหวัดเชียงใหม่ - Ch7.com | https://news.google.com/rss/articles/CBMiREFVX3lxTE1sbzRHZkJvdzQtdG04c1VkNDkzbnJpVHJibDRNelMybjNmTUc0a2RHc1pocVdqbjZrazNKdElQZUJ5aEdj0gFEQVVfeXFMTWxvNEdmQm93NC10bThzVWQ0OTNucmlUcmJsNE16UzJuM2ZNRzRrZEdzWmhxV2puNmtrM0p0SVBlQnloR2M?oc=5
+  - องคมนตรี ตรวจเยี่ยมโรงเรียนในโครงการกองทุนการศึกษา ที่จังหวัดเชียงใหม่ - Ch7.com | https://news.google.com/rss/articles/CBMiREFVX3lxTE5OWGM0c1BKclMxWWM0N3FPbDVmbUZIZnFKX2Z1T2czc092bVFTa2l6aUdxWWpSbG1Jb0VFeWU4M0dsZVho0gFEQVVfeXFMTk5YYzRzUEpyUzFZYzQ3cU9sNWZtRkhmcUpfZnVPZzNzT3ZtUVNraXppR3FZalJsbUlvRUV5ZTgzR2xlWGg?oc=5
+  - ข่าวประธานองคมนตรี และองคมนตรี มอบทุนการศึกษาพระราชทานแก่นักเรียนในโครงการกองทุนการศึกษาที่จังหวัดอุบลราชธานี และจังหวัดพะเยา - Ch7.com | https://news.google.com/rss/articles/CBMiSkFVX3lxTE1YYkJKeG1OQnVVVEpRcFRNYlJidVBrYkhGcWg1LXN4VXpOREtVdHY5clhFS3ZnX1oxeGNBdzdoWHZVWnBKbnVMM1Jn?oc=5
+  - ข่าวเจ้าหน้าที่สหรัฐฯ บุกคุมตัวนักศึกษาต่างชาติในหอพักมหาวิทยาลัย - Ch7.com | https://news.google.com/rss/articles/CBMiSkFVX3lxTE1ycmE3QUw5TTJrcE5ybFRYemk1WUtIZVQ0enExRjY2OEpGUWpIdEE3d19vbjYzSmgxVU5OeVUyb2xXSk0yVFUxbU1B?oc=5
+  - ข่าวองคมนตรี ไปตรวจเยี่ยมโรงเรียนในโครงการกองทุนการศึกษา ที่จังหวัดพะเยา - Ch7.com | https://news.google.com/rss/articles/CBMiSkFVX3lxTE5uSU9ZTU1TV25QWGFleFVJVXpnclZqYkpQbEpvLTAtU3BrRmJpWlcxc1VfX1p4eEZNZGFWX0hXRmlQVGEzSW1tQUFB?oc=5
+
+Source: Google News (International Students) - ข่าวสด | count = 2
+  - รองจเรตำรวจฯ มอบเงินช่วยเหลือครอบครัว ผอ.โรงเรียนพะตง เพื่อเป็นทุนการศึกษา - ข่าวสด | https://news.google.com/rss/articles/CBMiYkFVX3lxTE1HNmJnR1N4U1p0SlF5QjF1YTZuX0VFUmw1dFR6aHdJUHAzWkMtTmVkcjZjaktQUTVvZ1Ffbzl4WGZCcGpKSzRjTlJyVFl3bFk2TXQ5SXdBRHpmZVhiUDJHVFV3?oc=5
+  - เมืองไทยประกันชีวิต และมูลนิธิเมืองไทยยิ้ม มอบเงินสนับสนุนการศึกษาให้แก่ สภาสังคมสงเคราะห์ฯ - ข่าวสด | https://news.google.com/rss/articles/CBMidkFVX3lxTFBDSHEwQTV6eDJ5RGtBZHJlUEdYSTk2OFVhOWUtYkNlTWY0dGs1bk5TMVg0YmtxRTBsVlFud0ZIOXozcmNTVU5XYmpTbW5BTkVoVHp6RExJcXVSazVDbjNlbmxnWjNnWkRGT0YteHhDcXdZWG93cVE?oc=5
+
+Source: Google News (International Students) - สยามรัฐ | count = 2
+  - ไลออนส์ราชธานี กรุงเทพ มอบอาคาร-ทุนการศึกษา รร.เกล็ดลิ้นวิทยา โคราช รวมกว่า 3.3 แสนบาท - สยามรัฐ | https://news.google.com/rss/articles/CBMiVkFVX3lxTFA1SnVVX2pwVW9iM1ZDcmxMSWlhNHR0U3gtWjJzajhKTGNhaHY5Q3RPRVFNM2FFT0JwV3E0Y0dEbWJsOVo4dGhZMi1kU1Mydm85b3pfREFn?oc=5
+  - “ชมรมช่างภาพการเมือง”มอบทุนการศึกษาบุตร-ธิดา ครั้งที่ 16 รวมกว่า 3.3 แสนบาท เสริมสวัสดิการคนสื่อ สร้างอนาคตเยาวชน - สยามรัฐ | https://news.google.com/rss/articles/CBMiVkFVX3lxTFA0Y1l3a2YyczY2alM2Z1REd1EyQnRzNW1pSFpnV0V6U3htamVCT1FFYWNPcHVpZHh6Q1l0SnhPd3BXQUdpVHdnZ2xOZnhkT3JubEw4RFJn?oc=5
+
+Source: Google News (Thailand) - Matichon Online | count = 6
+  - อนุชาบอก บ้านสะสมทรัพย์ คว้า 4 เก้าอี้ ให้ ‘อนุทิน’ พิจารณา ขึ้นเป็น รมว. - Matichon Online | https://news.google.com/rss/articles/CBMiXEFVX3lxTE03bHJTcmZvMlFGcm5SYlJfNmJZVXplb1habUpCei1ncGhieW1jT2J0aFYtYUVxM3JiTnJjRGd5eGhYWnFieHdYd1hqaWt2XzJPVUZYT2lHeHVFUFhQ?oc=5
+  - นิด้าโพล เผยประชาชนไม่เห็นด้วย 3 พรรค เข้าร่วมจัดตั้งรัฐบาลกับภูมิใจไทย - Matichon Online | https://news.google.com/rss/articles/CBMiXEFVX3lxTFBoVWdlREdTbklJTkRXSWZFQXRNRFpMOE1BRXBoeWdBUW5QMUlLTXlSdTJSbjlIOUFaZ1Zxa3NvZ2dZX21qNGpMSVFXTnQtcG5WZmItVnF3eWU4S01h?oc=5
+  - ผลสอบถนนทรุดสามเสน เกิดจากเหตุสุดวิสัย ซ่อมยาวถึงปี 70 เสียหายพันล้าน - Matichon Online | https://news.google.com/rss/articles/CBMiW0FVX3lxTE16Ync4dVRvX2ZlZlRnRVl2YzVjX0JFVGc4U3JzX3pWd2tkbHNKTGlmay1WbWRFVVZOVy1LOWxwZE9qdk9iOWZpY0RSRHNUWTkybHFJd0s4UV9sOWM?oc=5
+  - อดีตผช.ผญบ.หญิง ไปทำงานบาห์เรน เผยนาที อิหร่านโต้กลับ ยิงถล่มฐานสหรัฐฯ (คลิป) - Matichon Online | https://news.google.com/rss/articles/CBMiWkFVX3lxTE5MckdoUk9BN3NmWTBRUzI5OHV1eG1oSzlxR2pTOFk1endRSUczS1dRNm5XUm1KV1NVUHAxZUxxZ0dNM3ZJQmhSN3FOR3RVREJ5Qld3NmVqX2pzZw?oc=5
+  - การาจีเดือด! กลุ่มสนับสนุนอิหร่านบุกสถานกงสุลสหรัฐ ดับแล้ว 9 - Matichon Online | https://news.google.com/rss/articles/CBMiW0FVX3lxTE1OclhOMjlpYXJXcS1jMHNXakt0a3BhRmdsWTdJS3VXbEZ5UmEtOUlZX3lWUzVoX0FONlBjOTVkS0xWRGFKYnJQZW5ydjZIYlRhQVNzaFNtOHN0Nkk?oc=5
+
+Source: Google News (International Students) - WeAreCP | count = 1
+  - เครือซีพีสดุดีทหารกล้า วันทหารผ่านศึก มอบทุนการศึกษาบุตรทหารเเละสนับสนุนครอบครัวทหารสละชีพ สานต่อเจตนารมณ์เชิดชูผู้เสียสละเพื่อชาติอย่างต่อเนื่อง ณ กองทัพภาคที่ 1 - - WeAreCP | https://news.google.com/rss/articles/CBMiT0FVX3lxTE9iWjZ2dWVTa1lHR3JQRGhaQUxLaXUtcmpPdEUyWnlhVEpyRXdGc0ZDOEd2cDlndzNuc2JacXc5TmpXRHYxeEdqanlJNXo3NjA?oc=5
+
+Source: Google News (International Students) - Share2Trade | count = 1
+  - IND ผนึก วปอ.รุ่น 47 มอบทุนการศึกษา นักเรียน รร.วัดสมบูรณ์สามัคคี จ.นครนายก - Share2Trade | https://news.google.com/rss/articles/CBMisAZBVV95cUxPWlFXNF9HWk03eTNTN000R19ZMG1JdlRzUUhlV0F6QnRrTWdqRS1WUUZCQVJtY2F3SHBEV2xqWkFGSnd5X0ktVVJ3NDd5YUw5WE1sNDB5R3lralZtS3p5dm1GdmRqanA3OFRvYk1fUktYT0h6d1VoN3pJUkJadFhSaUNDbzZYV3Z3U2ZudU5MeHUxTlpkenFKT291UldpQzJleUIwaDhEOHI2S08tQm9OUVF0Wi1JbFZfRExsMGxrMU1ha0VmRDJiQmt2OWkwR25nWUxmaVBjQi1sUUtZTzVSSFdhUUtnc2dleU95N1ZzR0NKYTBQNXFSdGdvQVBJTEhWMHVRdzFPaVFTRG9hMm83U1REczA0ZGxSN2FGcS1FTWtjZWM4aHBtRmtILVNIZmZZNlRYSzN3dDdEMmV5Z3NyYk52MXpreEZYeFJyVXBCcjVmUVd5ek1zYnRTaW5KY3RaTjc2T1U3Y0NWM2lrcTNGYWk0cjBMLTlScVhQcmFTTDE3OHJFR1NmemdldnUxdVU4UF85cVJGNFlEMHNQMkJKcU5FRXFYcVBOY0JmVG5kQUNuX3FRdFpIME1ZMnNFNHowd3dFZ21ENDA5UzMxc0Y1TURiMzNuNEhuVVotTnNEM2kyVm5xZGNVN1c5WGhxZ1Vla0hMa1hhdUNkTEs4NVE3aHNiUV9CTF9NZVcwdEcwZGF0QWVGN0NYaUhmSGxBaG9kOHNFOWtOMG82S0I0TGtxcDNQVmlaR3RoSnE0VVJIejhNSXFZOERQU09lQVFSUjNweEh0dXZRUUNJQ3htbGs5ODBRRDBydkNTemlub0szWGVVelQ3V29BZG96OWFxaXJDOGpzWC1MSkEwejdNa1gybmhwUFhXS29STXVwNVY1blNpUW42RzFBZm1zdkQ1WktBLUZ1aW5GX0xNUmlOSXlxSnFSbUt6NVBMQkdIZ2ktbWsweTd1UWdRb04wYm5fMjNOWTkwU1JENDdnNjFCSjR5b24xUERveHBpWmE5V1BFQlpnUG44NGRLTjFyS05DQXRYZDY1endmT0VET3FUNm53UDFBYlUtOGpWaXNNbHRhbG4?oc=5
+
+Source: Google News (International Students) - ประชาชาติธุรกิจ | count = 2
+  - มูลนิธิวิชัย ศรีวัฒนประภา เปิดรับสมัครนักเรียนขาดแคลนทุนทรัพย์รับทุนการศึกษาปี’69 - ประชาชาติธุรกิจ | https://news.google.com/rss/articles/CBMiW0FVX3lxTE1XUXF2amJzUXhxbi1WY1BkclhvQU43RklhNzVmSnBiY0ZScWszckg1RXdlaGNPNWdJMTRBd2NZc21oRnRnWUZyZVd1a0VTQWZkcVZlZkM0d09kU0E?oc=5
+  - 4 ทศวรรษเพื่ออนาคตเยาวชนไทย: ‘กองทุนการศึกษาเอ็กซอนโมบิล’ สร้างคนรุ่นใหม่ให้เป็นพลังขับเคลื่อนประเทศ - ประชาชาติธุรกิจ | https://news.google.com/rss/articles/CBMiYEFVX3lxTE55SlR4eVpZRVQ1M1N3TzJjaDdFcTUxREdjd19oRHFrRVU0SmlJYWljdndLM2Qzd3F1Z3RXRlo5Zm9vQ0g1Y3RFYTBVQlpSYnVQOUcwZlN1c1g0UWtBNFp4Yw?oc=5
+
+Source: Google News (Thailand) - AppDisqus | count = 1
+  - ลือ Ubisoft เตรียมชุบชีวิต Watch Dogs ซีรีย์เกม Openworld แฮกเกอร์อาจกลับมาโลดแล่นอีกครั้ง - AppDisqus | https://news.google.com/rss/articles/CBMifEFVX3lxTE5sOWRRRWFocHpycEU2dktLM3h4M1pFV1ZGSGNNR3V3MXFad0J1dmNGaTRTSlhPZkZIVXl1V3ZIdVZaUWs3ay00QVNFMUVRcVUwajFZNFV1WDJhWnFFQUN2UEVMeXotc0tSYjdhM2dUbVdveks4TTM5RHBxa2PSAYIBQVVfeXFMTU5nUExnTUI1ZDFZV1ZUbV9LYTZvT3BRU0pqQmw1V21PdERIVnR4dFlZNmRzZ3I4Nks4RVNOVUpKeUR2VjlJbDRfN3FUTlprdTZlcnpLX1NNQWNXUWZDemJHbFlCUXBYbHFoUkhfbFFLNUNzV3JEaldSMjhvdTdkLW1RUQ?oc=5
+
+Source: Google News (International Students) - แนวหน้า | count = 1
+  - ในประเทศ - มูลนิธิเปรม ติณสูลานนท์ มอบทุนการศึกษา879ทุน ให้บุตรทหารตำรวจ19จว. - แนวหน้า | https://news.google.com/rss/articles/CBMiS0FVX3lxTE5rUXpQUlBiWGozS2ZISk5aRm56SUgydlFmYXVSUThlS01McEIxRnRoaTV5YmVwRmYzYlZBX05HR05FTlZGMjFMYkhHOA?oc=5
+
+Source: Google News (Thailand) - Ch7.com | count = 3
+  - เบื้องหลังแก้วหน้าม้า กุ๊กกิ๊ก ฝึกซ้อมรำ - Ch7.com | https://news.google.com/rss/articles/CBMiSkFVX3lxTE9MbGI5R2dDWGF1dVJlVmZOTlk4ZFpnOXhZalNxdmx0WnRjYldjS0pTeXpKeVF1RXVaMmJJd2VoRzZrUmtsRGRaWVl3?oc=5
+  - เบื้องหลังวิวาห์ปฐพี รวมฉากดรามา แอปเปิ้ล มิ้ม - Ch7.com | https://news.google.com/rss/articles/CBMiSkFVX3lxTE1xbHNyRzYybjlCaEZ0NVpRdnMzeGhXNUt3WUNFcG13djRQQ1dodjV6bkdiLXlORU53SkUwLVdZbm9jZzZONUIyZTJ3?oc=5
+  - ป้าร้องมูลนิธิปวีณาฯช่วย พ่อแม่ติดยาละเลยลูก ทารก 6 เดือน เปื้อนฉี่-อึ จนผิวอักเสบติดเชื้อ - Ch7.com | https://news.google.com/rss/articles/CBMiSkFVX3lxTFBMSDk1a0hpSFEyRFJobFUxaUZiV3J0eHFEZ0l6VE1ILXlkQ0x6SDNmVngxVk81VmZ0NXY3M3ZGYlQtQkNJY3dqWnBn?oc=5
+
+Source: Google News (International Students) - Dek-D.com | count = 1
+  - ปลดล็อกโอกาสสายธุรกิจ! ‘SCG New Gen Scholarship 2026’ ทุนเรียนฟรี MBA ที่จีน พร้อมมีงานรองรับ - Dek-D.com | https://news.google.com/rss/articles/CBMiUkFVX3lxTE1tWU5iWHJzcUMxdWFYU2FDb05DM1ljWmh3dUVzMVYydGlrRWhKT25zMTZDU3JqYVZjSHlIcVBmblFHemFtN0JINC1CXzk3enZ1Ync?oc=5
+
+Source: Google News (International Students) - autoinfo.co.th | count = 1
+  - มูลนิธิโตโยต้าประเทศไทย มอบทุนการศึกษา - autoinfo.co.th | https://news.google.com/rss/articles/CBMiUkFVX3lxTE9pYlY0eG5lNzBmQmhaVkxpQlJCZHRSOVVRZ2FwVkxqaDJmNllZbnRMdEpKc2JtWEw2MzNBbGZyUEFudEpRdFV1YjNxQ21QbTlIREE?oc=5
+
+Source: Google News (Thailand) - Siamsport | count = 1
+  - ผลบอล : สดที่นี่ ... ครึ่งหลัง เมืองทอง ยูไนเต็ด เสมอ การท่าเรือ เอฟซี 0-0 - Siamsport | https://news.google.com/rss/articles/CBMidEFVX3lxTE9NZFVDN0prX3U3cmcwTC12WmxhZXRUX2VJUm40di11YVlQREVCa3J2bndmc2x2Y0dEX0ZDbHVPdkZ4bEVXWDlFUElWdHRfdkhseVBHWWhucHlIR3N1UjVXT3QzZl9VTlBVMDBLRXZ6b2ZnN2dk?oc=5
+
+Source: Google News (International Students) - สำนักงานปลัดกระทรวงศึกษาธิการ | count = 1
+  - สำนักงานศึกษาธิการจังหวัดสระแก้ว อาสาสมัครส่วนกลางและอาสาสมัครประจำพื้นที่จังหวัดสระแก้ว โรงเรียนในโครงการกองทุนการศึกษา ได้ประชุมนักเรียนทุนพระราชทาน ผู้ปกครอง ครูผู้ดูแลนักเรียน และผู้บริหารสถานศึกษา - สำนักงานปลัดกระทรวงศึกษาธิการ | https://news.google.com/rss/articles/CBMiR0FVX3lxTE0zaEtPVzU4UEM3eEZRUG5QVjZXbDhodVhoNm1kYng1ZERheWs0Y0dHbjdmUTBwOUw1djE4ZXVCWkdhT25Vd2M4?oc=5
+
+Source: Google News (Thailand) - 4gamers.co.th | count = 1
+  - ถ้าไม่นับซอมบี้ในเกม Resident Evil 2 Leon ฆ่าตัวทดลองที่ผลาญเงิน Umbrella ไป 220 ล้านดอลลาร์ - 4gamers.co.th | https://news.google.com/rss/articles/CBMi3gFBVV95cUxPUmU2dUhnX2RzNXdLcXh3UTJpM1djT3hhbG1wM1lvM2Q4Nk16a2FqZmUtTW96U1g3UGZsQzNydlZPTTRIbndXTWdsMWd3LXdwdWttMUJaNGI2VENEX3Zsa3JZcnVmTEU3SDhiSXp1TkVVZVV3bFZXSDJsWUlrdHZfWEFXNmF3QXA3cnBSUGdLU0VKSXNuU0tmWFp6bnpja3BDdlYyTnhJcG9Ybmx4TjYxdy10OXNNZnNtYXZTM3h1a1JKQjNITW01RFdMTXhVMXNEMUlwcVNoRWM5aTlzWFE?oc=5
+
+Source: Google News (International Students) - topnews.co.th | count = 1
+  - กองทัพบก ผนึกกำลังกลุ่มทุนปรัชญาเพื่อความมั่นคง ลงพื้นที่บึงกาฬ ขับเคลื่อนโครงการหมู่บ้านเข้มแข็งคู่ขนานตามแนวชายแดน และกิจกรรม CSR มอบทุนการศึกษา - topnews.co.th | https://news.google.com/rss/articles/CBMiT0FVX3lxTE5HaDJZMGZnbllLSld4UkhBNl9JTWw2S2dQZXJPRUFqemE5QW1PS2tSNXN3WWZZZDFZclEtYWFNMFlTSjBsd2NpNW9nX3EzUFU?oc=5
+
+Source: Google News (International Students) - Matichon Online | count = 2
+  - ซีพี ออลล์ ทุ่ม 1,678 ล้าน มอบทุนการศึกษาเด็กไทย พร้อมสาธิตแข่งหุ่นยนต์-หมากล้อม - Matichon Online | https://news.google.com/rss/articles/CBMiWEFVX3lxTFBhZVNod2xpZTFJTXJvM3htY2J1SGVyOUNkVEtVbF9GUHptY3NQX1JMWGhsa1Jsc2lzMW9OdEVpYlJZZ1B2eFN6VzN0SHlxQUwxbHp0MGxhT3k?oc=5
+  - วชส.2-ตชด.-ร.ร.นายร้อยตร.มอบอุปกรณ์ ทุนการศึกษา โรงเรียน ตชด.บ้านคลองน้อย - Matichon Online | https://news.google.com/rss/articles/CBMiWEFVX3lxTE1Xdkk0ZjNKODlabW1rd2tGYzdvcWxjeHZtSmJadlJ6VGN2Y2xLX3lmbmpaQnd5U3BETmtXSm51RnY0SmFKSXNBd21QdlpjR1U1WjJJVld4VDE?oc=5
+
+Source: Google News (International Students) - spu.ac.th | count = 2
+  - 7 ทีมนักศึกษาภาพยนตร์ฯ SPU คว้ารางวัลใหญ่! พร้อมทุนการศึกษา ตอกย้ำศักยภาพคนทำหนังรุ่นใหม่ จาก เนรมิตรหนัง ฟิล์ม และ เวอร์ส เอ็นเตอร์เทนเม้นท์ - news-update - spu.ac.th | https://news.google.com/rss/articles/CBMizwJBVV95cUxQdVV0TmlYZXNYa2JDWHkyd1RpUkpGaUJxbC1obFV4VnYzdHlhMTNfMldoZnkzWHJWbzRpZGhqWm12d05CUDQ5UzhNY1l2MWFCRF80a3hyMVdJdUFJalllX0hIY2hCc2M4UFJBYlNxTGRTeHR0MUxmQlFWWUVTVGVjUXdDZDZPTmlsT2pYbHNuNkxvU2FMUkZhU296cmNtc3dTRk5MV0ZfU1REcm1TUnFJdVktdTNVMGhrZTA1eDhvVnhocVFkUGUxaTQ5MWxUSURfSXY0TGZYa1gtUi1QVHlja19Pa3hEdWM5bXhXZlVZMVpXZTVNbl9GdUpOR2x0ZzY2NmVyRU0tdEEzZDlhQXdLNkt2NndXSUR1VWgxakJnVERuSFBCZjB0UU1hMjZaY2FXeWxvNWU4Tk9iV3BYQmc2WWRucWxGc040NEVyVlF6SQ?oc=5
+  - “ฉายหนังครั้งที่ 8” เด็กนิเทศฯ ศรีปทุม โชว์ศักยภาพภาพยนตร์ 19 เรื่องสู่สายตาคนวงการตัวจริง รับรางวัล-ทุนการศึกษา มูลค่ารวม 300,000 บาท - news-update - spu.ac.th | https://news.google.com/rss/articles/CBMisgJBVV95cUxORW9iVG81V2dZYkJXVFlUdFh1aGNrVkhFbkl3YVVONC1CMXF1VEJjZ3VKZVJ6Mjk1QmcyaGRRd29MSWN0cHoyTzI3eUFhek5KLVZ6WF9lOVAxaXlneXBydk5vN0JvX1R6NkU1QUZhSm1nR3ZBQjI2eWhHLXZscjAxVm9SdjZGajZTUjNZT2VQaWpxTkhxbWVHN2pDVzIyekFobjFhRDRlbnptUFI0QmNPQk5KallGY1dpSFhCM0thS2Y0Y254YVllYUU4amwyVGN5TkE4allkb3BONU43VmtDOWdDaUJCdkZmSTNWVG5hWXdmYm9SVTdSTXRrbXVjeS11RXhwTE5jOUg2b1pmbko5MC02dDBmTURISGJZTzJkckJyQnJFUmdlTlR0a3M4NGI0Q1E?oc=5
+
+Source: Google News (Thailand) - Hfocus.org | count = 1
+  - เวทีเสวนาเรียกร้องรัฐ "ปฏิรูปกฎหมายค้าประเวณี" ย้ำคุ้มครองสิทธิ–สุขภาพพนักงานบริการ - Hfocus.org | https://news.google.com/rss/articles/CBMiV0FVX3lxTFB4ZzItTVgyVWtFaEcxenI5M25wYl9vRG4taGhoLUtDUUZ2bElVamcxb1NOcWdPNXRDY3JKR1JYWWZRNG5vM3NRajFZeVg5ZHk5VXc0NlJlMA?oc=5
+
+Source: Google News (Thailand) - Thisisgame Thailand | count = 2
+  - Sony แท็กทีม AMD อัปเกรดกราฟิก PS5 Pro ให้คมชัดกว่าที่เคยด้วยพลัง AI - Thisisgame Thailand | https://news.google.com/rss/articles/CBMifEFVX3lxTE01TlR5M1pFcEs1U0lLNjFxbUlIUXhUSF9ORGhUc2xBSFliNlR0d0twZ0ZPV1p3Y29QVDFXa05tLUN4Z0NGcDUya25XRGVRM2J3cXJzbUV3aUc3ck1CTzdtMENoaWsyU2ZqRk9yYjg2TXNPazVqOVFNNVJ6VXA?oc=5
+  - ชี้เป้า! Monster Hunter Rise แจกฟรีบน PlayStation Plus ตลอดเดือนมีนาคม 2026 - Thisisgame Thailand | https://news.google.com/rss/articles/CBMi4wJBVV95cUxNZzNTV2c1c0ZsbkxTV0pVZ3JjcExVX3NKdW4ya0ZqMVNhTnBFREkwZV9tVU9Ed2dzM21uS0R6QzduSVdyaVFZQjR2OUgzQV8xVDlYczNsLURKekdLQk44RmVzVXc1OXM5bWJLUTR2REdFR2k5bmhoRTBJQ1E2a2NYZ2llQ2NWSjdYempxcGpYc0VSUmlFNzhUYmt3anRrWTRrUnU5YjltcVpydE9SNURiamtiWW52bER5SjFFdkJsaXljMVZ4eUtfRm1jYzg4eHhxUDZRcUpadjJJYnM5dlRyZTZ1VkJ6OXV3SWR6ZW9IaEhEalNXUjE5M0RabkpvbUhybk1PUWVKTnowY2M5NXZSUjNXcDUtN0RMRWpzSW1kajZYYVRnYzVFeXZRd3BiMHFnT045LXBkZTlvZGpETDRRTkg0cVVYSC1SeXhDOWpzNmNzNEJtU0Y0MVFwZkxPVXEtVktB?oc=5
+
+Source: Google News (International Students) - สยามธุรกิจ | count = 1
+  - สถาบันขงจื่อ AU เปิดตัวศูนย์สอบดิจิทัลมาตรฐานสากล พร้อมประกาศมอบทุนการศึกษาจำนวนมาก เพื่อสร้างโอกาสแห่งอนาคต - สยามธุรกิจ | https://news.google.com/rss/articles/CBMioApBVV95cUxQNjhCMWpaMWRyazY1QmhhVm5YMXFuNGo4UERDQUQ2aUUxQldGRTZiWGU0dm4yMU5QdXBQdjlEd0RjcmczNVpaWkkxUTBhMnQzSmFXb0VKU3VfT3Y5WTR0cTlBNlgtY0hkb1NhMVBSZlg2Qlh0MDQyU0pxa3dwWDJ4SVhJYlFlMXNSTEJGYlR2R0MyVnN6LUZSbmtWWGs2NHhjWjFhejFUTElzVkRDRHh5N1g3bVpoaDR3R3ZkQkRzVEFPMUowbk1KNG5Yem9aQUNiOVV2VFFHRXA1Vm1vVnFRMzZMVFpHUFhZLUJibHh4d3NuTmFJbW4xaGRXWWM2UHY3c254bUtQdlVYS3dmeVM1eEMxRV9sVXR2M2VfWE9TNUNLbHh1YTRIczNLNDEtbE1xc28zS2NyLWt1Q2pKS21WMklHQmgxdzgxLWhoV1VwbnQwRmtpdTRaWG02bmh0TGtPeVlvODY0OW5Gei1MTTFDdFQ3R3B6SW9VRnp0MkNwM3NjdWdrNUdMSGRIRWpydXczVTBUTnlILU5xSFUxUjg4N0MxYlAwV2VMMWVDdjJ3UHM5a2xqZzN2eXhyYUpqYjNlOE5HbFlkcjU0WGI5alI1b3YySlZ3all0OTZIbXh4OEk5c3o4RWhqX1d0bVJNeTFqYXZTVmF6Um5QRGNrRFdSaWVITElXRFNiZTVjNjN2azVSMEc2bTFkc3pnUWVRcDRPUHU5bjN0R09LdEhFaGw1NTAwSGhDRHJDUjNETHVlWE5fdFRxRGdMV1RGcXhsbzNIbDdIN0xIckp1VG5fajJCUnM5bHZ1S2haUHpuSy1GZGllU1dxdlhucGVXSjVfOGFBNFc2LTRqRzlFYWswTDVBOXVVUzBaZ1NwYkNYTzFHQU8tVGUzT1U5U3ZhMUVMQVIzMndfZ2pjaS1yVWFTemVFUkdUM0ZPY1hWMmRCeVh6LXNWLXQ3UHFJb1JFUzYxV1VzSEI4Qkd0SUJLc0xaUUdGcU9HMnVkR2c3d1pORjRDczdwVkJjSXJ0X1IzN3phZTVqSkdka2dfTFZGNC15Z2hLT1JDbElYVEpOUUNYRjRWTnppRHBpdTBEWnFIRUNkNUc4R0VxamwxRDUyOE11UlJLektYWnJWbllERGNxNXBTMnprMkQzMFA3ZzF1Znp2NU1nclpPVDdRSzhhcGxucjZ2el9NelZZS0ZLcWdvTTJUZWtqTVA2cFNaY1NfMm52ZUNlOGJTWDlFaUFrSnBvbllIb3lKUjJSaGR1ekN3Mno0RE9SZmZlalFBaTI1MlFpbVhFd1NxbkRfempidHdaSlduWnpZMEZOZEt6NDFtc2JRU3hCdVJTNDQ5ZW5PUldFU1lwRV91Q25vb093T2FpbDZrZXZLY1dINHJfeWZteEtJY3g1OFRyTDBJZjh0X2ZHa0ozSDhrcjRjX1pVTGN2MlRqbm1YZWQxbHRiaHY5UnZ4UmVURHhjYlhnd2RSbm9yTXRZYUtYdGZqSko1OGxzZzNWdUhCVkFMOFNIN2hMMXJEb2E3bWxpRDdVVEliRm1mVFFwemJ3QnJBQVI0SzZ6QkFSY0NQQmJuNmFjNWRhQWgxejZZOTdLdzRnbjlBTEJWSGFGbzZxR2pZYmFZS1lnUUYxZEtZdXowdHh2UjEycXkwb25pLVdKSGprUzE5aHpmNWpGZDVVVUY3QldUc1RBQ21zRjF3X1cwWTFqSHpWNVdBUGROek95TzlKMVRZS1VYOU9i?oc=5
+
+Source: Google News (Thailand) - Sanook.com | count = 1
+  - ภารกิจแลกเลือด! ทำไมนักบินอวกาศ "เล็บหลุด" เมื่อออกไปนอกโลก? ความลับที่นาซาไม่ได้บอก - Sanook.com | https://news.google.com/rss/articles/CBMiTEFVX3lxTE5qMVotWEh0MmRtejJXZUNyODhCWmdud2lYTS01Z1Ryb1NhbnNGYktyTUlRRl9MNm9pUDR1MWpwenFLWTZzQkdpTVR5bnQ?oc=5
+
+Source: Google News (Thailand) - Thairath | count = 2
+  - นายกฯ เยี่ยมให้กำลังใจ “พลทหารเดชศักดิ์” เหยียบทุ่นระเบิดชายแดน - Thairath | https://news.google.com/rss/articles/CBMiW0FVX3lxTE91Uk96VVJ4VC1ZQ1FzdjNNcmZfejl1d3ZBRm44R2tWNm53c0hLbkVFRFlYdEFueXZucmpUd1IweEIyM05HSG5oWUVRUVVkNkE3U1Fja1VXUXRBS00?oc=5
+  - ประกาศฉบับ 2 เตือน "พายุฤดูร้อน" ช่วงวันที่ 3–6 มี.ค.นี้ มีฝนตกหนักบางแห่ง - Thairath | https://news.google.com/rss/articles/CBMiWEFVX3lxTE5yeGFQWXItOTNyRWZZYjhHclV5YnFHYy1FSjB1Ulo3dFFXbzJXejIwOFM5aF9lcFlLTExjSEtJcDN4YlQ2RlRxaGVQOFpYUHQwNGFOQ3NZekk?oc=5
+
+Source: Google News (International Students) - ThaiPR.NET | count = 1
+  - แวลูร่า เอ็นเนอร์ยี่ มอบทุนการศึกษาและทุนพัฒนาโครงการสงขลา 2,500,000 บาท ติดต่อเป็นปีที่ 13 - ThaiPR.NET | https://news.google.com/rss/articles/CBMiT0FVX3lxTFBSN3BvNmJDb0pEYVdlY0EwcVBWc1pWOVlNUVBCV3VfS251TkdBYW91dlRWSWFEcVJtQnp1UVRtNmE1WUlycFpJX3BNeGRIdjQ?oc=5
+
+Source: Google News (International Students) - เดลินิวส์ | count = 4
+  - ‘สุวัจน์’ ร่วมมอบทุนการศึกษา ‘มูลนิธิเปรม ติณสูลานนท์’ ปี 2569 - เดลินิวส์ | https://news.google.com/rss/articles/CBMiU0FVX3lxTE44YlQydThKS1c2RlZVVlIycDZxTmZUek15TElGSDEyaDBrMzJ4TVdEZzVuVm02Mm5UMlV6QzhIWmNVeldQdmRqQmhqOWxOcEUwS1Nz?oc=5
+  - เทศบาลอยุธยา มอบทุนการศึกษานักเรียนยากจน แบ่งเบาภาระครอบครัว - เดลินิวส์ | https://news.google.com/rss/articles/CBMiU0FVX3lxTE5XZDZTSkg4eWt2WldhTHVDSGZEcG9CeWV4bU1PdWhoZThjV19PdmoybUlwemZZaU9RLUdVUUxZallqQl9Mb0ZfMnlObGx2RVpwUFNj?oc=5
+  - ม.กรุงเทพ ร่วมกับ กองทุน ดร.สุพงษ์ ลิ้มธนากุล มอบทุนการศึกษาสนับสนุนการพัฒนากำลังพล - เดลินิวส์ | https://news.google.com/rss/articles/CBMiU0FVX3lxTE9fSFNpdG54cENwcDVMZ204VndlcXhCY1lNYTY2Y09yMUVwLU5yU3piN3FwcGl0MGNEeXAtcHhuU3kzbENoZ0otcXl4V21ubUd5Z05N?oc=5
+  - ผู้ว่าฯ เมืองกรุงเก่า มอบทุนการศึกษา พร้อมเปิดมหกรรมอาหารฮาลาลครั้งยิ่งใหญ่ ณ อยุธยาซิตี้พาร์ค - เดลินิวส์ | https://news.google.com/rss/articles/CBMiU0FVX3lxTE1DRUhsa3d1ZW45MnVxRmdab0hFZVVISnJudHBPMkplZnVldTQzb1ZhNXBUc1RFZlgzUThDM1Z1a0wtQTBiSVh0TkJvNlppcWxiRG40?oc=5
+
+Source: Google News (International Students) - facebook.com | count = 2
+  - กรมทรัพยากรน้ำบาดาล ชวนวัยรุ่น Gen Z ร่วมเปิดค่ายเยาวชนรักษ์น้ำบาดาล ปี 2 (Youth Groundwater Guardian) สวมบทบาทนักสื่อสารน้ำบาดาลรุ่นใหม่ ชิงทุนการศึกษารวมมูลค่ากว่า 60,000 บาท https://www.fm91bkk.com/newsarticle/67238 #กรมทรัพยากรน้ำบาดาล #กระทรวงทรัพ - facebook.com | https://news.google.com/rss/articles/CBMi8gZBVV95cUxOZG55LWtudHBHY2dCMDYxVUlvNmRyTkRwWlgwZi13eXdvcFFVNkNkWklBMVBoV2YydkF3b0s0Z20zaVJOZlNoSmVfN1dzczVkOXo5TGdzeThyMHhTMlBWbTF0TlZ4MjN5QXRRUXBxczVMZHB3U1QyODIxMDRBeWUxV1UwYk53cnJxYV84S19LZHprOGRQV1RzSU91eGswMmw2aEZZOGNhNlo0OUUxTTRkZ0hXeVpsRklUSXQ3RWZIMjBGcDNhOUNSazg3TzNhV3J6TXBweERIZ1p6LXdYU2FCM2ItN0RIRHpqVmsyODQ0aUhhOVJBc2RNUklmaFBXQUFBLXItN1pUeU9rbW1jYlVaYUJWQXlnQ2tDZHY0Y29NM3ZJa0pNSVdCbnZxYzhUNWVjanNxZGNmajRxN0pqVTJfTUZ0bHFUVS1EaVlLbnMtMXExc281ZG1sdTJ5QnhYajJUcVA4ZUFLTlhManFBRWVnTXdoaDU1MWxqSlRiRjV2SGRUSFJOR3ZBdTE2dVBQcVhTbzhPdUtVbkV6SFBTb1hCUHkxbmpFYlRxaUNvVHJ1bnBlVzNlV0ZYTXlMZmRLS1ZReFdlQnJFSFN1OFUySWVzVHdxMVNBMVRiNjRkYnVlNU11cXF3bV9LVl9hSTlybERiUWZKZ21MeGtxXzRmclJqWGZHRWZ2RFFENVFXRlhDSVExMHZiNzFJcnFlQWZFZGhvaGkyZmQtU2p4a3Jxc3IxQU05WmlvOFd3bWw5X0ExVWZESHI2MGEwUS03c0FwM3pGdjFwSG8tR09zbWpobmxMbFVpZzkzMk81NU9rUUstQ3BMd1JVNkNKQVE5YXFuRXJzT0xKNGtwYmlEalpSVmhWYkZweVV2cWVNX1k1cEVobVJsaVJKSHl5TkgxNFlmT3hLMXR6emFJaElqaFQ1a0hLZWNKbE5DVktnbDlJbEZCVm8xTkZRVlh1WF8zMGNyLWVQMzRNZzZzMkhBeko2MTgxNC04Q2lKQmsyZGdqVVd1TTZsSWVtS1dOM2FjNk5Edk1JV3dWRWF1OUI2eEV1NV83UTVyWEhReHRoSUJtUlVBb2dCUkNWYVdzRlJpb2RuNHZ2N1N5T2REMzNrTzF4ZG0zR09CZU9qV1JjVTl5d0ZWLTdlakxmRk9pY2R2S0w5bUY2QWc?oc=5
+  - #มูลนิธิเพื่อเด็กและคนพิการ ประกาศรางวัลการประกวดเขียนเรียงความ ดึง #อายกมลเนตร #เต็กชัยรัตน์ เจ้าของ #กาหลมหรทึก ร่วมเสวนา : : มูลนิธิเพื่อเด็กและคนพิการ จัดงานประกาศผลรางวัล การประกวดเขียนเรียงความเพื่อพัฒนาทักษะทางภาษา และความคิดสร้างสรรค์ ประจำปี 69 พร้อมดึง 2 - facebook.com | https://news.google.com/rss/articles/CBMihAhBVV95cUxNWWRRSmtGX3ZWTHpKaGZRbndqaW5RRkZpVUtkaTE3SkNQNVdjNERwNWljbnFOVHhzR3RSYjFRVUZ6X2xRTFhVcFFydzJlRGZ0SFlpdUJtUVZPdmpIeDA0bG8yN1d1Z1JpSV9DZERUcVh6dUZmSDlIc0tBZkNWSGQ5Y1hQOTFWSC0zSDR5MzQ3ZEp5aW03N1JJSnFkQWZPa1BXWXJnSFBsOVR0NkRRcmRMVFpmdEV1LVhrbndsaS0zc1hTRkgtWUM0emNsV0xnSXA5V1dzb3FPbVdBSS16ejY1cVJ4dGpVVV9MbkxKYWcxdlpua21ocU1fbGprZndTVGhUMXhsYnY0VVg2ZG9ZbzNzaVhoM2EzRkxlNXNuaGwwaFcyVkJkeHctYzFTb21JaHR6blFsdEdJa2tlUVdfbnJZcnRYejlRNWFoa0pTYVY4MXFPckFrSXU4bzRMc0QtNGFzYnk4MTlOR0diT3llUFJ5WmNPTUNVck15RmZNaHRzLVVkZGNZLWREOTU2RmxUaVR0VW4yN0ExY2FEU01ISnpPQVA2V0NucXpQUHhXQmdwaHpUeGZsQ2FKNlZFR05rOFUtOGt1Q2d0WkRIU0FkcGxOU0x2WjJpTGJ0OFRETU5TNHRfSUR0NGJULXFGdTN3cV9RYVBUd3hmMU9jOEtYTVFDVW9BNzRRYmtVNUFzekpfRmlNQldnX2RqVktZUFBLcEVvLUs5cTJMaGUwcVBoeTNXTm1MQld2LWZHeWpVenl5em9oem1faDNSdWpTdk9JLWphSXBzd3FkY2hfdjhaUnBwRzZ3ejgzVWlKUHhRM2dfczdWanNtcnZ5VXNuLUl5UDRGZ2RtUmowaFhSU1hEVnZiZExrTzZpWEM0eFdSSWFuby02VGtHVTdCQzBsN0xZUmlXY3REYUVuYl9PdE5ZOVJXd284Ymw3MERuMUhlcWJ1djVCRmZmVXBmMi1EUGU0aUJLSUFEMjJKWnRnTWE2OXQzYXRwUnQ1Yks1SG91czZlanJqZHRVbWdTaGVYTjNLR2UzaFN1X19YR2V0cVQxa05ZaEVEVmFVU2psUFdKVXY5Ym1WX0FJT3hGYzg3cmlCMEIwdEJJT3RNbEZPV0RRZWI2VXVWcmVfX0Zkblljei1OUW11MmthcVM3S3RoNkEwZVA1VXFMXzZyVmk3a3FWRnVDTnhJbDdyM3FLZjBJYS1idTdjSHdVWTBqc2ZVb3lxNnljcjU3TmhDWEVhVjQzQzhGWEtXNjhmM1JUZ0xHOFA2SEd3dnlkb1FuZk9RT1IxZnpqY0t1OFcyQmNseVNiTTBKWnJzLTJZOGN0RjFNUU9lMGdYRHZwb3d4dnJCMC0xcDRBc0pFSA?oc=5
+
+Source: Google News (Thailand) - Thaipost.net | count = 1
+  - นายกฯ ดูจุดเพลิงไหม้ ตชด. 21 ตรวจซากคลังสรรพาวุธ - Thaipost.net | https://news.google.com/rss/articles/CBMiWkFVX3lxTE1XbFZ1VEVwSURnSWhvZUZmOTFyeXM2OTFUTmVDaXdYaUJwM0Jzd3pjREdXbVNOaFY3NmNMQTFlYUY3a0p4TFZaRFdzRGx3cVhQLUhrWE1kMm5TUQ?oc=5
+
+Source: Google News (International Students) - กระทรวงแรงงาน | count = 1
+  - ก.แรงงาน ร่วมกับ สมาคมแม่บ้านกระทรวงแรงงาน มอบรางวัลรถยนต์แก่ผู้โชคดีจากการออกสลากบำรุงสภากาชาดไทย พร้อมมอบทุนการศึกษาแก่บุตรข้าราชการ - พนักงาน ประจำปี 2568 - กระทรวงแรงงาน | https://news.google.com/rss/articles/CBMihA5BVV95cUxQX2V0TmdncUdIOEdCZFdiQ19RVnBVMERZMVlXaWtUem1ubXJFdF82MTQ3aGdFN3NfbGhhUzFxMDdad1F6YmkyRW9ENC0wMUNmRTFBUGFDT2txNTZCVVYzeDVFSUtiQ1ZWaEhQWW1ic25LNU92ZGFqOXFyb1M2Zjl4SmN2YWtYMlkwcW1wenJ4bmM5VXFfTWU2ZWF0YWs0eE05SFJnamk3N3F4R2Y2aDg3djd6T0liSVJraUtHeG9rS09vb1dsX0ZCMHFxRUZ1R0g1VE91WUlhM2RwbXdMajZMdWlxR19OZ0dQQTlRcXJ0SjlMc3gwSnA5MlZidlZNaGZCc0ozWmxrcGpldnc2VGtpV2Z6bDZEQUEwNjAwVlh3UHBQNDRfWEhGOXRJWGE4U2tGMHB3NDl1NVZwVnhCTWV2Z2dZUmxhLW54ZkF5YnpCUTNGa0xmTW5ncjNSR05yWmVvRkptQ1BtM0hSVWtBTS1WUnBtQXA3NU9sZnhpQnBHUTNBT1Q3TjVGZkF1SHN0VFNiLURBNVA2djliX09XTHl0UHBVQWFLbnl5ZC1SbnpUcnhVSEVQM2xuaFNveU9rcTFHX1FfWW1qNGMyR19TZ2I0Z2hhV3pyN09oR2xvYTJfcm9NSXphdUtaWlJxRG0weFhKM0RfeHlPWXlGZkdMYTlrend2YTlONmdRYmduVGI2bkhqWGtMZFo5RmZITkVMdDBSaGNSWXVnQ0JmekRUaVJfN3lNZ1VsVDZQM0QtajgxWHJQclZEYnJLV1QyV2pXXzBMOXl3ZTQzZm1GckZVMmNfTk9KSWpyOHpoR2o5RDMySTUxMFRORGpmUXF6THVtbFNMOV9UNUpqV2JMMlpaZ0VsUmRDdjBZbHR4WUhMbTBYWWZfWDQxa3FNNU1NOEx1RDhyVnJBUVZzTTBwVnNic0Ywd3B3eGV0RzRCWFlsZnZJcmFPRkJlMlVnLXdHNUFjcDFfd0ZPdTFscXFDMURoT1Vrdmw3dWxMVGJET2VSdlo3Z3BTVDlYWUZGVW5TSU1aUFVzVDg5anpBdy1hRHhfbFNvNmlvZUNQZ0RFQUF1VkctY2ZCUHdBTlJiVkRzME9rbk1ON21MREktN1UwSmhoY3pXaTM2ODdoaTlwWjg0R1hLS2lRdzlaSS1ENThhaWN1YXNIOHNycE1NMGhFTnVzSjlNMWF6RnlrUUxJbjI1M0V5TDBsVG9YakpmZ0swblpwbVRUUUt2dFpBODRSejdpZjVBS3htUk1XNVU3cWtJSUZZcXg4aU41RDBQejRIOEx1d29iNmxiTkhrb25vcDVkZlJCRThkRXRUYWcxcWpUUHduRHIxSlhQR20zV1ROeUxENXRuSmlqSDdLZUEzM2R2U0NEX1JSbXZLdlBoaDgxSGk3aGM2WjZld20zTHJNeFNjZG9hNHE1cjBrTXZ3VHdoV0stdUhkT19TenFyT29DZy0wSmNGcXQ0ZXBWcURMQ1FMa25WUkYwckE1M0NZSDJCWF9lYkVkMnJNNFZhaThVS1d0MTdmckE5TjF1TW1laEJUUG5NTjVhTkNXc0xiamhUQ0hZLTJOUmh2em56UFhId1hGREVfZXZfSjdiajVtekpydGtVa0Y4Qmk5aVkzMlVsVnhFZnpWLUg3Ty1yQnNHeXdxN1ltQ2tkU2NpbGNkUlRDYk1LcGxPNVJhRGk0TWtMT1NRZHZOVk56UzJzY19ZSTVvdnJVLWNRc3VIa2hYc1dwSHRXVXVpdFUtd0FEM3JqbjNRU2RzeWx0NXd4cXFFeXRlLU5iT2NSMjRHSFptYTV6Tk9xb2o1emV3eHI0dXo3ekZBMVd6NE91SFhFMzJBTk5XcWxnZGFFZWJpQ1Y5R1gyZVUyZ1ZiMWN3cWFsTm9HeWV5X21FVFR6cHQxQmtDSWF3XzB5NjV0bmFVeWZXdENGa25lNTNOejY3UUl5V1JFYWxraHJxSEVmcHk5Z3VuX2c0bVlPLXozcFM1Yk1WNnVMeUlXT2NhM0JSZEFzMVFNdGZJRzl5TFVEdDNUYnoyQkllT08yWEIzS00zM2xGbWJkRHBRSVdFdHFYbXFLa0VQUllZdTVKOTlaek9zY3N0LThBY0c0azJGVWF6TkxNdHoxT2xOc0R0OWpLd05IX3hVOW81MXloTVp4eGE0SklzU1pOTU9iMlQtZm4yQlpKVHFsZmk5SFZKVjFSOTh1bTJQdGFRUnZURHdKcFBMVldPQTRFenhvcXZiRVBsVnhhUHFGdTVCZFp6X3lNT051TW1nR3dva0dnSGFjLXJyV0FCUk10MHM1TG5jeU42V0dkTkg4NXpSSlFER1FadXFfM2pxQlVKeGo3eVAwdzI2MVJNTWpsUzhjaWlWSGZRTURuV2VyMTE5Zkp6Vg?oc=5
+
+Source: Google News (Thailand) - komchadluek | count = 1
+  - LIVE ลิงค์ดูบอลสด "บอร์นมัธ พบ ซันเดอร์แลนด์" พรีเมียร์ลีก อังกฤษ 19:30 น. - komchadluek | https://news.google.com/rss/articles/CBMiWEFVX3lxTE1kOUZsNlNzSXFIWXAwZGstRl9kaTkzTmhqQmJubk5ubGd0TzA4QmpMWEVKNEFhWjVIUWZ2VExqZDRzVnQtWTVERUxPMnJOaDQyN0ZIWGRhM2M?oc=5
+
+Source: Google News (Thailand) - LINE TODAY | count = 4
+  - ศึกอาเซียน! ฟุตซอลไทย ร่วมสาย เวียดนาม-เมียนมา-ติมอร์ฯ | Play Now Thailand - LINE TODAY | https://news.google.com/rss/articles/CBMiVkFVX3lxTE9UUkI0NjZGb29JRWhSTTZxVkU0WGhZMW1jcDduX081TVNoOENjekFHUVZ2OVdqeUEwS1ZhVUZZZktkdWFDYkpRQXRpc1B3U3pTejRIeDRn?oc=5
+  - SET mai TFEX LiVEx เปิดซื้อขายตามปกติวันที่ 2 มี.ค พร้อมติดตามสถานการณ์ใกล้ชิด | การเงินธนาคาร - LINE TODAY | https://news.google.com/rss/articles/CBMiVkFVX3lxTFBMTzRqR0dhNFc2SVNndUFTNEhWbDVoUHM3R2xtNTNjbnA2dVZUaC03VTNCdUtFNHYtT3FnSkpFNXFLN05kWGNhb3NxeUh5cml4T25JOVRB?oc=5
+  - ข่าวดี! หมอบอยเผย ราศีมาแรงอันดับ 1 โชคพุ่งแบบฉับพลัน รับทรัพย์ใหญ่ไม่ทันตั้งตัว | มุมข่าว - LINE TODAY | https://news.google.com/rss/articles/CBMiVkFVX3lxTE5RS0JjRlRvRTVWYy1tT2NZcFZXQjVrWmJVSWVXcTBNdGRfVThnT0UxdnpybDNjdFItbFdxdnhXSFdEUGY3MFYwLXZQYWZ6QTc1Vjg5S1Zn?oc=5
+  - หมอเจด เตือนเจอคนไข้เลื่อนนัด แค่ 1 ครั้ง เจอมะเร็งระยะ 2 ชี้สัญญาณเตือน | Khaosod - LINE TODAY | https://news.google.com/rss/articles/CBMiVkFVX3lxTE5URVFOVk04d0JYLXZQc2w2YlJFeER4c1dqSHhMd3lObENsTTlqUmVnaHVGZDhyN2U2TnZNdzNBRXMtN3dtNzdiYWlQR3l3Z0U4NHB4NWVR?oc=5
+
+Source: Google News (Thailand) - เดลินิวส์ | count = 2
+  - ทรัมป์โดนฟ้องร้อง “กว่า 2,000 คดี” หลังศาลฎีกาคว่ำภาษีครั้งใหญ่ - เดลินิวส์ | https://news.google.com/rss/articles/CBMiU0FVX3lxTE8tZWJEWmlQb2s3MUpDTmplamZWM01TTkZaRmUxVEhjTE01Q2xpU2dzejlySFRGVmlXQVdoTFc3RHVsQUk1SUdnQWk0U0ZvNm9JYzkw?oc=5
+  - เปิดคำชี้แจง กกต. ทำไมถึงต้องฟ้อง 6 คน ปมถอดรหัสบัตรเลือกตั้ง - เดลินิวส์ | https://news.google.com/rss/articles/CBMiU0FVX3lxTFBrdVdOUGJ5SkZpYXIzZ0djeFAxWWx4bTlYMjR1RDNtTEtrNUlZVFhyY0xjclNoT015UDFnMmVkRVJGamFYeE9UTmViSlFvVEM5NFRB?oc=5
+
+Source: Google News (International Students) - ผู้จัดการออนไลน์ | count = 1
+  - ทศวรรษแห่งเกียรติยศ: สถาบันขงจื่อ AU เปิดตัวศูนย์สอบดิจิทัลมาตรฐานสากล พร้อมประกาศมอบทุนการศึกษาจำนวนมาก เพื่อสร้างโอกาสแห่งอนาคต - ผู้จัดการออนไลน์ | https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1Ud08yZXRqTTNMaWp1UTJkcUFmWVFUUjg4RHFWaVBOc3lhVTUtTUhobzVYU1JqZU1rN0VxYUZqUHpWZ281X2t0LUxhSE5vVU0tdjFyRERBbFU5TnpmYnJ2aUNyR2Q5aHc?oc=5
+
+Source: Google News (International Students) - Siamsport | count = 1
+  - ชมรมช่างภาพการเมือง มอบทุนการศึกษาครั้งที่ 16 เสริมสวัสดิการคนสื่อ - Siamsport | https://news.google.com/rss/articles/CBMiVEFVX3lxTE5YSWpoUGtfS0UxMmc3OGN5LVliUWtjYXppUTl1YzFCQW5XTkl0eXcyNFhYVkx4cHdmUE5XOWJPOVZySE9uclZQZXk0S243bzdheW5EMQ?oc=5
+
+Source: Google News (Thailand) - bangkokbiznews | count = 1
+  - 'ไมโคโปรตีน' อาหารแห่งอนาคต ผลิตจากเส้นใยเชื้อรา ไม่มีคอเลสเตอรอล แคลอรี่ต่ำ - bangkokbiznews | https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1SM01NQmdGTTlhaWktTmpTLXl6ZkpHcUZCZVVUcEh3aHhxU1RQRWQwYUJ5YUFjaWVzRUdQd1NVdDJuRFFaQmJXZFo0ZnlKbnpQWTFtQTlqS1c4ZG5UbjNaNnNHMWYxSGs?oc=5
+
+Source: Google News (Thailand) - Hoonsmart | count = 1
+  - ‘กลุ่มซีพี’ ขายหุ้น TRUE 10% ร่วม 5 หมื่นลบ.ยันกอดหุ้นใหญ่ 20% - Hoonsmart | https://news.google.com/rss/articles/CBMiTkFVX3lxTE5obTg0ZW1xMTN0SE5YYUlZVUtQdHJuZmNnUDVHUVh5MW1NWTN0ZE1rUjZ4ZzFwMzdMbHZjdktyaS1EcEVfeGtIYjAyel9Vdw?oc=5
+]]></system-out>
+    <system-err><![CDATA[SLF4J: Class path contains multiple SLF4J providers.
+SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@1ebd319f]
+SLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@3c0be339]
+SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual provider is of type [ch.qos.logback.classic.spi.LogbackServiceProvider@1ebd319f]
+]]></system-err>
+  </testcase>
+</testsuite>

@@ -8,10 +8,10 @@
           style="flex: 1; padding-left: 44px"
           :placeholder="t('postList.searchPlaceholder')"
           v-model="query"
-          @keydown.enter="loadPosts"
+          @keydown.enter="loadPosts(true)"
         />
       </div>
-      <button class="btn btn-primary" @click="loadPosts" style="min-width: 100px">
+      <button class="btn btn-primary" @click="loadPosts(true)" style="min-width: 100px">
         {{ t('postList.search') }}
       </button>
     </div>
@@ -23,7 +23,7 @@
       style="padding: 1rem; background: #fee; border: 1px solid #fcc; border-radius: 8px; color: #c33;"
     >
       <p style="margin: 0 0 0.5rem 0; font-weight: 600;">{{ error }}</p>
-      <button class="btn btn-primary" @click="loadPosts" style="font-size: 0.875rem;">
+      <button class="btn btn-primary" @click="loadPosts(true)" style="font-size: 0.875rem;">
         {{ t('common.retry') || '重试' }}
       </button>
     </div>
@@ -58,7 +58,6 @@
                 style="cursor: pointer"
                 @click.stop="handleViewAuthorProfile(post.authorId)"
               >{{ post.authorName || post.authorId || t('postList.anonymous') }}</div>
-              <span class="post-author-badge">{{ t('postList.student') }}</span>
             </div>
           </div>
           <span class="post-tag" v-if="parseTags(post.tags).length > 0">
@@ -133,15 +132,23 @@ const page = ref(0);
 const size = ref(20);
 const hasMore = ref(true);
 const loadingMore = ref(false);
+// 用于避免并发请求导致的重复数据：每次请求递增 ID，旧请求返回时直接丢弃
+const currentRequestId = ref(0);
 
 const loadPosts = async (reset = false) => {
+  const thisRequestId = ++currentRequestId.value;
+
   if (reset) {
     page.value = 0;
     posts.value = [];
     hasMore.value = true;
   }
   
+  // 如果没有更多数据并且不是重置，就不再加载
   if (!hasMore.value && !reset) return;
+
+  // 防止在已有请求进行中时再次触发“加载更多”，造成并发请求同一页
+  if (!reset && (loading.value || loadingMore.value)) return;
   
   loading.value = reset;
   loadingMore.value = !reset;
@@ -161,6 +168,11 @@ const loadPosts = async (reset = false) => {
       size: size.value
     });
     console.log('PostList: Posts loaded:', result?.length || 0, 'posts');
+
+    // 如果在本次请求期间又发起了更新的请求，则忽略本次结果，避免旧数据覆盖新数据 / 造成重复
+    if (thisRequestId !== currentRequestId.value) {
+      return;
+    }
     
     if (reset) {
       posts.value = result || [];
@@ -196,8 +208,11 @@ const loadPosts = async (reset = false) => {
         : 'Failed to load posts, please try again later');
     }
   } finally {
-    loading.value = false;
-    loadingMore.value = false;
+    // 只在这是最近一次请求时，才重置 loading 状态，避免覆盖更新请求的状态
+    if (thisRequestId === currentRequestId.value) {
+      loading.value = false;
+      loadingMore.value = false;
+    }
   }
 };
 
@@ -208,7 +223,8 @@ const handleScroll = () => {
   const documentHeight = document.documentElement.scrollHeight;
   
   // Load more when near bottom (100px from bottom)
-  if (scrollTop + windowHeight >= documentHeight - 100 && hasMore.value && !loadingMore.value) {
+  // 额外判断 loading，避免在已有请求时再次触发导致同一页数据被重复追加
+  if (scrollTop + windowHeight >= documentHeight - 100 && hasMore.value && !loadingMore.value && !loading.value) {
     loadPosts(false);
   }
 };
@@ -359,10 +375,8 @@ onMounted(() => {
   const handleLanguageChange = (e) => {
     if (e && e.detail && e.detail.lang) {
       const newLang = e.detail.lang;
+      // 只更新语言，真正的重新加载由 watch(lang) 统一处理，避免重复追加数据
       lang.value = newLang;
-      setTimeout(() => {
-        loadPosts();
-      }, 100);
     }
   };
   

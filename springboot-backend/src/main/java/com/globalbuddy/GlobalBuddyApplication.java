@@ -20,4 +20,3 @@ public class GlobalBuddyApplication {
         SpringApplication.run(GlobalBuddyApplication.class, args);
     }
 }
-

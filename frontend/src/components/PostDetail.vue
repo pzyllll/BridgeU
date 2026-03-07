@@ -39,7 +39,6 @@
               style="cursor: pointer"
               @click="handleViewAuthorProfile"
             >{{ postDetail.authorDisplayName || postDetail.authorName || t('postList.anonymous') }}</div>
-            <span class="post-author-badge">{{ t('postList.student') }}</span>
           </div>
           <div 
             style="font-size: 0.875rem; color: #666; margin-top: 0.25rem; cursor: pointer"

@@ -1,0 +1,842 @@
+## BridgeU - Project Plan
+
+**System Name**: BridgeU – Bilingual Community & Daily Briefing Platform for International Students in Thailand  
+**Prepared by**: Zhiyi Pan (Student ID: 652115558)  
+**Project Advisor**: Asst. Prof. Pattama Longani, Ph.D.  
+**Date**: January 2026  
+
+---
+
+### 1. Introduction
+
+#### 1.1 Purpose
+
+The purpose of this Project Plan is to define the project management activities, resources, and schedule required to successfully deliver the BridgeU web application.  
+It provides a high‑level view of the work products (Proposal, SRS, SDD, Test Plan, Source Code), clarifies responsibilities, and describes how the project will be monitored and controlled in alignment with ISO/IEC 29110 and the detailed requirements and design documented in the **BridgeU‑SRS** and **BridgeU‑SDD v2.0**.
+
+#### 1.2 Project Overview
+
+BridgeU is a web‑based platform that helps international students in Thailand adapt to local life and connect with each other and local merchants.  
+The system provides:
+- **Daily Briefing System** – automatically crawls news from Google News RSS, summarizes it using Qwen AI, and presents bilingual (Chinese/English) daily briefings with powerful search and date filters.
+- **Community Interaction Platform** – a bilingual forum where users can create posts, comment, like, follow each other, and use private messaging, with Qwen AI‑based translation, content moderation, and comment summarization to ensure a safe environment.
+- **Authentication & Profile Management** – secure registration (email or phone + verification code), login/logout, profile editing (display name, avatar, preferred language), and a “My Community Posts” view showing post review status.
+
+The architecture is a standard client‑server web system: a Vue.js frontend communicates with a Spring Boot backend via REST APIs, persisting data in a MySQL 8 database and integrating with Aliyun Qwen AI services.
+
+#### 1.3 Project Scope
+
+The project scope covers the following major functional areas (features), which are consistent with the Proposal, SRS, and SDD:
+
+- **Feature #1: Daily Briefing System**  
+  - Scheduled crawling of Thai news at 8:00 AM daily from approved media sources.  
+  - AI‑generated Chinese/English titles and summaries using Qwen AI.  
+  - Daily Briefing list with pagination, keyword search, date range and source filters, and a button to open the original news link.  
+
+
+- **Feature #2: Community Interaction Platform**  
+  - Bilingual post creation and editing with predefined tags (Study, Housing, Travel, Part‑time Job, Life Services).  
+  - Infinite‑scroll community feed with keyword and tag filters, likes, comments, AI comment summary, and report functions.  
+  - Mutual‑follow management and one‑to‑one private messaging (conversation list, message history, read/unread/delete).
+
+- **Feature #3: Authentication & Profile / My Community Activity**  
+  - Registration via email or phone with verification codes, secure password rules, and login/logout.  
+  - Profile management (display name, avatar, preferred language) and real‑time language switching across the UI.  
+  - “My Community Posts” page showing the user’s posts and their AI review status (awaiting moderation, approved, rejected).
+
+Non‑functional scope includes performance (responsive UI, pre‑generated AI summaries), security (JWT, password hashing), and maintainability (layered architecture, clear API contracts as detailed in SRS/SDD).
+
+---
+
+### 2. Project Deliverables (Work Products)
+
+The BridgeU project will produce the following key documents and artefacts:
+
+1. **Project Proposal** – `Proposal.md` describing background, target users, features, user journey, business review, architecture, objectives, milestones, and references.  
+2. **Project Plan (PMP)** – this document, `BridgeU-projectplan`, defining management activities, schedule, and configuration management.  
+3. **Software Requirement Specification (SRS)** – `BridgeU-SRS.md` describing functional and non‑functional requirements, use cases, and system constraints.  
+4. **Software Design Document (SDD)** – `BridgeU-SDD.md` and `BridgeU-SDDv.2.md` describing architecture, DFDs, ERD, data dictionary, and component design.  
+5. **Software Test Plan & Test Record** – `BridgeU-TestPlan.md` containing unit, integration, and system test cases and execution records.  
+6. **Traceability Record** – `BridgeU-TraceabilityRecord.md` mapping URS ↔ SRS ↔ design artefacts ↔ test cases.  
+7. **Final Software Product** – complete source code (Vue frontend + Spring Boot backend + database schema), build scripts, and deployment instructions, as well as the runnable application.  
+8. **Presentation & Final Report** – slides and final written report summarizing objectives, design, implementation, and evaluation results.
+
+---
+
+### 3. Management Procedures
+
+#### 3.1 Project Team & Roles
+
+This project is carried out by a single student developer under the supervision of an academic advisor:
+
+- **Zhiyi Pan (Student)**  
+  - Requirement elicitation and refinement (Proposal, SRS).  
+  - UI/UX design and frontend implementation (Vue.js).  
+  - Backend design and implementation (Spring Boot, REST APIs, database schema).  
+  - AI integration (Qwen AI for translation, summarization, moderation).  
+  - Test design and execution (unit, integration, and system tests).  
+  - Documentation (SDD v2, Test Plan, Traceability Record, Project Plan, Final Report).
+
+- **Asst. Prof. Pattama Longani, Ph.D. (Project Advisor)**  
+  - Provides technical and methodological guidance.  
+  - Reviews and approves milestones (Proposal, Progress I, Final Progress).  
+  - Evaluates deliverables and gives feedback to improve quality.
+
+#### 3.2 Monitoring and Controlling
+
+- **Meeting Schedule**  
+  - Regular consultation with the advisor to review progress, discuss issues, and validate design/testing decisions.  
+  - Additional meetings before each major milestone (Proposal defense, Progress I, Final presentation).
+
+- **Software Development Life Cycle (SDLC)**  
+  - The project adopts an **iterative and incremental** approach aligned with ISO/IEC 29110:  
+    - Iteration 1 (Proposal & Architecture): clarify objectives, target users, high‑level features, and architecture.  
+    - Iteration 2 (Progress I): complete SRS and SDD, implement **Feature 1**, and prepare initial test cases.  
+    - Iteration 3 (Final Progress): implement **Feature 2** and **Feature 3**, refine design, and complete full testing and documentation.  
+
+- **Progress Tracking**  
+  - Use the milestone schedule from the Proposal (Chapter 10) as the baseline.  
+  - Track task completion by date and adjust effort allocation if delays occur.  
+  - Ensure that all SRS requirements are covered by design (SDD) and tests (Test Plan) using the Traceability Record.
+
+---
+
+### 4. Quality Standards
+
+This project follows the **ISO/IEC 29110** standard for Very Small Entities (VSEs), focusing on:
+
+1. **Project Management (PM) Process** – planning, assessment, and closure:  
+   - Establish clear scope, schedule, roles, and risks in the Project Plan.  
+   - Periodically assess progress against the milestone plan and adjust when needed.  
+   - Perform formal closure with final report, presentation, and advisor evaluation.
+
+2. **Software Implementation (SI) Process** – analysis, design, construction, and testing:  
+   - Requirements are documented in `BridgeU-SRS.md` with use cases and non‑functional constraints.  
+   - Design is captured in `BridgeU-SDDv.2.md` (architecture, DFDs, ERD, data dictionary, component design).  
+   - Construction follows a layered architecture (Controller → Service → Repository → Entity/DTO) as described in the SDD.  
+   - Testing is guided by `BridgeU-TestPlan.md`, including unit, integration, and system tests, and recorded to provide objective evidence of requirement coverage.
+
+Additional quality practices include code review (self‑review and advisor feedback), consistent coding standards (naming, formatting), and regular backups of documents and source code.
+
+---
+
+### 4.1 Project Management Process (PM)
+
+#### 4.1.1 Purpose
+
+The purpose of the Project Management Process is to establish and carry out the systematic way of the task of the software implementation project, which allows complying with the project's objectives in the expected quality, time and costs.
+
+#### 4.1.2 Project Management Activities
+
+The following activities are performed in accordance with ISO/IEC 29110:
+
+**PM.01 – Project Planning**
+
+The project plan for the execution of the project is developed according to the Statement of Work (Proposal) and validated with the customer (Project Advisor), where tasks and resources necessary to complete the work are sized and estimated. This Project Plan document (`BridgeU-projectplan`) serves as the baseline project plan, defining project scope, deliverables, and milestones (Section 1, 2, 6), detailed Work Breakdown Structure (Section 7) with task breakdown for each phase, resource requirements (Section 8) including tools, technologies, and human resources, risk management strategy (Section 9) with identified risks and mitigation plans, and schedule with specific dates for each phase (Phase 1-4). The project plan is reviewed and approved by the advisor before execution begins.
+
+**PM.02 – Project Monitoring, Control, Risk Management, and Closure**
+
+Progress of the project is monitored against the Project Plan and recorded in the Progress Status Record, with weekly progress updates provided to the advisor documenting completed tasks from the WBS (Section 7), current work in progress with status indicators, blockers or issues encountered and their resolution plans, and next week's planned activities aligned with the schedule. Corrections to remediate problems and deviations from the plan are taken when project targets are not achieved, including schedule adjustments when tasks take longer than estimated, resource reallocation when needed, and scope adjustments (if approved through change management). Appropriate treatment is taken to correct or avoid the impact of risks (see Section 9 for detailed risk management), including risk monitoring and review at regular intervals, implementation of mitigation strategies when risks materialize, and update of risk register with current status. Closure of the project is performed to get the customer acceptance documented in the acceptance record, including final presentation and demo to advisor and committee, advisor approval and acceptance record, and project archive and submission of all deliverables.
+
+**PM.03 – Change Management**
+
+Change Requests are addressed through their reception and analysis, where changes to software requirements are evaluated for cost, schedule and technical impact including impact assessment on scope, schedule, resources, and deliverables, technical feasibility analysis, and effort estimation for implementing the change. The change request process (detailed in Section 13) involves: (1) identifying and documenting proposed change with rationale, (2) assessing impact on scope, schedule, resources, and deliverables, (3) reviewing with advisor for approval/rejection, (4) if approved, updating relevant documents (SRS, SDD, Project Plan, Test Plan), (5) updating Traceability Record if requirements change, and (6) re-baselining affected work products. All change requests are tracked and documented for audit purposes.
+
+**PM.04 – Communication and Agreement Tracking**
+
+Review meetings with the Work Team and the Customer (Advisor) are held, including regular weekly consultations to discuss progress and issues, milestone review meetings (Proposal defense, Progress I, Progress II, Final presentation), and ad-hoc meetings when critical issues arise. Agreements are registered and tracked, with meeting minutes documenting decisions and action items, follow-up on action items in subsequent meetings, formal approval of deliverables documented in milestone reviews, and action item tracking until completion. Communication channels are established, including email for formal communications and document sharing, regular meeting schedule for synchronous discussions, and project repository for document access.
+
+**PM.05 – Risk Identification**
+
+Risks are identified as they develop and during the conduct of the project, with a risk register maintained (Section 9) containing risk description, probability, impact, and severity rating, mitigation strategies and contingency plans, risk owner and monitoring schedule, and current status and review dates. New risks are added to the register as they are identified during project execution, including technical risks (e.g., API integration challenges, performance issues), schedule risks (e.g., task delays, resource unavailability), and scope risks (e.g., requirement changes, feature creep). Risk review is conducted regularly (at least monthly) to assess current risk status.
+
+**PM.06 – Software Version Control and Configuration Management**
+
+A software version control strategy is developed (Section 5.2), including Git repository for source code and Markdown documentation, meaningful commit messages for each change following conventions, branch strategy for experimental features (feature branches merged to main after testing), and tag releases for each milestone (v1.0, v2.0, etc.). Items of software configuration are identified, defined and baselined, including source code (frontend Vue.js and backend Spring Boot), database schema and Flyway migration scripts, documentation (Proposal, SRS, SDD, Test Plan, Project Plan, Final Report), build scripts (Maven/Gradle, npm package.json), and deployment instructions and environment configuration. Modifications and releases of the items are controlled and made available to the customer and work team including the storage, handling and delivery of the items, with all documents stored in structured project directory, cloud backup (Google Drive/OneDrive) for safety and redundancy, version numbering convention (Section 5.1) for document versions, and access control and change tracking through Git history.
+
+**PM.07 – Software Quality Assurance**
+
+Software quality assurance is performed to provide assurance that work products and processes comply with the Project Plan and Requirements Specification, with quality assurance activities including code review (self-review and advisor feedback) for adherence to coding standards, consistent coding standards (naming conventions, formatting, documentation), test coverage verification (target: ≥70% for critical services), documentation review and approval process, traceability verification (requirements → design → tests) using Traceability Record, and compliance checking against ISO/IEC 29110 process requirements. Quality assurance records are maintained in Test Plan and Test Records (`BridgeU-TestPlan.md`), Traceability Record (`BridgeU-TraceabilityRecord.md`), code review notes and advisor feedback, and quality metrics and coverage reports. Quality issues and non-conformances are identified, tracked, and resolved before project closure.
+
+---
+
+### 4.2 Software Implementation Process (SI)
+
+#### 4.2.1 Purpose
+
+The purpose of the Software Implementation Process is the systematic performance of the analysis, design, construction, integration and tests activities for new or modified software products according to the specified requirements.
+
+#### 4.2.2 Software Implementation Activities
+
+The following activities are performed in accordance with ISO/IEC 29110:
+
+**SI.01 – Task Execution Through Project Plan**
+
+Tasks of the activities are performed through the accomplishment of the current Project Plan, where all development, testing, and documentation tasks follow the detailed WBS defined in Section 7, including Phase 1 (Proposal development and defense), Phase 2 (SRS, SDD, Project Plan, and Feature #1 implementation), Phase 3 (Feature #2 and #3 implementation, comprehensive testing), and Phase 4 (Finalization, documentation, and closure). Progress is tracked against the Project Plan milestones and schedule, with task completion status updated regularly, milestone deliverables verified before proceeding to next phase, and deviations from plan identified and addressed through PM.02.
+
+**SI.02 – Software Requirements Definition and Analysis**
+
+Software requirements are defined, analyzed for correctness and testability, approved by the customer, baselined, and communicated, with requirements documented in `BridgeU-SRS.md` including functional requirements for all three features (Feature #1: Daily Briefing System with news crawling, AI summarization/translation, search/filter; Feature #2: Community Interaction Platform with posts, comments, likes, tags, AI moderation, AI comment summary, mutual follow list, private messaging; Feature #3: Authentication & Profile with registration, login/logout, profile management, "My Community Posts"), non-functional requirements (performance, security, usability, reliability), use case diagrams and detailed use case descriptions for each feature, and system constraints and assumptions. Requirements are analyzed for correctness (validated against user needs and project objectives from Proposal), testability (each requirement can be verified through testing), completeness (all features from Proposal are covered with no gaps), consistency (requirements do not conflict with each other), and clarity (requirements are unambiguous and understandable). Requirements are approved by the advisor (customer) through milestone reviews, with Progress I review including SRS approval, feedback incorporated and requirements refined, and requirements baselined after approval and communicated to all stakeholders. Changes to requirements follow the change management process (PM.03), with change requests evaluated for impact, approved changes updating SRS and Traceability Record, and requirements re-baselined after changes.
+
+**SI.03 – Software Architectural and Detailed Design**
+
+Software architectural and detailed design is developed and baselined, where design describes the software items and internal and external interfaces of them, and consistency and traceability to software requirements are established. Design is documented in `BridgeU-SDDv.2.md` including system architecture (logical architecture with layered architecture of Presentation, Business, Data layers; physical architecture with frontend Vue.js, backend Spring Boot, database MySQL, external services Qwen AI and Google News RSS), Data Flow Diagrams (DFD) at Level 0, 1, and 2 showing data flows for each feature, Entity-Relationship Diagram (ERD) showing all database entities and relationships, data dictionary for all database tables with field descriptions, types, and constraints, component design (Controller, Service, Repository layers) with responsibilities, API contracts (endpoints, request/response formats, status codes, error handling), and database schema design (tables, indexes, foreign keys, constraints). Design consistency is verified, ensuring all SRS requirements are addressed in the design, design components map to requirements via Traceability Record, internal interfaces (between components) are clearly defined, external interfaces (APIs, database, external services) are specified, and design is implementable with chosen technologies. Design is baselined after advisor review and approval, with Progress I review including SDD approval, and design refined based on feedback (e.g., SDD v1 → v2 with complete DFDs/ERD).
+
+**SI.04 – Software Component Construction and Unit Testing**
+
+Software components defined by the design are produced, where unit test is defined and performed to verify the consistency with requirements and the design, and traceability to the requirements and design are established. Component construction follows the layered architecture, including Entity Layer (data models such as User, Post, Comment, News, Message, Tag with JPA annotations), Repository Layer (data access using Spring Data JPA with custom query methods), Service Layer (business logic including NewsService, PostService, AuthService, MessageService), Controller Layer (REST API endpoints with request validation and response formatting), DTO Layer (data transfer objects for API requests/responses), Frontend Components (Vue.js components such as DailyBriefingList.vue, CommunityPage.vue, ProfilePage.vue), and Frontend Composables (reusable logic such as useAuth, useApi). Unit tests are written for service methods (business logic) using JUnit and Mockito, repository queries and data access methods, utility functions and helper classes, frontend components and composables using Vue Test Utils, and API endpoint handlers (controller methods). Unit tests verify that components behave according to design specifications, components meet their requirements from SRS, components handle error cases correctly (validation, exception handling), and components integrate correctly with dependencies (mocked). Test cases are documented in `BridgeU-TestPlan.md` with test case ID, description, preconditions, test steps and expected results, traceability to requirements and design components, and test execution results and coverage metrics.
+
+**SI.05 – Software Integration and Integration Testing**
+
+Software is produced performing integration of software components and verified using test cases and test procedures, where results are recorded at the test report, defects are corrected, and consistency and traceability to Software Design are established. Integration activities include Backend Integration (Controller → Service → Repository → Database, where REST endpoints call service methods, service methods use repository interfaces, and repository implementations interact with MySQL database), Frontend-Backend Integration (Vue components → Axios → REST APIs → Backend, where frontend components make HTTP requests via Axios, backend REST APIs process requests and return responses, and data flows correctly between frontend and backend), and External Service Integration (Qwen AI API for summarization and translation, email service for notifications, and Google News RSS for news crawling). Integration test cases are defined and executed, including API endpoint testing (using Postman or automated tests to test all CRUD operations, authentication and authorization, and error handling and edge cases), database integration testing (testing CRUD operations with real database, relationships and constraints, and transaction handling), external service integration testing (testing with mock responses for unit tests, real API for integration tests, and error handling for service failures), and end-to-end workflow testing (complete user workflows such as create post, add comment, like post, and cross-feature integration such as daily briefing → community discussion). Integration test results are recorded in `BridgeU-TestPlan.md` with test case ID, description, steps, expected results, actual results, pass/fail status, defects found and their resolution, and integration coverage metrics. Defects identified during integration testing are documented with description and steps to reproduce, fixed and verified through re-testing, and tracked until closure in defect log. Consistency with Software Design is verified, ensuring integrated components match design specifications from SDD, interfaces between components work as designed, data flows match DFDs, and traceability to design is maintained.
+
+**SI.06 – Software Configuration Integration and Baseline**
+
+A software configuration that meets the requirements specification as agreed to with the customer, which includes user, operation, and maintenance documentation, is integrated, baselined, and stored at the project repository, where needs for changes to the software configuration are detected and related change requests are initiated. Software configuration includes source code (complete frontend Vue.js and backend Spring Boot code), database schema (MySQL schema with Flyway migration scripts for version control), build scripts (Maven/Gradle build files, npm package.json with dependencies), deployment instructions (`DEPLOYMENT.md` with environment setup and deployment steps), user documentation (user guide if applicable, API documentation Swagger/OpenAPI), operation documentation (system administration guide, backup procedures, monitoring guidelines), and maintenance documentation (code comments, architecture documentation in SDD, troubleshooting guide). Software configuration is integrated, ensuring all components work together as a complete system, system meets all requirements specified in SRS, system is ready for system testing and deployment, and all dependencies are resolved and compatible. Software configuration is baselined, with final version tagged in Git repository (e.g., v1.0, v2.0), all documents finalized and versioned, configuration items listed and stored in project repository, and baseline documented with version numbers and dates. Change detection and requests involve identifying changes needed during testing or deployment, initiating change requests following PM.03 process, implementing approved changes and re-baselining configuration, and maintaining change history for audit purposes.
+
+**SI.07 – Verification and Validation**
+
+Verification and validation tasks of all required work products are performed using the defined criteria to achieve consistency among output and input products in each activity, where defects are identified and corrected, and records are stored in the verification/validation results. Verification activities (checking that work products meet specifications) include Requirements Verification (verifying SRS requirements are complete, consistent, and testable, ensuring all requirements from Proposal are addressed, requirements are unambiguous and measurable, and requirements can be traced to design and tests), Design Verification (verifying SDD design is consistent with requirements and implementable, ensuring design addresses all SRS requirements, design is traceable to requirements, and design is technically feasible with chosen technologies), Code Verification (verifying code follows design, coding standards, and requirements, ensuring code implements design specifications, code follows naming conventions and formatting standards, code includes appropriate comments and documentation, and code passes all unit and integration tests), and Test Verification (verifying test cases cover all requirements and design components, ensuring test cases are traceable to requirements, test cases cover all design components, and test coverage meets target of ≥70% for critical services). Validation activities (checking that work products meet user needs) include System Validation (system testing validates that the complete system meets user requirements, ensuring all features work as specified in use cases, system performs correctly under normal and edge conditions, and system meets non-functional requirements for performance, security, and usability), User Acceptance (advisor validates that system meets project objectives through final demo and presentation, advisor feedback and acceptance record, and system meeting expectations from Proposal), Functional Validation (all features work as specified in use cases, including Feature #1 Daily Briefing System, Feature #2 Community Interaction Platform, and Feature #3 Authentication & Profile), and Non-functional Validation (performance, security, and usability meet specified criteria, including response times meeting performance requirements, security measures such as authentication, authorization, and data protection in place, and user interface being intuitive and accessible). Verification/validation criteria include Requirements (all SRS requirements are addressed in design and tests), Design (design is traceable to requirements and implementable), Code (code coverage ≥ 70% for critical services, all tests pass), and System (all system test scenarios pass, no critical bugs remain). Verification/validation results are recorded in test execution records in `BridgeU-TestPlan.md` with pass/fail status, traceability verification in `BridgeU-TraceabilityRecord.md`, code review notes and advisor feedback, defect logs with resolution status, and coverage reports and quality metrics. Defects identified during verification/validation are documented with severity and priority, corrected and re-verified, tracked until closure, and records stored in test reports and defect logs.
+
+---
+
+### 5. Software Configuration Management
+
+#### 5.1 Naming Conventions
+
+Project artefacts follow a consistent naming pattern:
+
+- **Format**: `BridgeU-[DocumentName]_v[Version].[Extension]`  
+  - Examples:  
+    - `BridgeU-ProjectPlan_v1.0.docx`  
+    - `BridgeU-SRS_v1.0.docx`  
+    - `BridgeU-SDDv2.0.docx`  
+    - `BridgeU-TestPlan_v1.0.docx`
+- Source code modules use descriptive package and file names consistent with the SDD, such as:  
+  - Backend: `com.globalbuddy.controller.NewsController`, `MessageController`, `AuthController`, etc.  
+  - Frontend: Vue component files like `DailyBriefingList.vue`, `DailyBriefingDetail.vue`, `CommunityPage.vue`, `ProfilePage.vue`.
+
+Version numbers are incremented when major changes to requirements, design, or test scope are made (e.g., SDD v1 → v2 with new DFD/ERD).
+
+#### 5.2 Project Repository
+
+- **Document Storage**:  
+  - All formal documents (Proposal, SRS, SDD, Test Plan, Project Plan, Final Report) are stored in a structured folder under the BridgeU project directory and can also be backed up to cloud storage (e.g., Google Drive / OneDrive) for safety.
+
+- **Version Control**:  
+  - Source code and Markdown documentation are managed in a Git repository (e.g., on GitHub or a private Git server).  
+  - Each significant change (new feature, refactoring, new tests) is committed with meaningful messages.  
+  - Branches can be used for experimental features or major refactors, which are then merged back into the main branch after testing.
+
+---
+
+### 6. Project Schedule & Milestones
+
+The project schedule is based on the milestones and task breakdown defined in the Proposal (Chapter 10), organized into four main phases.
+
+- **Phase 1 – Project Proposal**  
+  - **Duration**: 20 Nov 2025 – 19 Dec 2025 (29 days)  
+  - **Main Tasks**:  
+    - Research background, target users, and similar systems.  
+    - Write the Proposal document (`Proposal.md`).  
+    - Prepare and deliver the Proposal presentation.  
+
+- **Phase 2 – Progress I (Requirements & Design)**  
+  - **Approx. Duration**: 20 Dec 2025 – 26 Jan 2026 (~36 days)  
+  - **Main Tasks** (aligned with Proposal milestone table):  
+    - Draft and refine the **Software Requirement Specification (SRS)**.  
+    - Create this **Project Plan** document.  
+    - Develop the initial **Software Design Document (SDD)**, later refined into `BridgeU-SDDv.2.md` with DFDs, ERD, and data dictionary.  
+    - Implement **Feature #1 – Daily Briefing System** (frontend + backend + database + AI integration).  
+    - Prepare the Progress I report and presentation.  
+
+- **Phase 3 – Progress II (Implementation & Testing)**  
+  - **Approx. Duration**: 27 Jan 2026 – 11 Mar 2026  
+  - **Main Tasks**:  
+    - Implement **Feature #2 – Community Interaction Platform** (posts, comments, likes, tags, AI moderation, AI comment summary, mutual follow list, private messaging).  
+    - Implement **Feature #3 – Authentication & Profile / My Community Activity** (registration, login/logout, profile, “My Community Posts”).  
+    - Design and execute unit tests (UTC), integration tests (ITC), and system tests (STC) as defined in `BridgeU-TestPlan.md`.  
+    - Fix defects found during testing and update SRS/SDD/Test Plan where necessary.  
+
+- **Phase 4 – Final Submission & Closure**  
+  - **Approx. Duration**: 12 Mar 2026 – 25 Mar 2026  
+  - **Main Tasks**:  
+    - Finalize source code, database schema, and deployment instructions.  
+    - Complete the **Final Report**, including evaluation results and reflection on ISO/IEC 29110 processes.  
+    - Prepare and deliver the **final presentation/demo** to the advisor and committee.  
+    - Archive all project artefacts (documents, code, test records, traceability matrix) for assessment and future reference.
+
+This schedule may be refined in consultation with the advisor, but all three core features (Daily Briefing, Community Interaction, Authentication & Profile) must reach completion, be fully tested, and documented before the final submission.
+
+---
+
+### 7. Detailed Work Breakdown Structure (WBS)
+
+The following sections provide a detailed breakdown of tasks for each phase, organized by feature and work product.
+
+#### 7.1 Phase 1 – Project Proposal (20 Nov 2025 – 19 Dec 2025)
+
+**Task 1.1: Research & Background Analysis** (5 days)
+- Research target user needs (international students in Thailand)
+- Analyze similar platforms (Reddit, Facebook Groups, local Thai community apps)
+- Study technical feasibility of AI integration (Qwen AI capabilities)
+- Document findings in research notes
+
+**Task 1.2: Proposal Document Writing** (15 days)
+- Write background and problem statement
+- Define target users and user personas
+- Design user journey maps for each feature
+- Create business review and value proposition
+- Document high-level architecture (frontend, backend, database, external services)
+- Define project objectives and success criteria
+- Create initial milestone schedule
+- Compile references and citations
+
+**Task 1.3: Proposal Presentation Preparation** (5 days)
+- Create presentation slides
+- Prepare demo mockups or wireframes
+- Rehearse presentation
+- Address advisor feedback
+
+**Task 1.4: Proposal Defense** (1 day)
+- Deliver presentation to advisor/committee
+- Respond to questions and feedback
+- Incorporate feedback into Proposal document
+
+#### 7.2 Phase 2 – Progress I (20 Dec 2025 – 26 Jan 2026)
+
+**Task 2.1: Software Requirement Specification (SRS)** (8 days)
+- Define functional requirements for Feature #1 (Daily Briefing)
+- Define functional requirements for Feature #2 (Community) – initial draft
+- Define functional requirements for Feature #3 (Auth & Profile) – initial draft
+- Document non-functional requirements (performance, security, usability)
+- Create use case diagrams for all features
+- Write detailed use case descriptions
+- Define system constraints and assumptions
+- Review and refine with advisor
+
+**Task 2.2: Software Design Document (SDD)** (10 days)
+- Design system architecture (logical and physical)
+- Create Level 0, Level 1, and Level 2 Data Flow Diagrams (DFDs)
+- Design Entity-Relationship Diagram (ERD)
+- Create data dictionary for all tables
+- Design component architecture (Controller, Service, Repository layers)
+- Document API contracts (endpoints, request/response formats)
+- Design database schema (tables, indexes, constraints)
+- Refine into SDD v2.0 with complete DFDs and ERD
+
+**Task 2.3: Project Plan Document** (3 days)
+- Write this Project Plan document
+- Define management procedures
+- Create detailed schedule and milestones
+- Document configuration management procedures
+- Review with advisor
+
+**Task 2.4: Feature #1 Implementation – Daily Briefing System** (12 days)
+
+*Backend Development* (6 days):
+- Set up Spring Boot project structure
+- Create `News` entity and repository
+- Implement `NewsService` with Google News RSS crawling logic
+- Integrate Qwen AI API for summarization and translation
+- Implement scheduled task (Spring `@Scheduled`) for daily crawling at 8:00 AM
+- Create `NewsController` with REST endpoints (list, search, filter, detail)
+- Implement pagination, keyword search, date range and source filters
+- Add error handling and logging
+
+*Database Setup* (2 days):
+- Create MySQL database schema
+- Create `NEWS` table with Flyway migration script
+- Add indexes for search and filtering performance
+- Test data insertion and queries
+
+*Frontend Development* (3 days):
+- Create `DailyBriefingList.vue` component with pagination
+- Implement search and filter UI (keyword, date range, source)
+- Create `DailyBriefingDetail.vue` for viewing individual news items
+- Integrate with backend APIs using `axios`
+- Add loading states and error handling
+- Implement responsive design
+
+*Integration & Testing* (1 day):
+- Test end-to-end flow (crawling → AI processing → storage → display)
+- Fix integration issues
+- Verify scheduled task execution
+
+**Task 2.5: Progress I Report & Presentation** (3 days)
+- Write Progress I report documenting completed work
+- Prepare presentation slides
+- Create demo of Feature #1
+- Rehearse presentation
+
+#### 7.3 Phase 3 – Progress II (27 Jan 2026 – 11 Mar 2026)
+
+**Task 3.1: Feature #2 Implementation – Community Interaction Platform** (25 days)
+
+*Backend Development – Core Community Features* (10 days):
+- Create `CommunityPost`, `Comment`, `PostLike`, `UserFollow` entities
+- Implement `PostService` with CRUD operations
+- Implement `CommentService` for comment management
+- Implement `LikeService` for post likes
+- Implement `FollowService` for user follow/unfollow
+- Create REST controllers (`PostController`, `CommentController`, `FollowController`)
+- Implement infinite scroll pagination for community feed
+- Add keyword and tag filtering
+
+*Backend Development – AI Integration* (5 days):
+- Integrate Qwen AI for post/comment translation (Chinese ↔ English)
+- Implement AI content moderation service (`ReportModerationService`)
+- Create report submission endpoint (`ReportController`)
+- Implement AI comment summarization feature
+- Add moderation status tracking (`status`, `ai_confidence`, `ai_result`)
+
+*Backend Development – Private Messaging* (5 days):
+- Create `Conversation` and `Message` entities
+- Implement `ConversationService` for conversation management
+- Implement `MessageService` for message CRUD and read/unread tracking
+- Create `MessageController` with REST endpoints
+- Add mutual follow validation for messaging permission
+
+*Database Setup* (2 days):
+- Create Flyway migration scripts for all community tables:
+  - `POSTS`, `COMMENTS`, `POST_LIKES`, `USER_FOLLOWS`
+  - `CONVERSATION`, `MESSAGE`
+  - `REPORT`, `REPORT_REASONS`, `NOTIFICATIONS`
+- Add foreign key constraints and indexes
+- Test data relationships
+
+*Frontend Development* (8 days):
+- Create `CommunityPage.vue` with infinite scroll feed
+- Implement post creation/edit form (`PostForm.vue`)
+- Create post detail page with comments (`PostDetail.vue`)
+- Implement comment submission and display
+- Add like/unlike functionality
+- Create follow/unfollow UI
+- Implement `MessageList.vue` (conversation list)
+- Create `MessageDetail.vue` (message history with read/unread indicators)
+- Add report submission dialog
+- Implement AI comment summary display
+- Add tag filtering UI
+
+*Integration & Testing* (2 days):
+- Test post creation → AI moderation → status update flow
+- Test comment submission → AI translation → display flow
+- Test messaging flow (mutual follow validation → conversation creation → message exchange)
+- Fix integration issues
+
+**Task 3.2: Feature #3 Implementation – Authentication & Profile** (15 days)
+
+*Backend Development – Authentication* (6 days):
+- Create `AppUser` entity with roles (STUDENT, MERCHANT, ADMIN)
+- Implement `AuthService` with registration, login, logout
+- Implement JWT token generation and validation
+- Create `VerificationCode` entity and service for email/SMS OTP
+- Integrate email service for verification code delivery
+- Implement password hashing (BCrypt)
+- Create `AuthController` with registration, login, logout endpoints
+- Add password validation rules (min length, complexity)
+
+*Backend Development – Profile Management* (3 days):
+- Create `ProfileService` for user profile CRUD
+- Implement avatar upload (file storage or URL)
+- Add preferred language management
+- Create `ProfileController` with profile update endpoints
+- Implement "My Community Posts" endpoint (filter posts by user ID)
+
+*Database Setup* (1 day):
+- Create `USERS` and `VERIFICATION_CODE` tables via Flyway
+- Add indexes for username, email, phone lookups
+
+*Frontend Development* (4 days):
+- Create `LoginPage.vue` and `RegisterPage.vue`
+- Implement registration form (email/phone selection, verification code input)
+- Create `ProfilePage.vue` with profile editing (display name, avatar, preferred language)
+- Implement "My Community Posts" view with status indicators
+- Add JWT token storage and automatic inclusion in API requests
+- Implement logout functionality
+- Add real-time language switching across UI
+
+*Integration & Testing* (1 day):
+- Test registration → verification code → account activation flow
+- Test login → JWT token → authenticated API calls
+- Test profile update and "My Community Posts" display
+- Fix integration issues
+
+**Task 3.3: Testing & Quality Assurance** (10 days)
+
+*Unit Testing* (4 days):
+- Write unit tests for backend services (using JUnit 5)
+  - `NewsService` tests (crawling, AI integration)
+  - `PostService`, `CommentService`, `LikeService` tests
+  - `AuthService`, `ProfileService` tests
+  - `MessageService`, `ConversationService` tests
+- Write unit tests for frontend components (using Vitest/Vue Test Utils)
+  - Component rendering tests
+  - User interaction tests (button clicks, form submissions)
+- Achieve minimum 70% code coverage for critical services
+
+*Integration Testing* (3 days):
+- Test API endpoints with Postman or automated integration tests
+- Test database operations (CRUD, relationships, constraints)
+- Test external service integrations (Qwen AI, email service)
+- Document test results in `BridgeU-TestPlan.md`
+
+*System Testing* (2 days):
+- Execute end-to-end test scenarios:
+  - User registration → login → create post → receive AI moderation → view in feed
+  - Daily briefing crawl → AI summarization → user search and filter
+  - User A follows User B → send private message → read/unread tracking
+- Test cross-browser compatibility (Chrome, Firefox, Safari, Edge)
+- Test responsive design on mobile and desktop
+- Document test execution records
+
+*Defect Fixing* (1 day):
+- Fix bugs found during testing
+- Update test cases if requirements change
+- Re-run failed tests to verify fixes
+
+**Task 3.4: Documentation Updates** (3 days):
+- Update SRS if requirements change during implementation
+- Update SDD if design changes (add new components, modify ERD)
+- Complete `BridgeU-TestPlan.md` with all test cases and execution records
+- Update `BridgeU-TraceabilityRecord.md` to map requirements → design → tests
+
+#### 7.4 Phase 4 – Final Submission & Closure (12 Mar 2026 – 25 Mar 2026)
+
+**Task 4.1: Code Finalization** (3 days):
+- Code review and refactoring
+- Remove debug code and console logs
+- Optimize database queries and add missing indexes
+- Ensure consistent code formatting and naming conventions
+- Create deployment documentation (environment setup, build instructions)
+
+**Task 4.2: Final Report Writing** (5 days):
+- Write executive summary
+- Document project objectives and achievements
+- Describe system architecture and design decisions
+- Document implementation details for each feature
+- Present test results and coverage metrics
+- Include evaluation results (user testing, if applicable)
+- Reflect on ISO/IEC 29110 process adherence
+- Document lessons learned and future improvements
+- Compile references and appendices
+
+**Task 4.3: Final Presentation Preparation** (4 days):
+- Create comprehensive presentation slides
+- Prepare live demo of all three features
+- Create demo script and backup video recording
+- Rehearse presentation timing
+- Address advisor feedback on draft slides
+
+**Task 4.4: Final Presentation & Defense** (1 day):
+- Deliver final presentation to advisor and committee
+- Demonstrate all features with live demo
+- Respond to questions and feedback
+- Incorporate final feedback into documentation
+
+**Task 4.5: Project Closure** (2 days):
+- Archive all project artefacts:
+  - Source code (frontend + backend) in Git repository
+  - Database schema and migration scripts
+  - All documentation (Proposal, SRS, SDD, Test Plan, Project Plan, Final Report)
+  - Test records and traceability matrix
+  - Presentation slides and demo videos
+- Create project archive package
+- Submit final deliverables to advisor
+- Update project repository with final versions
+
+---
+
+### 8. Resource Requirements
+
+#### 8.1 Human Resources
+
+- **Student Developer (Zhiyi Pan)**: Full-time commitment (~40 hours/week during active development phases)
+  - Skills required: Java/Spring Boot, Vue.js, MySQL, REST API design, AI integration, testing
+- **Project Advisor (Asst. Prof. Pattama Longani)**: Guidance and review (~2-4 hours/week)
+  - Provides technical guidance, reviews deliverables, approves milestones
+
+#### 8.2 Technical Resources
+
+**Development Environment:**
+- **IDE**: IntelliJ IDEA or VS Code
+- **Version Control**: Git (GitHub or private Git server)
+- **Build Tools**: 
+  - Backend: Maven or Gradle
+  - Frontend: npm/yarn, Vite
+- **Database**: MySQL 8.0+ (local development instance)
+- **API Testing**: Postman or similar REST client
+
+**External Services & APIs:**
+- **Qwen AI API** (Aliyun): For translation, summarization, and content moderation
+  - Requires API key and account setup
+  - Cost consideration: monitor API usage to stay within free tier or budget
+- **Email Service**: For sending verification codes (e.g., SMTP server or email service provider)
+- **Google News RSS**: Public RSS feeds (no API key required)
+
+**Infrastructure:**
+- **Development Server**: Local machine (Windows/Linux/Mac) with:
+  - Java JDK 17+
+  - Node.js 18+
+  - MySQL 8.0+
+  - Sufficient RAM (8GB+) for running IDE, database, and both frontend/backend servers
+- **Deployment Environment** (for final demo):
+  - Option 1: Local deployment (localhost)
+  - Option 2: Cloud platform (AWS, Azure, or Aliyun) for production-like demo
+  - Option 3: University server (if available)
+
+#### 8.3 Software Tools
+
+- **Backend Development:**
+  - Spring Boot 3.x framework
+  - Spring Data JPA for database access
+  - Spring Security for authentication
+  - Flyway for database migrations
+  - JUnit 5 for unit testing
+  - Logback for logging
+
+- **Frontend Development:**
+  - Vue 3 (Composition API)
+  - Element Plus UI component library
+  - Axios for HTTP requests
+  - Vue Router for navigation
+  - Pinia or Vuex for state management (if needed)
+  - Vitest for unit testing
+
+- **Documentation:**
+  - Markdown editor (VS Code, Typora, or similar)
+  - Diagramming tools (Mermaid for ERD/DFD, draw.io for additional diagrams)
+  - Word processor for formal documents (if required)
+
+---
+
+### 9. Risk Management
+
+#### 9.1 Risk Identification & Assessment
+
+| Risk ID | Risk Description | Probability | Impact | Severity | Mitigation Strategy |
+|---------|------------------|-------------|--------|----------|---------------------|
+| R1 | Qwen AI API unavailable or rate-limited | Medium | High | High | Monitor API usage, implement caching for AI results, have fallback plan (manual moderation or alternative AI service) |
+| R2 | Google News RSS feed structure changes | Low | Medium | Medium | Implement robust RSS parsing with error handling, test with multiple news sources, monitor feed changes |
+| R3 | Database performance issues with large datasets | Medium | Medium | Medium | Design proper indexes, implement pagination, optimize queries, consider database tuning |
+| R4 | Schedule delays due to underestimated complexity | High | Medium | High | Break tasks into smaller chunks, prioritize core features, maintain buffer time in schedule, regular progress reviews with advisor |
+| R5 | Integration issues between frontend and backend | Medium | Medium | Medium | Define clear API contracts early, use API documentation tools (Swagger), test integration incrementally |
+| R6 | Security vulnerabilities (JWT, SQL injection, XSS) | Low | High | High | Follow security best practices, use parameterized queries, validate inputs, conduct security review |
+| R7 | Insufficient test coverage leading to bugs in production | Medium | High | High | Write tests alongside development, aim for 70%+ coverage, conduct thorough system testing |
+| R8 | External service dependencies (email/SMS) fail | Low | Low | Low | Implement graceful error handling, provide alternative verification methods, log errors for debugging |
+| R9 | Browser compatibility issues | Low | Low | Low | Test on multiple browsers early, use cross-browser compatible libraries, polyfills if needed |
+| R10 | Advisor feedback requires major design changes | Medium | High | High | Schedule regular check-ins, get early feedback on design documents, maintain flexible architecture |
+
+#### 9.2 Risk Monitoring
+
+- Review risks weekly during active development phases
+- Update risk register if new risks are identified
+- Escalate high-severity risks to advisor immediately
+- Document risk mitigation actions taken
+
+---
+
+### 10. Testing Strategy
+
+#### 10.1 Testing Levels
+
+**Unit Testing (UTC):**
+- **Scope**: Individual methods and classes in isolation
+- **Backend**: Test service methods, repository queries, utility functions using JUnit 5 and Mockito
+- **Frontend**: Test Vue components, composables, utility functions using Vitest
+- **Target Coverage**: Minimum 70% for critical business logic (services, controllers)
+- **Execution**: Run automatically on each commit via CI/CD (if set up) or manually before integration
+
+**Integration Testing (ITC):**
+- **Scope**: Test interactions between components (Controller → Service → Repository → Database)
+- **Backend**: Test REST API endpoints with real database (test database), verify data persistence and retrieval
+- **Frontend-Backend**: Test API calls from frontend to backend, verify request/response formats
+- **External Services**: Test Qwen AI integration, email service integration (mock or test environment)
+- **Execution**: Run after each feature completion, document results in Test Plan
+
+**System Testing (STC):**
+- **Scope**: End-to-end testing of complete user workflows
+- **Test Scenarios**:
+  - User registration → login → create post → view in feed → receive AI moderation result
+  - Daily briefing crawl → AI summarization → user search → view detail → open original link
+  - User A follows User B → send message → mark as read → delete conversation
+  - Profile update → language switch → verify UI language change
+- **Execution**: Run before each milestone, document in Test Record
+
+#### 10.2 Test Environment
+
+- **Development Environment**: Local machine with test database
+- **Test Database**: Separate MySQL instance with test data (reset before each test run)
+- **Mock Services**: Mock Qwen AI responses for unit tests (use real API for integration tests)
+- **Test Data**: Predefined test users, posts, comments, messages for consistent testing
+
+#### 10.3 Test Documentation
+
+- All test cases documented in `BridgeU-TestPlan.md` with:
+  - Test case ID, description, preconditions, steps, expected results
+  - Test execution records with pass/fail status, actual results, defects found
+- Traceability: Each test case linked to requirements via `BridgeU-TraceabilityRecord.md`
+
+---
+
+### 11. Deployment Plan
+
+#### 11.1 Deployment Environment Setup
+
+**Development:**
+- Local machine: Frontend (Vue dev server on port 8080), Backend (Spring Boot on port 8081), MySQL (port 3306)
+- Environment variables: API keys, database credentials stored in `.env` files (not committed to Git)
+
+**Production/Demo:**
+- Option 1: Local deployment for demo
+  - Build frontend: `npm run build` → static files served by Nginx or Spring Boot static resources
+  - Build backend: `mvn package` → run JAR file
+  - Database: MySQL on same machine or remote server
+- Option 2: Cloud deployment (AWS/Azure/Aliyun)
+  - Frontend: Static hosting (S3 + CloudFront, or similar)
+  - Backend: EC2/App Service with Spring Boot
+  - Database: RDS/Managed MySQL service
+
+#### 11.2 Deployment Steps
+
+1. **Database Setup:**
+   - Create production database
+   - Run Flyway migrations to create schema
+   - Seed initial data if needed (admin user, default tags)
+
+2. **Backend Deployment:**
+   - Build JAR: `mvn clean package`
+   - Configure `application.properties` with production database URL, API keys
+   - Start Spring Boot application: `java -jar bridgeu-backend.jar`
+   - Verify health endpoint: `GET /actuator/health`
+
+3. **Frontend Deployment:**
+   - Build static files: `npm run build`
+   - Configure API base URL to point to backend
+   - Deploy `dist/` folder to web server (Nginx, Apache, or Spring Boot static resources)
+   - Verify frontend loads and can connect to backend
+
+4. **Scheduled Tasks:**
+   - Verify daily news crawling task is scheduled correctly
+   - Monitor logs for successful execution
+
+#### 11.3 Deployment Documentation
+
+- Create `DEPLOYMENT.md` with:
+  - Environment requirements
+  - Step-by-step deployment instructions
+  - Configuration file templates
+  - Troubleshooting guide
+  - Rollback procedures
+
+---
+
+### 12. Communication Plan
+
+#### 12.1 Regular Communication
+
+- **Weekly Progress Updates**: Email or meeting with advisor to report:
+  - Completed tasks
+  - Current work in progress
+  - Blockers or issues
+  - Next week's plan
+
+- **Milestone Reviews**: Formal meetings before each milestone:
+  - Proposal defense
+  - Progress I presentation
+  - Final presentation
+  - Agenda: Present deliverables, receive feedback, discuss next steps
+
+#### 12.2 Documentation Updates
+
+- Update project documents (SRS, SDD, Test Plan) as requirements/design evolve
+- Maintain change log in each document
+- Communicate significant changes to advisor before implementation
+
+#### 12.3 Issue Escalation
+
+- Technical blockers: Discuss with advisor within 2 days
+- Schedule delays: Notify advisor immediately, propose revised timeline
+- Quality concerns: Request advisor review before proceeding
+
+---
+
+### 13. Change Management
+
+#### 13.1 Change Request Process
+
+1. **Identify Change**: Document proposed change (requirement, design, or schedule)
+2. **Assess Impact**: Evaluate impact on scope, schedule, resources, and other deliverables
+3. **Review with Advisor**: Present change request and impact assessment
+4. **Approve/Reject**: Advisor approves or rejects change
+5. **Implement Change**: If approved, update relevant documents (SRS, SDD, Project Plan)
+6. **Update Traceability**: Update Traceability Record if requirements change
+
+#### 13.2 Version Control
+
+- Use Git branches for experimental changes
+- Main branch contains stable, tested code
+- Tag releases for each milestone (Proposal, Progress I, Final)
+- Document significant changes in commit messages
+
+---
+
+### 14. Acceptance Criteria
+
+The project will be considered complete and acceptable when:
+
+1. **Functional Requirements:**
+   - ✅ All three features (Daily Briefing, Community Interaction, Authentication & Profile) are fully implemented and functional
+   - ✅ All use cases defined in SRS are supported
+   - ✅ System handles error cases gracefully (invalid input, network errors, API failures)
+
+2. **Non-Functional Requirements:**
+   - ✅ System responds to user actions within 2 seconds for standard operations
+   - ✅ UI is responsive and works on desktop and mobile browsers
+   - ✅ Authentication is secure (JWT tokens, password hashing)
+   - ✅ Database queries are optimized (proper indexes, pagination)
+
+3. **Quality Assurance:**
+   - ✅ Unit test coverage ≥ 70% for critical services
+   - ✅ All integration tests pass
+   - ✅ All system test scenarios pass
+   - ✅ No critical or high-severity bugs remain
+
+4. **Documentation:**
+   - ✅ All required documents are complete (Proposal, SRS, SDD, Test Plan, Project Plan, Final Report)
+   - ✅ Traceability Record maps all requirements to design and tests
+   - ✅ Source code is well-commented and follows coding standards
+   - ✅ Deployment documentation is complete
+
+5. **Presentation:**
+   - ✅ Final presentation demonstrates all features
+   - ✅ Advisor and committee approve the project
+
+---
+
+### 15. Project Success Metrics
+
+- **Schedule Adherence**: Complete all phases within planned timeline (with approved adjustments)
+- **Requirement Coverage**: 100% of SRS requirements implemented and tested
+- **Code Quality**: Pass code review, maintain consistent style, achieve target test coverage
+- **Documentation Quality**: All documents reviewed and approved by advisor
+- **System Performance**: Meet non-functional requirements (response time, usability)
+- **User Acceptance**: System is usable and meets target user needs (validated through testing)
+
+---
+
+### 16. Lessons Learned & Continuous Improvement
+
+Throughout the project, the following practices will be maintained:
+
+- **Regular Reflection**: After each phase, reflect on what went well and what could be improved
+- **Document Decisions**: Record key design and implementation decisions with rationale
+- **Seek Feedback**: Actively seek advisor feedback and incorporate it promptly
+- **Adapt Process**: Adjust project plan and processes based on lessons learned
+
+A "Lessons Learned" section will be included in the Final Report summarizing:
+- Technical challenges and solutions
+- Process improvements (what worked, what didn't)
+- Recommendations for future similar projects
+
+
