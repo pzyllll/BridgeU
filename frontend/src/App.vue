@@ -104,7 +104,7 @@
               :post-id="selectedPostId"
               :token="token"
               :current-user-id="user?.id"
-              @back="handleNavigate('home')"
+              @back="handleBack"
               @author-click="handleViewUserProfile"
             />
             <div v-else class="card">{{ lang === 'zh' ? '帖子未找到' : 'Post not found' }}</div>
@@ -117,7 +117,7 @@
                 :user-id="selectedUserId"
                 :token="token"
                 :current-user-id="user?.id"
-                @back="selectedUserId = null"
+                @back="handleBack"
                 @post-click="handlePostClickFromProfile"
                 @send-message="handleSendMessageFromProfile"
                 :on-view-user-profile="handleViewUserProfile"
@@ -130,7 +130,7 @@
                   :token="token"
                   :selected-conversation-id="selectedConversationId"
                   @select-conversation="handleSelectConversation"
-                  @back="handleBackToCommunity"
+                  @back="handleBack"
                   @view-user-profile="handleViewUserProfile"
                 />
               </div>
@@ -243,6 +243,9 @@ const rejectedPosts = ref([]);
 const showMyPostsList = ref(false);
 const showMyReportsList = ref(false);
 
+// Navigation history stack to track page visits
+const navigationHistory = ref([]);
+
 // Element Plus locale - 响应语言变化
 const elementLocale = computed(() => {
   return lang.value === 'zh' ? zhCn : en;
@@ -339,6 +342,8 @@ const handleLogin = (userData, authToken) => {
   if (userData) {
     localStorage.setItem('user', JSON.stringify(userData));
   }
+  // Clear navigation history on login
+  navigationHistory.value = [];
   currentPage.value = 'briefing'; // Default to briefing page
   
   if (userData && userData.preferredLanguage) {
@@ -366,6 +371,8 @@ const handleLogout = () => {
   rejectedPosts.value = [];
   showMyPostsList.value = false;
   showMyReportsList.value = false;
+  // Clear navigation history on logout
+  navigationHistory.value = [];
   currentPage.value = 'briefing'; // Reset to default page
   selectedPostId.value = null;
   selectedNewsId.value = null;
@@ -395,6 +402,32 @@ const handleNavigate = (page, postId = null) => {
     ElMessage.info(lang.value === 'zh' ? '管理面板已移除' : 'Admin panel has been removed');
     return;
   }
+  
+  // Save current page state to history before navigating (except for initial load)
+  // Only save if we're not already on the target page
+  if (currentPage.value !== page || (page === 'postDetail' && selectedPostId.value !== postId)) {
+    // Don't save detail pages (postDetail, news detail) to history as they're temporary views
+    // Only save main pages
+    const mainPages = ['briefing', 'community', 'post', 'search', 'messages', 'profile'];
+    if (mainPages.includes(currentPage.value)) {
+      navigationHistory.value.push({
+        page: currentPage.value,
+        postId: selectedPostId.value,
+        newsId: selectedNewsId.value,
+        userId: selectedUserId.value,
+        conversationId: selectedConversationId.value,
+        conversation: selectedConversation.value,
+        showMyPostsList: showMyPostsList.value,
+        showMyReportsList: showMyReportsList.value,
+        selectedTag: selectedTag.value
+      });
+      // Limit history size to prevent memory issues
+      if (navigationHistory.value.length > 20) {
+        navigationHistory.value.shift();
+      }
+    }
+  }
+  
   if (page === 'postDetail' && postId) {
     selectedPostId.value = postId;
     currentPage.value = 'postDetail';
@@ -433,10 +466,55 @@ const handleNavigate = (page, postId = null) => {
   }
 };
 
+// Handle back navigation using history stack
+const handleBack = () => {
+  if (navigationHistory.value.length > 0) {
+    const previousState = navigationHistory.value.pop();
+    // Restore previous page state
+    currentPage.value = previousState.page;
+    selectedPostId.value = previousState.postId;
+    selectedNewsId.value = previousState.newsId;
+    selectedUserId.value = previousState.userId;
+    selectedConversationId.value = previousState.conversationId;
+    selectedConversation.value = previousState.conversation;
+    showMyPostsList.value = previousState.showMyPostsList;
+    showMyReportsList.value = previousState.showMyReportsList;
+    selectedTag.value = previousState.selectedTag || 'all';
+  } else {
+    // If no history, default to community page
+    currentPage.value = 'community';
+    selectedPostId.value = null;
+    selectedNewsId.value = null;
+    selectedUserId.value = null;
+    selectedConversationId.value = null;
+    selectedConversation.value = null;
+    showMyPostsList.value = false;
+    showMyReportsList.value = false;
+    selectedTag.value = 'all';
+  }
+};
+
 const handleViewNewsDetail = (newsId) => {
   if (newsId === null || newsId === undefined || newsId === '') {
     ElMessage.warning(lang.value === 'zh' ? '无法打开详情：新闻ID无效' : 'Cannot open detail: invalid news id');
     return;
+  }
+  // Save current state to history before showing news detail
+  if (currentPage.value === 'briefing' && !selectedNewsId.value) {
+    navigationHistory.value.push({
+      page: currentPage.value,
+      postId: selectedPostId.value,
+      newsId: null,
+      userId: selectedUserId.value,
+      conversationId: selectedConversationId.value,
+      conversation: selectedConversation.value,
+      showMyPostsList: showMyPostsList.value,
+      showMyReportsList: showMyReportsList.value,
+      selectedTag: selectedTag.value
+    });
+    if (navigationHistory.value.length > 20) {
+      navigationHistory.value.shift();
+    }
   }
   // Ensure we are on the briefing page and have a valid id
   currentPage.value = 'briefing';
@@ -448,7 +526,12 @@ const handleViewNewsDetail = (newsId) => {
 };
 
 const handleBackToBriefingList = () => {
-  selectedNewsId.value = null;
+  // If we have history, go back to previous page, otherwise just close the detail
+  if (navigationHistory.value.length > 0) {
+    handleBack();
+  } else {
+    selectedNewsId.value = null;
+  }
 };
 
 const handleBackFromProfile = () => {
@@ -457,6 +540,23 @@ const handleBackFromProfile = () => {
 };
 
 const handlePostClickFromProfile = (postId) => {
+  // Save current state (profile page) to history before showing post detail
+  if (currentPage.value === 'profile' || currentPage.value === 'messages') {
+    navigationHistory.value.push({
+      page: currentPage.value,
+      postId: null,
+      newsId: selectedNewsId.value,
+      userId: selectedUserId.value,
+      conversationId: selectedConversationId.value,
+      conversation: selectedConversation.value,
+      showMyPostsList: showMyPostsList.value,
+      showMyReportsList: showMyReportsList.value,
+      selectedTag: selectedTag.value
+    });
+    if (navigationHistory.value.length > 20) {
+      navigationHistory.value.shift();
+    }
+  }
   selectedPostId.value = postId;
   currentPage.value = 'postDetail';
 };
@@ -531,6 +631,24 @@ const handleViewUserProfile = (userId) => {
     return;
   }
   
+  // Save current state to history before showing user profile (if not already on messages page)
+  if (currentPage.value !== 'messages') {
+    navigationHistory.value.push({
+      page: currentPage.value,
+      postId: selectedPostId.value,
+      newsId: selectedNewsId.value,
+      userId: null,
+      conversationId: selectedConversationId.value,
+      conversation: selectedConversation.value,
+      showMyPostsList: showMyPostsList.value,
+      showMyReportsList: showMyReportsList.value,
+      selectedTag: selectedTag.value
+    });
+    if (navigationHistory.value.length > 20) {
+      navigationHistory.value.shift();
+    }
+  }
+  
   // Set the selected user ID
   selectedUserId.value = userId;
   
@@ -565,10 +683,9 @@ const handleMessageSent = () => {
   console.log('Message sent, conversation list should refresh');
 };
 
+// handleBackToCommunity is now replaced by handleBack, but keeping for backward compatibility
 const handleBackToCommunity = () => {
-  currentPage.value = 'community';
-  selectedConversationId.value = null;
-  selectedConversation.value = null;
+  handleBack();
 };
 </script>
 
