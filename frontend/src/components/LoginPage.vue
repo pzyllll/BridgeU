@@ -199,7 +199,7 @@
             type="button" 
             class="btn btn-primary register-btn" 
             @click="completeRegistration"
-            :disabled="loading || !codeSent || (registerMethod === 'email' && !codeVerified)"
+            :disabled="loading || !codeSent || !codeVerified"
           >
             {{ loading ? t('login.pleaseWait') : t('login.register') }}
           </button>
@@ -705,8 +705,8 @@ const completeRegistration = async () => {
     return;
   }
   
-  // 检查验证码是否已验证（邮箱注册需要）
-  if (registerMethod.value === 'email' && !codeVerified.value) {
+  // 检查验证码是否已验证（邮箱和手机注册都需要）
+  if (!codeVerified.value) {
     error.value = lang.value === 'zh' ? '请先验证验证码' : 'Please verify the code first';
     return;
   }
