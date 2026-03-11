@@ -1,11 +1,9 @@
 package com.globalbuddy.security;
 
 import com.globalbuddy.repository.AppUserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -46,13 +44,14 @@ public class SecurityConfig {
 
     /**
      * UserDetailsService Bean
-     * 根据用户名或邮箱加载用户信息
+     * 根据用户名、邮箱或手机号加载用户信息
      */
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .or(() -> userRepository.findByEmail(username))
-                .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + username));
+        return identifier -> userRepository.findByUsername(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
+                .or(() -> userRepository.findByPhone(identifier))
+                .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + identifier));
     }
 
     /**

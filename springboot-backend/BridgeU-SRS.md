@@ -2557,64 +2557,64 @@ endif
 
 **SRS-82**: The system shall provide a registration page (UI-Register) that allows users to choose between email or phone number registration methods.
 
-**SRS-83**: The system shall provide a "Send Verification Code" action that sends a 6-digit verification code to the user's email address or phone number via `POST /api/auth/send-verification-code` with `identifier` and `type` ("email" or "phone").
+**SRS-83**: For **email-based registration**, the system shall provide a "Send Verification Code" action that sends a 6-digit verification code to the user's email address via `POST /api/auth/send-verification-code` with `identifier` and `type = "email"`. For **phone-based registration**, the SMS verification code is sent via an external provider (Firebase) from the frontend and does not go through a backend `/api/auth/send-verification-code` endpoint in the current implementation.
 
-**SRS-84**: The system shall validate the verification code via `POST /api/auth/verify-code` before allowing the user to proceed with registration.
+**SRS-84**: For **email-based registration**, the system shall validate the verification code via `POST /api/auth/verify-code` before allowing the user to proceed with registration. For **phone-based registration**, verification of the SMS code is performed on the client side via Firebase; the UI implementation **requires** that the SMS code must be verified before allowing registration (users cannot skip the "Verify Code" action).
 
-**SRS-85**: The system shall provide a registration form that collects: username (unique, alphanumeric), password (must contain both uppercase and lowercase letters), display name (allows English characters), preferred language (Chinese "zh" or English "en"), identifier (email or phone), verification code, and type ("email" or "phone").
+**SRS-85**: The system shall provide a registration form that collects: username (unique, alphanumeric), password (must contain both uppercase and lowercase letters), display name (allows English characters), preferred language (Chinese "zh" or English "en"), identifier (email or phone), verification code, and type ("email" or "phone"). The verification code and type fields are **required** for both email-based and phone-based registration.
 
-**SRS-86**: The backend shall register the user via `POST /api/auth/register` with all collected information, verify the code, check for duplicate username/email/phone, and create the user account with hashed password.
+**SRS-86**: For **email-based registration**, the backend shall register the user via `POST /api/auth/register` with all collected information, verify the code, check for duplicate username/email/phone, and create the user account with hashed password. For **phone-based registration**, the backend shall register the user via `POST /api/auth/register/phone` with the phone number, username, password, and preferred language, without receiving or re-validating the SMS verification code (which is assumed to have been handled by Firebase or at least sent to the user).
 
 **SRS-87**: Upon successful registration, the system shall automatically log in the user and redirect to the main application, or display a success message and redirect to the login page.
 
 **SRS-88**: If registration fails (duplicate username/email/phone, invalid verification code, validation errors), the system shall display a localized error message indicating the specific failure reason.
 
-##### 2.3.19.2 Use Case Description
+##### 2.3.19.2 Use Case Descriptions
 
-| Use Case ID | UC-19 |
-|------------|------|
-| Use Case Name | Register Account |
+###### 2.3.19.2.1 UC-19-Email: Register Account by Email
+
+| Use Case ID | UC-19-Email |
+|------------|-------------|
+| Use Case Name | Register Account by Email |
 | Created By | ZhiYi Pan |
 | Date Created | 23/01/2026 |
 | Last Update By | |
 | Last Revision Date | |
 | Actors | User |
-| Description | User registers a new account using email or phone number with verification code validation. |
-| Trigger | User clicks "Register" or navigates to the registration page. |
-| Preconditions | 1. User is not logged in.<br>2. User has access to their email or phone number for verification code.<br>3. Network connection is available. |
+| Description | User registers a new account using an email address. Email registration requires sending and validating a 6-digit verification code via backend before account creation. |
+| Trigger | User clicks "Register" or navigates to the registration page and selects email registration. |
+| Preconditions | 1. User is not logged in.<br>2. User has access to their email inbox.<br>3. Network connection is available. |
 
-**Use Case Input Specification**
+**Use Case Input Specification (Email Registration)**
 
 | Input | type | Constraint | Example |
 |-------|------|------------|---------|
-| Registration Method | String | Must be "email" or "phone" | "email" |
-| Email/Phone | String | Valid email format or phone number | "user@example.com" |
-| Verification Code | String | 6-digit numeric code | "123456" |
+| Registration Method | String | Must be `"email"` | "email" |
+| Email | String | Valid email format | "user@example.com" |
+| Verification Code | String | 6-digit numeric code, required | "123456" |
 | Username | String | Unique, alphanumeric, not empty | "john_doe" |
 | Password | String | Must contain both uppercase and lowercase letters | "Password123" |
 | Display Name | String | Allows English characters | "John Doe" |
 | Preferred Language | String | Must be "zh" or "en" | "en" |
 
-**Post conditions**:
-- A new user account is created in the system.
+**Post conditions (Email)**:
+- A new user account is created in the system based on the email.
 - User is logged in automatically (or redirected to login page).
 
-**Normal Flows**
+**Normal Flows (Email)**  *(Swimlanes: User / System / Email Service)*
 
-| User (Actions) | System (Responses) |
-|----------------|-------------------|
-| 1. User opens registration page and selects registration method (email or phone). | 2. System displays registration form with method-specific fields. |
-| 3. User enters email/phone and clicks "Send Verification Code". | 4. System validates identifier format and sends verification code via email/SMS.<br>   • `[E1: Network timeout or connection error]`<br>   • `[E2: Invalid identifier format]` |
-| | 5. System displays success message: "Verification code sent" (zh: "验证码已发送"). |
-| 6. User receives verification code and enters it in the form. | 7. System validates the code format (6 digits). |
-| 8. User clicks "Verify Code". | 9. System sends verification request to backend.<br>   • `[A1: Invalid or expired code]` |
-| | 10. Backend validates code and marks it as verified. |
-| 11. User fills in username, password, display name, and selects preferred language. | 12. System validates form fields (username format, password strength, etc.).<br>   • `[A2: Validation failed]` |
-| 13. User clicks "Register". | 14. System sends registration request to backend with all information.<br>   • `[E1: Network timeout or connection error]` |
-| | 15. Backend verifies code again, checks for duplicate username/email/phone, creates user account, and returns success.<br>   • `[E3: Duplicate username/email/phone]`<br>   • `[E4: Server error]` |
-| 16. User views success message. | 17. System automatically logs in the user (or redirects to login page) and displays welcome message. |
+| User (Actions) | System (Responses) | Email Service |
+|----------------|--------------------|---------------|
+| 1. User opens registration page and selects **email** as registration method. | 2. System displays registration form with email-related fields. | |
+| 3. User enters email and clicks "Send Verification Code". | 4. System validates email format and calls email service via `POST /api/auth/send-verification-code` (`type = "email"`) to send a 6-digit verification code.<br>   • `[E1: Network timeout or connection error]`<br>   • `[E2: Invalid email format]` | 5. Email service delivers verification email with 6-digit code to the user's inbox. |
+| 6. User receives email and enters the verification code in the form. | 7. System validates the code format (6 digits). | |
+| 8. User clicks "Verify Code". | 9. System sends verification request to backend via `POST /api/auth/verify-code` with email and code; backend validates the code and marks it as verified.<br>   • `[A1: Invalid or expired code]` | |
+| 11. User fills in username, password, display name, and selects preferred language. | 12. System validates form fields (username format, password strength, etc.).<br>   • `[A2: Validation failed]` | |
+| 13. User clicks "Register". | 14. System sends registration request to backend via `POST /api/auth/register` with email, code, type, username, password, and preferred language.<br>   • `[E1: Network timeout or connection error]` | |
+| | 15. Backend verifies the code again, checks for duplicate username/email/phone, creates user account with hashed password, and returns success.<br>   • `[E3: Duplicate username/email/phone]`<br>   • `[E4: Server error]` | |
+| 16. User views success message. | 17. System automatically logs in the user (or redirects to login page) and displays welcome message. | |
 
-**Alternative Flow**
+**Alternative Flow (Email)**
 
 **`[A1: Invalid or expired code]`**
 - A1.1 Backend returns error: code is invalid, expired, or already used.
@@ -2626,55 +2626,146 @@ endif
 - A2.2 System displays validation errors next to relevant fields.
 - A2.3 User corrects errors and resubmits.
 
-**Exception Flows**
+**Exception Flows (Email)**
 
 **`[E1: Network timeout or connection error]`**
 - E1.1 Request fails due to network issues.
 - E1.2 System displays a localized error message and allows retry.
 - E1.3 Use case end.
 
-**`[E2: Invalid identifier format]`**
-- E2.1 System detects invalid email format or phone number format.
-- E2.2 System displays error message: "Invalid email/phone format" (zh: "邮箱/手机号格式无效").
-- E2.3 User corrects identifier and retries.
+**`[E2: Invalid email format]`**
+- E2.1 System detects invalid email format.
+- E2.2 System displays error message: "Invalid email format" (zh: "邮箱格式无效").
+- E2.3 User corrects email and retries.
 
 **`[E3: Duplicate username/email/phone]`**
 - E3.1 Backend detects that username, email, or phone number already exists.
 - E3.2 Backend returns error with specific field information.
 - E3.3 System displays error message: "Username/Email/Phone already registered" (zh: "用户名/邮箱/手机号已被注册").
-- E3.4 User chooses a different username/email/phone and retries.
+- E3.4 User chooses a different username/email and retries.
 
 **`[E4: Server error]`**
 - E4.1 Backend returns 5xx (服务器错误) error due to internal error.
 - E4.2 System displays error message and allows retry.
 - E4.3 Use case end.
 
-**Note**:
-- Registration supports both email and phone number methods, with verification code validation required before account creation.
-- Verification codes are 6-digit numeric codes sent via email or SMS, with expiration time and single-use validation to ensure security.
-- The registration form collects: username (unique, alphanumeric), password (must contain both uppercase and lowercase letters), display name (allows English characters), preferred language (Chinese "zh" or English "en"), and identifier (email or phone).
-- Upon successful registration, the system automatically logs in the user and redirects to the main application, or displays a success message and redirects to the login page depending on implementation.
+**Note (Email)**:
+- Email registration requires backend verification of a 6-digit email verification code (format, expiration, single-use) before account creation and login.
+- The registration form collects: email, username (unique, alphanumeric), password (must contain both uppercase and lowercase letters), display name (allows English characters), preferred language (Chinese "zh" or English "en"), and verification code.
+- Upon successful email-based registration, the system automatically logs in the user and redirects to the main application, or displays a success message and redirects to the login page depending on implementation.
 
-##### 2.3.19.3 Activity Diagram
+------
+
+###### 2.3.19.2.2 UC-19-Phone: Register Account by Phone
+
+| Use Case ID | UC-19-Phone |
+|------------|-------------|
+| Use Case Name | Register Account by Phone |
+| Created By | ZhiYi Pan |
+| Date Created | 23/01/2026 |
+| Last Update By | |
+| Last Revision Date | |
+| Actors | User |
+| Description | User registers a new account using a phone number. Phone registration uses SMS verification via Firebase (as SMS service). The UI **requires** that the SMS verification code must be verified before allowing registration . |
+| Trigger | User clicks "Register" or navigates to the registration page and selects phone registration. |
+| Preconditions | 1. User is not logged in.<br>2. User has access to their phone to receive SMS.<br>3. Network connection is available. |
+
+**Use Case Input Specification (Phone Registration)**
+
+| Input | type | Constraint | Example |
+|-------|------|------------|---------|
+| Registration Method | String | Must be `"phone"` | "phone" |
+| Phone | String | Valid phone number with country code (e.g. "+66...") | "+66912345678" |
+| Verification Code | String | 6-digit numeric code, **required** (Firebase SMS) | "123456" |
+| Username | String | Unique, alphanumeric, not empty | "john_doe" |
+| Password | String | Must contain both uppercase and lowercase letters | "Password123" |
+| Display Name | String | Allows English characters | "John Doe" |
+| Preferred Language | String | Must be "zh" or "en" | "en" |
+
+**Post conditions (Phone)**:
+- A new user account is created in the system based on the phone number.
+- User is logged in automatically (or redirected to login page).
+
+**Normal Flows (Phone)**  *(Swimlanes: User / System / SMS Service)*
+
+| User (Actions) | System (Responses) | SMS Service |
+|----------------|--------------------|------------|
+| 1. User opens registration page and selects **phone** as registration method. | 2. System displays registration form with phone-related fields. | |
+| 3. User enters phone number and clicks "Send Verification Code". | 4. System validates phone format and calls Firebase (SMS service) from frontend to send a 6-digit SMS verification code to the phone.<br>   • `[E1: Network timeout or connection error]`<br>   • `[E2: Invalid phone format]` | 5. SMS service sends SMS with 6-digit verification code to the user's phone. |
+| | 6. System displays success message: "Verification code sent" (zh: "验证码已发送"). | |
+| 7. User receives SMS code and enters it in the form. | 8. System validates the code format (6 digits). | |
+| 9. User clicks "Verify Code". | 10. System uses Firebase (client-side) to verify the SMS code with the SMS service; on success, Firebase marks the SMS session as verified.<br>   • `[A1: Invalid or expired code]` | 11. SMS service responds with verification success/failure. |
+| | 12. System displays success message: "Verification successful" (zh: "验证成功") and enables the registration form fields. | |
+| 13. User fills in username, password, display name, and selects preferred language. | 14. System validates form fields (username format, password strength, etc.).<br>   • `[A2: Validation failed]` | |
+| 15. User clicks "Register". | 16. System sends registration request to backend via `POST /api/auth/register/phone` with phone, username, password, and preferred language (without the SMS code).<br>   • `[E1: Network timeout or connection error]` | |
+| | 17. Backend checks for duplicate phone/username, creates user account with hashed password based on the phone number, and returns success (assuming SMS verification has been handled on the client side, or at least the code was sent).<br>   • `[E3: Duplicate username/email/phone]`<br>   • `[E4: Server error]` | |
+| 18. User views success message. | 19. System automatically logs in the user (or redirects to login page) and displays welcome message. | |
+
+**Alternative Flow (Phone)**
+
+**`[A1: Invalid or expired code]`**
+- A1.1 Firebase (SMS service) returns an error: code is invalid, expired, or already used.
+- A1.2 System displays error message: "Invalid or expired verification code" (zh: "验证码无效或已过期").
+- A1.3 User can request a new code and retry. Registration cannot proceed until verification is successful.
+
+**`[A2: Validation failed]`**
+- A2.1 System validates form fields and detects errors (e.g., password doesn't contain uppercase/lowercase, username already taken on frontend check).
+- A2.2 System displays validation errors next to relevant fields.
+- A2.3 User corrects errors and resubmits.
+
+**Exception Flows (Phone)**
+
+**`[E1: Network timeout or connection error]`**
+- E1.1 Request to send SMS or register fails due to network issues.
+- E1.2 System displays a localized error message and allows retry.
+- E1.3 Use case end.
+
+**`[E2: Invalid phone format]`**
+- E2.1 System detects invalid phone number format.
+- E2.2 System displays error message: "Invalid phone format" (zh: "手机号格式无效").
+- E2.3 User corrects phone and retries.
+
+**`[E3: Duplicate username/email/phone]`**
+- E3.1 Backend detects that username, email, or phone number already exists.
+- E3.2 Backend returns error with specific field information.
+- E3.3 System displays error message: "Username/Email/Phone already registered" (zh: "用户名/邮箱/手机号已被注册").
+- E3.4 User chooses a different username/phone and retries.
+
+**`[E4: Server error]`**
+- E4.1 Backend returns 5xx (服务器错误) error due to internal error.
+- E4.2 System displays error message and allows retry.
+- E4.3 Use case end.
+
+**Note (Phone)**:
+- Phone registration uses SMS verification via Firebase as SMS service. The UI **requires** that the SMS verification code must be verified before allowing registration; users cannot skip the "Verify Code" action.
+- The registration form collects: phone, username (unique, alphanumeric), password (must contain both uppercase and lowercase letters), display name (allows English characters), preferred language (Chinese "zh" or English "en"), and verification code (required).
+- Upon successful phone-based registration, the system automatically logs in the user and redirects to the main application, or displays a success message and redirects to the login page depending on implementation.
+
+##### 2.3.19.3 Activity Diagrams
+
+**UC-19-Email: Register Account by Email**
 
 ```plantuml
-@startuml UC19_Activity_Diagram
-title UC-19: Register Account - Activity Diagram
+@startuml UC19_Email_Activity_Diagram
+title UC-19-Email: Register Account by Email - Activity Diagram
 
 |User|
 start
 :opens registration page;
-:selects registration method\n(email or phone);
-:enters email/phone;
+:selects email registration;
+:enters email;
 :clicks "Send Verification Code";
 
 |System|
-if () then ([Identifier invalid])
-  :shows format error;
+if () then ([Email invalid])
+  :shows email format error;
   stop
-else ([Identifier valid])
-  :sends verification code;
-  
+else ([Email valid])
+  |Email Service|
+  :sends 6-digit verification code to email;
+  |System|
+  :shows "Verification code sent";
+
   if () then ([Code send failed])
     :shows error and allows retry;
     stop
@@ -2684,6 +2775,7 @@ else ([Identifier valid])
     :clicks "Verify Code";
     
     |System|
+    :sends /api/auth/verify-code request;
     if () then ([Code invalid or expired])
       :shows "Invalid or expired code";
       stop
@@ -2697,7 +2789,8 @@ else ([Identifier valid])
         :shows validation errors;
         stop
       else ([Form valid])
-        :backend verifies code and checks duplicates;
+        :calls /api/auth/register\nwith email, code and user data;
+        :verifies code and checks duplicates;
         
         if () then ([Registration failed])
           :shows error\n(duplicate or server error);
@@ -2707,6 +2800,75 @@ else ([Identifier valid])
           :logs in user automatically\n(or redirects to login);
           stop
         endif
+      endif
+    endif
+  endif
+endif
+
+@enduml
+```
+
+**UC-19-Phone: Register Account by Phone**
+
+```plantuml
+@startuml UC19_Phone_Activity_Diagram
+title UC-19-Phone: Register Account by Phone - Activity Diagram
+
+|User|
+start
+:opens registration page;
+:selects phone registration;
+:enters phone number;
+:clicks "Send Verification Code";
+
+|System|
+if () then ([Phone invalid])
+  :shows phone format error;
+  stop
+else ([Phone valid])
+  |SMS Service|
+  :sends 6-digit SMS verification code;
+  |System|
+  :shows "Verification code sent";
+
+  if () then ([Code send failed])
+    :shows error and allows retry;
+    stop
+  else ([Code sent successfully])
+    |User|
+    :enters verification code;
+    :clicks "Verify Code";
+    
+    |System|
+    |SMS Service|
+    :verifies SMS code via Firebase;
+    |System|
+    if () then ([Code invalid or expired])
+      :shows "Invalid or expired code";
+      stop
+    else ([Code valid])
+      :marks SMS session as verified;
+    endif
+    
+    |User|
+    :fills registration form\n(username, password, display name, language);
+    :clicks "Register";
+    
+    |System|
+    if () then ([Form invalid])
+      :shows validation errors;
+      stop
+    else ([Form valid])
+      :calls /api/auth/register/phone\nwith phone and user data;
+      :checks duplicate phone/username;
+      
+      if () then ([Registration failed])
+        :shows error\n(duplicate or server error);
+        stop
+      else ([Registration succeeded])
+        :creates user account;
+        :logs in user automatically\n(or redirects to login);
+        stop
       endif
     endif
   endif
@@ -2731,15 +2893,9 @@ endif
 
 **SRS-93**: The system shall include the JWT token in the `Authorization: Bearer <token>` header for all subsequent authenticated API requests.
 
-**SRS-94**: If login fails (invalid credentials), the system shall display a localized error message: "Invalid username or password" (zh: "用户名或密码错误") and allow retry.
+**SRS-94**: If login fails (invalid credentials), the system shall display a localized error message: "Incorrect username or password" (zh: "用户名或密码错误") and allow retry.
 
-**SRS-95**: The system shall provide a "Forgot Password" link on the login page that allows users to reset their password via email or phone verification code.
-
-**SRS-96**: When user clicks "Forgot Password", the system shall display a password reset form where user can enter email/phone, receive a verification code, verify the code, and set a new password.
-
-**SRS-97**: The system shall send password reset verification code via `POST /api/auth/forgot-password/send-code` with identifier (email or phone) and type ("email" or "phone").
-
-**SRS-98**: The system shall reset password via `POST /api/auth/forgot-password/reset` (for email) or `POST /api/auth/forgot-password/reset/phone` (for phone) with identifier, verification code, and new password.
+**SRS-95**: The system shall provide a "Forgot Password" link on the login page that navigates the user to the password reset flow (see UC-26), allowing users to reset their password via **email** or **phone**.
 
 ##### 2.3.20.2 Use Case Description
 
@@ -2787,19 +2943,8 @@ endif
 
 **`[A2: User clicks "Forgot Password"]`**
 - A2.1 User clicks "Forgot Password" link on the login page.
-- A2.2 System displays password reset form with fields for email/phone selection, identifier input, verification code input, new password, and confirm password.
-- A2.3 User selects reset method (email or phone) and enters email/phone.
-- A2.4 User clicks "Send Code" button.
-- A2.5 System sends verification code request to `POST /api/auth/forgot-password/send-code` with identifier and type. `[E4: Send code failed]` may occur here.
-- A2.6 System displays success message: "Verification code sent" (zh: "验证码已发送") and enables code input field.
-- A2.7 User enters verification code.
-- A2.8 For email method, user clicks "Verify Code" button; system verifies code via `POST /api/auth/verify-code`. `[E5: Verification code invalid]` may occur here.
-- A2.9 User enters new password and confirms password.
-- A2.10 User clicks "Reset Password" button.
-- A2.11 System validates password (must contain uppercase and lowercase letters) and password match. If validation fails, `[A3: Password validation failed]` is triggered.
-- A2.12 System sends password reset request to `POST /api/auth/forgot-password/reset` (email) or `POST /api/auth/forgot-password/reset/phone` (phone) with identifier, code, and new password. `[E6: Reset password failed]` may occur here.
-- A2.13 System displays success message: "Password reset successfully" (zh: "密码重置成功") and redirects user back to login page.
-- A2.14 Use case continues with login flow.
+- A2.2 System navigates to the password reset page (UI-ForgotPassword / UI-ResetPassword) and starts the password reset use case (UC-26).
+- A2.3 After the password reset succeeds, the system redirects the user back to the login page.
 
 **`[A3: Password validation failed]`**
 - A3.1 System detects password does not meet requirements (must contain uppercase and lowercase) or passwords do not match.
@@ -2823,27 +2968,12 @@ endif
 - E3.2 System displays error message and allows retry.
 - E3.3 Use case end.
 
-**`[E4: Send code failed]`**
-- E4.1 Backend returns error when sending verification code.
-- E4.2 System displays error message: "Failed to send verification code, please try again" (zh: "发送验证码失败，请稍后重试").
-- E4.3 User can retry from A2.4.
-
-**`[E5: Verification code invalid]`**
-- E5.1 Backend returns error: verification code is incorrect or expired.
-- E5.2 System displays error message: "Invalid or expired verification code" (zh: "验证码错误或已过期").
-- E5.3 User can request a new code or retry from A2.7.
-
-**`[E6: Reset password failed]`**
-- E6.1 Backend returns error when resetting password (e.g., invalid code, user not found).
-- E6.2 System displays error message: "Failed to reset password" (zh: "重置密码失败").
-- E6.3 User can retry from A2.10 or go back to login page.
-
 **Note**:
 - Login supports both username and email address as credentials, providing flexibility for users who may prefer either method.
 - The username used for login is the same as the username shown on the profile page; when the user changes their display name in the profile and the update succeeds, the backend synchronizes the username to this new display name so that subsequent logins use the updated name.
 - Upon successful authentication, the backend generates a JWT token that is stored in localStorage or sessionStorage and included in the `Authorization: Bearer <token>` header for all subsequent authenticated API requests.
 - After successful login, the system redirects the user to the main application or to a previously requested page if the user was redirected to login from a protected route.
-- The login page includes a "Forgot Password" link that allows users to reset their password through email or phone verification. The password reset process requires: (1) entering email/phone and receiving a verification code, (2) verifying the code (for email method), (3) entering and confirming a new password that meets requirements (must contain uppercase and lowercase letters), and (4) submitting the reset request. After successful password reset, the user is redirected back to the login page to log in with the new password.
+- The login page includes a "Forgot Password" link that navigates to the password reset use case (UC-26).
 
 ##### 2.3.20.3 Activity Diagram
 
@@ -3505,6 +3635,175 @@ endif
 ```
 
 ---
+
+#### 3.3.26 UCD-26: Forgot Password (Reset Password)
+
+##### 2.3.26.1 User Requirement Specification (URS) and System Requirement Specification (SRS)
+
+**URS-20-FP**: The User can reset their password if they forget it, using email or phone verification.
+
+**SRS-96**: When user clicks "Forgot Password", the system shall display a password reset form where user can choose **email** or **phone**, then complete the corresponding verification flow and set a new password.
+
+**SRS-97**: The system shall send password reset verification code using the selected method:
+- **Email reset**: Send code via `POST /api/auth/forgot-password/send-code` with identifier (email) and type `"email"`.
+- **Phone reset**: Send SMS code via **Firebase Phone Authentication** on the client side (no backend `send-code` call for phone).
+
+**SRS-98**: The system shall reset password using the selected method:
+- **Email reset**: Reset via `POST /api/auth/forgot-password/reset` with identifier (email), verification code, new password, and type `"email"`.
+- **Phone reset**: After the SMS code is verified by Firebase on the client side, reset via `POST /api/auth/forgot-password/reset/phone` with phone and new password (verification code is not sent to this endpoint).
+
+##### 2.3.26.2 Use Case Description
+
+| Use Case ID | UC-26 |
+|------------|------|
+| Use Case Name | Forgot Password (Reset Password) |
+| Created By | ZhiYi Pan |
+| Date Created | 23/01/2026 |
+| Last Update By | |
+| Last Revision Date | |
+| Actors | User |
+| Supporting Actors | Email Service, SMS Service (Firebase) |
+| Description | User resets password via email verification code or phone verification (Firebase), then returns to login. |
+| Trigger | User clicks "Forgot Password" on login page. |
+| Preconditions | 1. User has a registered account.<br>2. Network connection is available. |
+
+**Use Case Input Specification**
+
+| Input | type | Constraint | Example |
+|-------|------|------------|---------|
+| Method | Enum | `email` or `phone` | `email` |
+| Identifier | String | Valid email or phone | `user@example.com` / `+8613812345678` |
+| Verification code | String | Required for email (and for phone, handled by Firebase) | `123456` |
+| New password | String | Must meet password policy | `Password123` |
+
+**Post conditions**:
+- User password is updated successfully.
+- User is redirected back to login page and can log in with the new password.
+
+**Normal Flows**
+
+| User (Actions) | System (Responses) | Email Service | SMS Service (Firebase) |
+|----------------|-------------------|--------------|------------------------|
+| 1. User clicks "Forgot Password" on the login page. | 2. System navigates to the password reset page and displays method tabs/options (email/phone), identifier input, code input (as applicable), and new password inputs. | - | - |
+| 3. User selects **email** method and enters email. | 4. System sends `POST /api/auth/forgot-password/send-code` with identifier=email and type=`"email"`, and requests Email Service to deliver a reset code.<br>   • `[E1: Send code failed]` | 5. Email Service sends verification code email to the user. | - |
+| 6. User enters the received email code and new password, then submits. | 7. System sends `POST /api/auth/forgot-password/reset` with identifier=email, verification code, new password, and type=`"email"`.<br>   • `[E2: Invalid/expired code]`<br>   • `[E3: Reset password failed]` | - | - |
+| 8. User selects **phone** method and enters phone number, then requests SMS code. | 9. System invokes Firebase Phone Authentication on the client side to request an SMS and later verify it.<br>   • `[E4: Firebase send/verify failed]` | - | 10. SMS Service (Firebase) sends SMS code and verifies the submitted code. |
+| 11. After Firebase verification succeeds, user enters new password and submits. | 12. System sends `POST /api/auth/forgot-password/reset/phone` with phone and new password.<br>   • `[E3: Reset password failed]` | - | - |
+| 13. User sees success result. | 14. System displays "Password reset successfully" (zh: "密码重置成功") and redirects to login page. | - | - |
+
+**Exception Flows**
+
+**`[E1: Send code failed]`**
+- E1.1 Backend returns error when sending email reset code.
+- E1.2 System displays error message: "Failed to send verification code, please try again" (zh: "发送验证码失败，请稍后重试") and allows retry.
+
+**`[E2: Invalid/expired code]`**
+- E2.1 Backend indicates verification code is incorrect or expired.
+- E2.2 System displays error message: "Invalid or expired verification code" (zh: "验证码错误或已过期") and allows retry / resend.
+
+**`[E3: Reset password failed]`**
+- E3.1 Backend returns error when resetting password (e.g., user not found, policy violation, server error).
+- E3.2 System displays error message: "Failed to reset password" (zh: "重置密码失败") and allows retry.
+
+**`[E4: Firebase send/verify failed]`**
+- E4.1 Firebase fails to send SMS or verification fails (invalid code / too many attempts / quota / network).
+- E4.2 System displays a localized error message and allows retry.
+
+##### 2.3.26.3 Activity Diagram
+
+```plantuml
+@startuml UC26_Activity_Diagram
+title UC-26: Forgot Password (Reset Password) - Activity Diagram
+
+|User|
+start
+:clicks "Forgot Password" on login page;
+
+|System|
+:navigates to password reset page;
+
+|User|
+if () then ([Choose email])
+  :selects "Email" method;
+  :enters email;
+  :clicks "Send Code";
+
+  |System|
+  :sends /api/auth/forgot-password/send-code;
+
+  if () then ([Send code failed])
+    :shows "Failed to send verification code";
+    stop
+  else ([Send code accepted])
+    |Email Service|
+    :delivers verification code email;
+  endif
+
+  |User|
+  :enters received email code;
+  :enters new password and confirmation;
+  :clicks "Reset Password";
+
+  |System|
+  if () then ([Code invalid/expired])
+    :shows "Invalid or expired verification code";
+    stop
+  else ([Code valid])
+    :calls /api/auth/forgot-password/reset\n(email, code, new password, type="email");
+
+    if () then ([Reset failed])
+      :shows "Failed to reset password";
+      stop
+    else ([Reset succeeded])
+      :updates password;
+    endif
+  endif
+
+else ([Choose phone])
+  :selects "Phone" method;
+  :enters phone number;
+  :clicks "Send SMS Code";
+
+  |System|
+  :invokes Firebase Phone Authentication;
+
+  |SMS Service (Firebase)|
+  :sends SMS code;
+
+  |User|
+  :enters SMS code;
+
+  |SMS Service (Firebase)|
+  if () then ([Verify failed])
+    |System|
+    :shows error from Firebase\nand allows retry;
+    stop
+  else ([Verified])
+    |System|
+    :phone number is verified;
+  endif
+
+  |User|
+  :enters new password and confirmation;
+  :clicks "Reset Password";
+
+  |System|
+  if () then ([Reset failed])
+    :shows "Failed to reset password";
+    stop
+  else ([Reset succeeded])
+    :calls /api/auth/forgot-password/reset/phone\n(phone, new password);
+    :updates password;
+  endif
+endif
+
+|System|
+:shows "Password reset successfully";
+:redirects to login page;
+stop
+
+@enduml
+```
 
 ## Chapter 4 API Endpoints Reference
 

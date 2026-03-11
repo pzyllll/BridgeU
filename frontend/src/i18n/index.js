@@ -11,7 +11,7 @@ const translations = {
     // Login Page
     login: {
       subtitle: 'Connecting Students & Local Life',
-      username: 'USERNAME',
+      username: 'USERNAME / EMAIL / PHONE NUMBER',
       email: 'EMAIL',
       phone: 'PHONE NUMBER',
       password: 'PASSWORD',
@@ -359,7 +359,7 @@ const translations = {
     // Login Page
     login: {
       subtitle: '连接留学生与本地生活',
-      username: '用户名',
+      username: '用户名 / 邮箱 / 手机号',
       email: '电子邮箱',
       phone: '手机号码',
       password: '密码',

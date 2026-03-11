@@ -423,9 +423,10 @@ public class AuthController {
                 )
             );
 
-            // 获取用户信息
+            // 获取用户信息（支持用户名 / 邮箱 / 手机号）
             AppUser user = userRepository.findByUsername(request.getUsername())
                 .or(() -> userRepository.findByEmail(request.getUsername()))
+                .or(() -> userRepository.findByPhone(request.getUsername()))
                 .orElseThrow(() -> new BadCredentialsException("用户不存在"));
 
             // 生成 JWT Token
