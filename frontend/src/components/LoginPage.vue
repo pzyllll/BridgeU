@@ -29,11 +29,11 @@
           {{ error }}
         </div>
         <div class="form-group">
-          <label>{{ t('login.username') }}</label>
+          <label>{{ t('login.loginIdentifier') }}</label>
           <input
             type="text"
             class="input"
-              :placeholder="t('login.username')"
+              :placeholder="t('login.loginIdentifier')"
               v-model="loginForm.username"
               required
             />
@@ -722,6 +722,13 @@ const completeRegistration = async () => {
     error.value = t('login.passwordWeak');
     return;
   }
+  // Validate password length (at least 6 characters)
+  if (registerForm.value.password.length < 6) {
+    error.value = lang.value === 'zh'
+      ? '密码不能少于六位数'
+      : 'Password must be at least 6 characters';
+    return;
+  }
   
   // Check password match
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
@@ -963,6 +970,13 @@ const resetPassword = async () => {
   // Validate password (must contain uppercase and lowercase)
   if (!/(?=.*[a-z])(?=.*[A-Z])/.test(forgotPasswordForm.value.newPassword)) {
     error.value = t('login.passwordWeak');
+    return;
+  }
+  // Validate password length (at least 6 characters)
+  if (forgotPasswordForm.value.newPassword.length < 6) {
+    error.value = lang.value === 'zh'
+      ? '密码不能少于六位数'
+      : 'Password must be at least 6 characters';
     return;
   }
   

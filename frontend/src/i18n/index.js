@@ -11,7 +11,8 @@ const translations = {
     // Login Page
     login: {
       subtitle: 'Connecting Students & Local Life',
-      username: 'USERNAME / EMAIL / PHONE NUMBER',
+      username: 'USERNAME',
+      loginIdentifier: 'USERNAME / EMAIL / PHONE NUMBER',
       email: 'EMAIL',
       phone: 'PHONE NUMBER',
       password: 'PASSWORD',
@@ -41,7 +42,7 @@ const translations = {
       codeSentTo: 'Verification code sent to',
       completeRegistration: 'Complete Registration',
       setPassword: 'Set Password',
-      passwordRequirements: 'Password must contain both uppercase and lowercase letters',
+      passwordRequirements: 'Password must contain both uppercase and lowercase letters and be at least 6 characters',
       usernameRequirements: 'Username must be English characters only',
       // Forgot password
       resetPassword: 'Reset Password',
@@ -359,7 +360,7 @@ const translations = {
     // Login Page
     login: {
       subtitle: '连接留学生与本地生活',
-      username: '用户名 / 邮箱 / 手机号',
+      username: '用户名',
       email: '电子邮箱',
       phone: '手机号码',
       password: '密码',
@@ -389,7 +390,7 @@ const translations = {
       codeSentTo: '验证码已发送至',
       completeRegistration: '完成注册',
       setPassword: '设置密码',
-      passwordRequirements: '密码必须包含大小写字母',
+      passwordRequirements: '密码必须包含大小写字母，且不少于6位',
       usernameRequirements: '用户名只能使用英文字符',
       // Forgot password
       resetPassword: '重置密码',
@@ -401,7 +402,7 @@ const translations = {
       codeExpired: '验证码已过期',
       passwordsNotMatch: '密码不匹配',
       usernameInvalid: '用户名只能包含英文字符',
-      passwordWeak: '密码必须包含大小写字母',
+      passwordWeak: '密码必须包含大小写字母，且不少于6位',
     },
     // Header
     header: {
