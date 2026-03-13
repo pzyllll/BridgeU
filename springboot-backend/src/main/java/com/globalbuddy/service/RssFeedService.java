@@ -35,7 +35,13 @@ import java.util.List;
 public class RssFeedService {
 
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-    private static final int TIMEOUT = 30000; // 30 seconds timeout
+    /**
+     * 网络环境不稳定时，Google News RSS 可能响应较慢：
+     * - 连接超时保持相对保守，避免完全不可达时长时间卡死
+     * - 读取超时适当放宽，让大一点的 RSS 响应有足够时间返回
+     */
+    private static final int CONNECT_TIMEOUT = 15000; // 15 seconds connect timeout
+    private static final int READ_TIMEOUT = 90000;    // 90 seconds read timeout
 
     /**
      * Create a trust-all SSL context for handling SSL certificate issues
@@ -102,8 +108,8 @@ public class RssFeedService {
             }
             
             connection.setRequestProperty("User-Agent", USER_AGENT);
-            connection.setConnectTimeout(TIMEOUT);
-            connection.setReadTimeout(TIMEOUT);
+            connection.setConnectTimeout(CONNECT_TIMEOUT);
+            connection.setReadTimeout(READ_TIMEOUT);
             
             // Check HTTP response code and handle redirects
             if (connection instanceof HttpURLConnection) {

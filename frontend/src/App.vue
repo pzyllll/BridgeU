@@ -263,9 +263,21 @@ onMounted(() => {
   
   // Listen for unauthorized errors from API interceptor
   const handleUnauthorized = (e) => {
-    console.warn('App: Received auth:unauthorized event, logging out user');
+    console.warn('App: Received auth:unauthorized event, logging out user', e?.detail);
+    
+    // 统一 401 友好提示
+    ElMessage.warning(
+      t('auth.sessionExpired')
+    );
+
+    // 统一触发前端退出登录流程
     if (isLoggedIn.value) {
       handleLogout();
+    } else {
+      // 即使本地认为未登录，也确保清掉残留 token / user
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('sessionActive');
     }
   };
   
@@ -319,13 +331,7 @@ const loadRejectedPosts = async () => {
     rejectedPosts.value = Array.isArray(data) ? data : [];
   } catch (e) {
     console.error('Failed to load rejected posts', e);
-    
-    // 如果是认证错误，清除 token 并登出用户
-    if (e.response?.status === 401 || e.isAuthError) {
-      console.warn('🔒 Authentication failed (401), logging out user');
-      handleLogout();
-      // 不需要显示错误消息，因为用户会被重定向到登录页面
-    }
+    // 401 情况统一交给全局拦截器 + App.vue 的 auth:unauthorized 监听来处理
   }
 };
 

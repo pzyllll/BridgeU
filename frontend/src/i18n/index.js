@@ -8,6 +8,11 @@ import { getLanguagePreference, setLanguagePreference } from '../utils/language'
 // All UI text translations
 const translations = {
   en: {
+    // Global auth / session messages
+    auth: {
+      sessionExpired: 'Your session has expired, please login again',
+      loginRequired: 'Please login to continue',
+    },
     // Login Page
     login: {
       subtitle: 'Connecting Students & Local Life',
@@ -187,6 +192,8 @@ const translations = {
       loadFailed: 'Failed to load profile',
       unauthorized: 'Please login to view your profile',
       anonymous: 'Anonymous',
+      usernameTaken: 'Username already taken',
+      usernameInvalid: 'Username must contain only English letters (A-Z or a-z)',
       posts: 'Posts',
       followers: 'Followers',
       mutualFollows: 'Friends',
@@ -212,6 +219,8 @@ const translations = {
       loadFailed: 'Failed to load posts',
       unauthorized: 'Please login to view your posts',
       noPosts: 'You have not posted anything yet',
+      postId: 'Post ID',
+      tags: 'Tags',
       reviewedAt: 'Reviewed At',
       reviewNote: 'Review Note',
       delete: 'Delete Post',
@@ -289,7 +298,7 @@ const translations = {
       uploadImage: 'Upload Image (Optional)',
       publish: 'Publish Now',
       publishing: 'Publishing...',
-      success: '✅ Post published successfully, check it in Community Feed.',
+      success: '✅ Post submission received. It will appear in the list after it passes review.',
       failed: '❌ Failed to publish, please check your input.',
     },
     
@@ -357,6 +366,11 @@ const translations = {
     },
   },
   zh: {
+    // 全局登录/会话提示
+    auth: {
+      sessionExpired: '登录已过期，请重新登录',
+      loginRequired: '请先登录再继续操作',
+    },
     // Login Page
     login: {
       subtitle: '连接留学生与本地生活',
@@ -508,6 +522,8 @@ const translations = {
       loadFailed: '加载个人资料失败',
       unauthorized: '请登录以查看您的个人资料',
       anonymous: '匿名',
+      usernameTaken: '用户名已被使用',
+      usernameInvalid: '用户名必须为英文字符',
       posts: '帖子',
       followers: '粉丝',
       mutualFollows: '朋友',
@@ -533,6 +549,8 @@ const translations = {
       loadFailed: '加载帖子失败',
       unauthorized: '请登录以查看您的帖子',
       noPosts: '您还没有发布任何帖子',
+      postId: '帖子ID',
+      tags: '标签',
       reviewedAt: '审核时间',
       reviewNote: '审核备注',
       delete: '删除帖子',
@@ -637,7 +655,7 @@ const translations = {
       uploadImage: '上传图片（可选）',
       publish: '立即发布',
       publishing: '发布中...',
-      success: '✅ 帖子发布成功，请在社区动态中查看。',
+      success: '✅ 帖子发布已受理，审核通过后即可在列表中展示。',
       failed: '❌ 发布失败，请检查您的输入。',
     },
    

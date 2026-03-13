@@ -774,8 +774,25 @@ public class PostController {
             ContentModerationService.ModerationResult moderation = contentModerationService.moderatePost(post);
             post.setAiResult(moderation.getAiResult());
             post.setAiConfidence(moderation.getConfidence());
+
             if (moderation.getStatus() != null) {
-                post.setStatus(moderation.getStatus());
+                // 如果 AI 已经给出明确结论且不需要人工审核，则直接写入审核结果与备注
+                if (!moderation.isNeedsManualReview()
+                        && (moderation.getStatus() == CommunityPost.Status.APPROVED
+                        || moderation.getStatus() == CommunityPost.Status.REJECTED)) {
+
+                    String reviewerId = "AI_AUTOMOD";
+                    String reason = moderation.getReason();
+
+                    if (moderation.getStatus() == CommunityPost.Status.APPROVED) {
+                        post.approve(reviewerId, reason);
+                    } else {
+                        post.reject(reviewerId, reason);
+                    }
+                } else {
+                    // 仅更新状态，等待后续人工在后台面板中补充审核信息
+                    post.setStatus(moderation.getStatus());
+                }
             }
         } catch (Exception e) {
             log.error("内容审核失败，标记为待审核: {}", post.getId(), e);

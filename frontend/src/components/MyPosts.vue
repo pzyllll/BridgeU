@@ -52,6 +52,26 @@
           {{ truncateText(post.body, 200) }}
         </div>
 
+        <!-- Post metadata: ID + tags -->
+        <div class="post-meta-line">
+          <span class="post-id">
+            {{ t('myPosts.postId') }}: {{ post.id }}
+          </span>
+          <span 
+            v-if="post.tags && post.tags.length" 
+            class="post-tags"
+          >
+            {{ t('myPosts.tags') }}:
+            <span 
+              v-for="tag in post.tags" 
+              :key="tag" 
+              class="tag-chip"
+            >
+              #{{ tag }}
+            </span>
+          </span>
+        </div>
+
         <div class="post-footer">
           <div class="post-meta">
             <span class="post-time">{{ formatTime(post.createdAt) }}</span>
@@ -177,7 +197,7 @@ const getStatusClass = (status) => {
 const getStatusText = (status) => {
   const statusMap = {
     'PENDING_REVIEW': lang.value === 'zh' ? '待审核' : 'Pending Review',
-    'APPROVED': lang.value === 'zh' ? '已发布' : 'Published',
+    'APPROVED': lang.value === 'zh' ? '已通过' : 'Approved',
     'REJECTED': lang.value === 'zh' ? '已拒绝' : 'Rejected'
   };
   return statusMap[status] || status;

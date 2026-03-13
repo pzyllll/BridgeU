@@ -447,6 +447,17 @@ const uploadAvatar = async () => {
 };
 
 const saveProfile = async () => {
+  // 基本校验：用户名必须为英文（如果填写了）
+  const rawName = (editForm.value.displayName || '').trim();
+  if (rawName && !/^[A-Za-z]+$/.test(rawName)) {
+    alert(t('myProfile.usernameInvalid'));
+    return;
+  }
+
+  // 记录当前的名称，用于判断是否真的修改了名字
+  const originalName = (profile.value?.displayName || profile.value?.username || '').trim();
+  const hasNameChange = !!rawName && rawName !== originalName;
+
   saving.value = true;
   
   try {
@@ -464,9 +475,13 @@ const saveProfile = async () => {
     
     // 准备更新数据
     const updateData = {
-      displayName: editForm.value.displayName,
       preferredLanguage: editForm.value.preferredLanguage
     };
+
+    // 只有在非空、通过校验时才更新显示名称 / 用户名
+    if (rawName) {
+      updateData.displayName = rawName;
+    }
     
     // 如果有新头像URL，添加到更新数据中
     if (avatarUrl) {
@@ -510,12 +525,42 @@ const saveProfile = async () => {
       
       // Show success message
       alert(t('myProfile.updateSuccess'));
+
+      // 当且仅当用户实际修改了名字时，强制刷新到登录页，让用户重新登录
+      if (hasNameChange) {
+        // 清理本地认证信息
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('sessionActive');
+
+        // 提示用户需要重新登录
+        const message =
+          lang.value === 'zh'
+            ? '用户名已更新，请重新登录。'
+            : 'Your username has been updated, please log in again.';
+        alert(message);
+
+        // 强制刷新页面，回到登录视图
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
+      }
     } else {
-      alert(response.data.message || t('myProfile.updateFailed'));
+      const backendMsg = response.data.message || response.data.error || '';
+      if (backendMsg.includes('用户名已被使用')) {
+        alert(t('myProfile.usernameTaken'));
+      } else {
+        alert(backendMsg || t('myProfile.updateFailed'));
+      }
     }
   } catch (err) {
     console.error('Failed to update profile:', err);
-    alert(err.response?.data?.message || t('myProfile.updateFailed'));
+    const backendMsg = err.response?.data?.message || err.response?.data?.error || err.message;
+    if (backendMsg && backendMsg.includes('用户名已被使用')) {
+      alert(t('myProfile.usernameTaken'));
+    } else {
+      alert(backendMsg || t('myProfile.updateFailed'));
+    }
   } finally {
     saving.value = false;
   }
@@ -578,7 +623,7 @@ const getStatusClass = (status) => {
 const getStatusText = (status) => {
   const statusMap = {
     'PENDING_REVIEW': lang.value === 'zh' ? '待审核' : 'Pending Review',
-    'APPROVED': lang.value === 'zh' ? '已发布' : 'Published',
+    'APPROVED': lang.value === 'zh' ? '已通过' : 'Approved',
     'REJECTED': lang.value === 'zh' ? '已拒绝' : 'Rejected'
   };
   return statusMap[status] || status;
