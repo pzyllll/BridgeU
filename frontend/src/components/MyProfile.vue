@@ -623,7 +623,7 @@ const getStatusClass = (status) => {
 const getStatusText = (status) => {
   const statusMap = {
     'PENDING_REVIEW': lang.value === 'zh' ? '待审核' : 'Pending Review',
-    'APPROVED': lang.value === 'zh' ? '已通过' : 'Approved',
+    'APPROVED': lang.value === 'zh' ? '已发布' : 'Published',
     'REJECTED': lang.value === 'zh' ? '已拒绝' : 'Rejected'
   };
   return statusMap[status] || status;

@@ -402,6 +402,11 @@ const forgotPasswordPhoneConfirmation = ref(null); // Firebase confirmation resu
 // Firebase 短信验证码确认对象（注册用）
 const registerPhoneConfirmation = ref(null);
 
+// 记录最近一次发送验证码的时间戳（毫秒）用于节流：1 分钟内重复发送给出提示
+// 使用 localStorage 持久化，确保刷新或重新进入页面时依然生效
+const lastVerificationCodeSentAt = ref(0);
+const lastPasswordResetCodeSentAt = ref(0);
+
 // Computed properties
 const maskedIdentifier = computed(() => {
   if (!registerForm.value.identifier) return '';
@@ -437,6 +442,16 @@ onMounted(() => {
   
   if (typeof window !== 'undefined') {
     window.addEventListener('languageChanged', handleLanguageChange);
+
+    // 从 localStorage 中恢复最近发送验证码时间，保证刷新/重新进入页面时仍然有一分钟限制
+    const regTs = window.localStorage.getItem('lastVerificationCodeSentAt');
+    const fpTs = window.localStorage.getItem('lastPasswordResetCodeSentAt');
+    if (regTs) {
+      lastVerificationCodeSentAt.value = Number(regTs) || 0;
+    }
+    if (fpTs) {
+      lastPasswordResetCodeSentAt.value = Number(fpTs) || 0;
+    }
   }
   
   return () => {
@@ -551,6 +566,15 @@ const onIdentifierInput = () => {
 const sendVerificationCode = async () => {
   error.value = '';
   
+  // 频率限制：1 分钟内多次点击，提示稍后重试
+  const now = Date.now();
+  if (lastVerificationCodeSentAt.value && now - lastVerificationCodeSentAt.value < 60 * 1000) {
+    error.value = lang.value === 'zh'
+      ? '发送频繁，请一分钟之后重试'
+      : 'Too many requests. Please try again in 1 minute.';
+    return;
+  }
+
   if (!registerForm.value.identifier) {
     error.value = lang.value === 'zh' ? '请输入邮箱或手机号' : 'Please enter email or phone number';
     return;
@@ -592,6 +616,12 @@ const sendVerificationCode = async () => {
       codeSent.value = true;
       codeVerified.value = false; // 重置验证状态
       error.value = '';
+    }
+    // 记录发送时间（内存 + localStorage）
+    const ts = Date.now();
+    lastVerificationCodeSentAt.value = ts;
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('lastVerificationCodeSentAt', String(ts));
     }
   } catch (err) {
     console.error('Send verification code error:', err);
@@ -670,7 +700,13 @@ const verifyCode = async () => {
     
     // 处理 400 错误（验证失败或格式错误）
     if (err.response?.status === 400) {
-      if (err.response?.data?.error) {
+      const backendMsg = err.response?.data?.error || err.response?.data?.message || '';
+      // 当后端提示中包含“验证码错误”时，统一给用户一个明确的提示
+      if (backendMsg && backendMsg.includes('验证码错误')) {
+        error.value = lang.value === 'zh'
+          ? '验证码错误，请重新输入'
+          : 'Incorrect verification code, please try again';
+      } else if (err.response?.data?.error) {
         error.value = err.response.data.error;
       } else if (err.response?.data?.message) {
         error.value = err.response.data.message;
@@ -820,6 +856,15 @@ const completeRegistration = async () => {
 const sendPasswordResetCode = async () => {
   error.value = '';
   
+  // 频率限制：1 分钟内多次点击，提示稍后重试
+  const now = Date.now();
+  if (lastPasswordResetCodeSentAt.value && now - lastPasswordResetCodeSentAt.value < 60 * 1000) {
+    error.value = lang.value === 'zh'
+      ? '发送频繁，请一分钟之后重试'
+      : 'Too many requests. Please try again in 1 minute.';
+    return;
+  }
+
   if (!forgotPasswordForm.value.identifier) {
     error.value = lang.value === 'zh' ? '请输入邮箱或手机号' : 'Please enter email or phone number';
     return;
@@ -849,6 +894,12 @@ const sendPasswordResetCode = async () => {
       forgotPasswordCodeSent.value = true;
       forgotPasswordCodeVerified.value = false; // 重置验证状态
       error.value = '';
+    }
+    // 记录发送时间（内存 + localStorage）
+    const ts = Date.now();
+    lastPasswordResetCodeSentAt.value = ts;
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('lastPasswordResetCodeSentAt', String(ts));
     }
   } catch (err) {
     console.error('Send password reset code error:', err);
@@ -926,7 +977,12 @@ const verifyPasswordResetCode = async () => {
     
     // 处理 400 错误（验证失败或格式错误）
     if (err.response?.status === 400) {
-      if (err.response?.data?.error) {
+      const backendMsg = err.response?.data?.error || err.response?.data?.message || '';
+      if (backendMsg && backendMsg.includes('验证码错误')) {
+        error.value = lang.value === 'zh'
+          ? '验证码错误，请重新输入'
+          : 'Incorrect verification code, please try again';
+      } else if (err.response?.data?.error) {
         error.value = err.response.data.error;
       } else if (err.response?.data?.message) {
         error.value = err.response.data.message;
