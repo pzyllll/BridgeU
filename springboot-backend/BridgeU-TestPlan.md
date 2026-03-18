@@ -167,6 +167,7 @@ Description: Tests the frontend component method for fetching daily briefing lis
 Prerequisite: Frontend application is running and connected to the backend API; database contains at least 20 valid news records.
 Test ID: UTC-01
 Test Function: fetchDailyBriefing()
+API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.fetchDailyBriefing()` 间接调用后端接口 `GET /api/news/daily-briefing`（对应后端控制器方法：`NewsController.getDailyBriefing()`）。
 Test Cases: 
 ID	Description	Input	Expected Result
 1	Verify that fetchDailyBriefing() successfully retrieves news list with default parameters	{
@@ -225,6 +226,7 @@ Description:Tests the frontend component method for fetching news details, verif
 Prerequisite: Same as UTC-01, and at least one news record with a valid ID exists in the database.
 Test ID: UTC-02
 Test Function: fetchNewsDetail()
+API/Method Mapping (中文说明): 通过前端方法 `DailyBriefingDetail.fetchNewsDetail()` 调用后端接口 `GET /api/news/daily-briefing/{id}`（对应后端控制器方法：`NewsController.getNewsDetail()`）。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that fetchNewsDetail() successfully retrieves news detail	{
@@ -278,6 +280,7 @@ Description:Tests the frontend component method for handling search operations, 
 Prerequisite: Daily Briefing page is loaded successfully and `fetchDailyBriefing()` is available on the component instance.
 Test ID: UTC-03
 Test Function: handleSearch()
+API/Method Mapping (中文说明): 通过调用前端方法 `DailyBriefing.handleSearch()`，再触发 `fetchDailyBriefing()`，最终访问接口 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）以带上搜索关键字参数 `keyword`。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that handleSearch() resets currentPage to 1	{
@@ -299,6 +302,7 @@ Description:Tests the frontend component method for applying date filters, verif
 Prerequisite: Daily Briefing page is loaded with date filter controls rendered and bound to component state.
 Test ID: UTC-04
 Test Function: applyFilters()
+API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.applyFilters()`，重置分页并调用 `fetchDailyBriefing()`，从而以 `startDate`、`endDate` 参数访问接口 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that applyFilters() validates invalid date range	{
@@ -335,6 +339,7 @@ Description:Tests the frontend component method for resetting filters, verifying
 Prerequisite: Daily Briefing page is loaded and at least one filter (keyword or date) has been applied.
 Test ID: UTC-05
 Test Function: resetFilters()
+API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.resetFilters()` 清空筛选条件并调用 `fetchDailyBriefing()`，最终访问接口 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）以获取未过滤的新闻列表。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that resetFilters() clears all filter values	{
@@ -356,6 +361,7 @@ Description:Tests the frontend component method for handling page changes, verif
 Prerequisite: Daily Briefing list is visible with pagination controls rendered.
 Test ID: UTC-06
 Test Function: handlePageChange(page)
+API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.handlePageChange(page)` 更新分页参数，并再次调用 `fetchDailyBriefing()`，从而以新的 `page` 参数请求 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that handlePageChange() updates currentPage	{
@@ -382,6 +388,7 @@ Description:Tests the utility method for normalizing date values, verifying it c
 Prerequisite: JavaScript date utilities and localization libraries used by the component are loaded (no external API dependency).
 Test ID: UTC-07
 Test Function: normalizeDateValue(value)
+API/Method Mapping (中文说明): 本单元测试仅验证前端工具方法 `DailyBriefing.normalizeDateValue()` 的日期转换逻辑，不直接调用任何后端接口。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that normalizeDateValue() converts Date object to yyyy-MM-dd	{
@@ -414,6 +421,7 @@ Description: Tests the utility method for formatting dates, verifying it correct
 Prerequisite: Component or utility module has access to the current interface language setting (`currentLang`).
 Test ID: UTC-08
 Test Function: formatDate(date)
+API/Method Mapping (中文说明): 本单元测试仅验证前端显示方法 `DailyBriefing.formatDate()` 的格式化逻辑，不直接调用后端接口。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that formatDate() formats date correctly	{
@@ -442,6 +450,7 @@ Description:Tests the backend service method for converting news entities to Dat
 Prerequisite: News entity objects are instantiated in memory with various combinations of original and translated fields; no database access is required.
 Test ID: UTC-09
 Test Function: convertToDTO(news, lang)
+API/Method Mapping (中文说明): 本单元测试直接调用后端控制器内部私有方法 `NewsController.convertToDTO()`（或通过可访问的包装/辅助类调用），不经由对外 REST 接口，只验证 DTO 转换逻辑。
 Test Cases:
 
 ID	Description	Input	Expected Result
@@ -511,6 +520,7 @@ Description:Tests the backend controller API method for retrieving daily briefin
 Prerequisite: Spring Boot backend is running with access to the `news` table in the MySQL `bridgeu` database; `NewsRepository` is correctly wired.
 Test ID: UTC-10
 Test Function: getDailyBriefing()
+API/Method Mapping (中文说明): 通过直接调用后端接口 `GET /api/news/daily-briefing`（控制器方法：`NewsController.getDailyBriefing()`）进行单元/集成测试，可使用 `MockMvc` 或 Postman 发送请求。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that getDailyBriefing() returns paginated news list with default parameters	{
@@ -565,6 +575,7 @@ Description:Tests the backend controller API method for retrieving news details,
 Prerequisite: Backend is running and the `news` table contains at least one valid record and one non-existent ID to test 404 behaviour.
 Test ID: UTC-11
 Test Function: getNewsDetail()
+API/Method Mapping (中文说明): 通过后端接口 `GET /api/news/daily-briefing/{id}`（控制器方法：`NewsController.getNewsDetail()`）进行测试，重点验证 `id` 与 `lang` 参数处理和 404/500 异常分支。
 Test Cases:
 
 ID	Description	Input	Expected Result
@@ -625,6 +636,7 @@ Description: Tests the backend repository method for searching news by keyword, 
 Prerequisite: `NewsRepository` is available in a Spring test context with test data inserted into the `news` table.
 Test ID: UTC-12
 Test Function: findByKeyword(keyword, pageable)
+API/Method Mapping (中文说明): 本单元测试直接调用仓库接口 `NewsRepository.findByKeyword(...)`，不经由 HTTP 接口；该方法在 `NewsController.getDailyBriefing()` 中被间接使用以支持关键字搜索。
 Test Cases:
 
 ID	Description	Input	Expected Result
@@ -677,6 +689,7 @@ ID	Description	Input	Expected Result
 3.1.1.13 UTC-13: Test findByPublishDateBetweenOrdered()
 Description:Tests the backend repository method for querying news by publication date range, verifying it correctly filters news within the specified date range, orders by publication date in descending order, and supports pagination.
 Prerequisite: `NewsRepository` is available in a Spring test context with multiple news records covering different publish dates for the target range.
+API/Method Mapping (中文说明): 本单元测试直接调用仓库方法 `NewsRepository.findByPublishDateBetweenOrdered(...)`，该方法在 `NewsController.getDailyBriefing()` 中被用来实现日期范围过滤逻辑。
 Test ID: UTC-13
 Test Function: findByPublishDateBetweenOrdered(startDate, endDate, pageable)`
 Test Cases:
@@ -739,6 +752,173 @@ ID	Description	Input	Expected Result
                         
                         
                         
+3.1.2 Feature 2 – Community Interaction Platform
+
+3.1.2.1 Unit Test Cases
+
+3.1.2.1.1 UTC-14: Test fetchPosts() – Community Feed List
+Description:Tests the frontend API wrapper method for fetching the community feed list, verifying it correctly attaches the language parameter, passes through query parameters (page, size, q), and handles success and error responses from the backend `GET /api/posts` endpoint.
+Prerequisite: Vue frontend is configured with `frontend/src/api.js` and Axios client; no real backend dependency is required when using mocked Axios responses.
+Test ID: UTC-14
+Test Function: fetchPosts(params)
+API/Method Mapping (中文说明): 通过前端 API 封装方法 `fetchPosts(params)`（定义于 `frontend/src/api.js`），最终访问后端接口 `GET /api/posts`（控制器方法：`PostController.listPosts(q, lang, page, size)`），用于在社区首页展示分页帖子列表。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-14-1: fetchPosts - basic query with explicit lang=en | `{ "params": { "q": "scholarship", "page": 0, "size": 10, "lang": "en" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/posts", "params": { "q": "scholarship", "page": 0, "size": 10, "lang": "en" }, "timeout": 60000 }, "apiResponse": { "success": true, "data": [ { "id": "p1", "title": "Scholarship for international students" } ] } }` |
+| 2 | UTC-14-2: fetchPosts - when lang omitted uses language preference | `{ "params": { "q": "visa", "page": 1, "size": 5 }, "getLanguagePreference()": "en" }` | `{ "apiRequest": { "method": "GET", "url": "/api/posts", "params": { "q": "visa", "page": 1, "size": 5, "lang": "en" }, "timeout": 60000 }, "apiResponse": { "success": true, "data": [] } }` |
+
+
+3.1.2.1.2 UTC-15: Test fetchPostDetail() – View Post Details
+Description:Tests the frontend API wrapper method for fetching a single post detail, verifying it correctly sends the `postId` path parameter and `lang` query parameter, and correctly unwraps the backend response payload into the component.
+Prerequisite: Post detail view component is wired to call `fetchPostDetail(postId, lang)` when opening a post; Axios calls can be mocked in unit tests.
+Test ID: UTC-15
+Test Function: fetchPostDetail(postId, lang)
+API/Method Mapping (中文说明): 通过前端 API 方法 `fetchPostDetail(postId, lang)`（`frontend/src/api.js`）调用后端接口 `GET /api/posts/{id}`（控制器方法：`PostController.getPost(id, lang)`），用于在帖子详情页加载指定帖子的完整内容与评论统计信息。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-15-1: fetchPostDetail - with explicit lang=zh | `{ "postId": "post-123", "lang": "zh" }` | `{ "apiRequest": { "method": "GET", "url": "/api/posts/post-123", "params": { "lang": "zh" } }, "apiResponse": { "success": true, "post": { "id": "post-123", "title": "测试帖子详情（中文）" } } }` |
+
+3.1.2.1.3 UTC-16: Test createPost() – Create a New Post
+Description: Tests the frontend API wrapper method `createPost(payload, token)` which calls `POST /api/posts`, verifying it sends the request body and attaches the `Authorization` header when a token is provided.
+Prerequisite: Axios client can be mocked; no real backend dependency is required.
+Test ID: UTC-16
+Test Function: createPost(payload, token)
+API/Method Mapping (中文说明): 通过前端 API 封装方法 `createPost(payload, token)`（定义于 `frontend/src/api.js`）调用后端接口 `POST /api/posts`（控制器方法：`PostController.createPost(...)`），用于在社区中发布新帖子。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-16-1: createPost - success (with token header) | `{ "payload": { "title": "Hello", "body": "First post", "lang": "en" }, "token": "fake-token" }` | `{ "apiRequest": { "method": "POST", "url": "/api/posts", "headers": { "Authorization": "Bearer fake-token" }, "body": { "title": "Hello", "body": "First post", "lang": "en" } }, "apiResponse": { "success": true, "post": { "id": "p100", "title": "Hello" } } }` |
+
+3.1.2.1.4 UTC-17: Test addComment() – Add Comment to Post
+Description: Tests the frontend API wrapper method `addComment(postId, content, lang, token)` which calls `POST /api/posts/{postId}/comments`, verifying it sends the comment payload, includes `lang` as a query parameter, and attaches `Authorization` when a token is provided.
+Prerequisite: Axios client can be mocked; no real backend dependency is required.
+Test ID: UTC-17
+Test Function: addComment(postId, content, lang, token)
+API/Method Mapping (中文说明): 通过前端 API 方法 `addComment(...)`（`frontend/src/api.js`）调用后端接口 `POST /api/posts/{id}/comments`（控制器方法：`CommentController.addComment(...)` 或 `PostController.addComment(...)`），用于对帖子发表评论。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-17-1: addComment - success (lang omitted uses preference + token header) | `{ "postId": "p100", "content": "Nice post", "lang": null, "token": "fake-token", "getLanguagePreference()": "en" }` | `{ "apiRequest": { "method": "POST", "url": "/api/posts/p100/comments", "params": { "lang": "en" }, "headers": { "Authorization": "Bearer fake-token" }, "body": { "content": "Nice post" } }, "apiResponse": { "success": true, "comment": { "id": "c1", "content": "Nice post" } } }` |
+
+3.1.2.1.5 UTC-18: Test getCommentSummary() – Comment Summary
+Description: Tests the frontend API wrapper method `getCommentSummary(postId, lang)` which calls `GET /api/posts/{postId}/comments/summary`, verifying it includes the `lang` query parameter.
+Prerequisite: Axios client can be mocked; no real backend dependency is required.
+Test ID: UTC-18
+Test Function: getCommentSummary(postId, lang)
+API/Method Mapping (中文说明): 通过前端 API 方法 `getCommentSummary(...)`（`frontend/src/api.js`）调用后端接口 `GET /api/posts/{id}/comments/summary`，用于获取评论统计信息（如总数等）。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-18-1: getCommentSummary - success (explicit lang=zh) | `{ "postId": "p100", "lang": "zh" }` | `{ "apiRequest": { "method": "GET", "url": "/api/posts/p100/comments/summary", "params": { "lang": "zh" } }, "apiResponse": { "success": true, "summary": { "total": 2 } } }` |
+
+3.1.2.1.6 UTC-19: Test deleteComment() – Delete Comment
+Description: Tests the frontend API wrapper method `deleteComment(postId, commentId, token)` which calls `DELETE /api/posts/{postId}/comments/{commentId}`, verifying it attaches the `Authorization` header.
+Prerequisite: Axios client can be mocked; no real backend dependency is required.
+Test ID: UTC-19
+Test Function: deleteComment(postId, commentId, token)
+API/Method Mapping (中文说明): 通过前端 API 方法 `deleteComment(...)`（`frontend/src/api.js`）调用后端接口 `DELETE /api/posts/{postId}/comments/{commentId}`，用于删除指定评论。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-19-1: deleteComment - success (with token header) | `{ "postId": "p100", "commentId": "c1", "token": "fake-token" }` | `{ "apiRequest": { "method": "DELETE", "url": "/api/posts/p100/comments/c1", "headers": { "Authorization": "Bearer fake-token" } }, "apiResponse": { "success": true } }` |
+
+3.1.2.1.7 UTC-20: Test toggleLike() – Like / Unlike Post
+Description: Tests the frontend API wrapper method `toggleLike(postId, token)` which calls `POST /api/posts/{postId}/like`, verifying it attaches the `Authorization` header.
+Prerequisite: Axios client can be mocked; no real backend dependency is required.
+Test ID: UTC-20
+Test Function: toggleLike(postId, token)
+API/Method Mapping (中文说明): 通过前端 API 方法 `toggleLike(...)`（`frontend/src/api.js`）调用后端接口 `POST /api/posts/{id}/like`，用于点赞/取消点赞（由后端根据当前状态切换）。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-20-1: toggleLike - success (with token header) | `{ "postId": "p100", "token": "fake-token" }` | `{ "apiRequest": { "method": "POST", "url": "/api/posts/p100/like", "headers": { "Authorization": "Bearer fake-token" }, "body": {} }, "apiResponse": { "success": true, "liked": true, "likeCount": 1 } }` |
+
+3.1.2.1.8 UTC-21: Test searchAll() – Global Search (Posts & Communities)
+Description: Tests the frontend API wrapper method `searchAll(params)` which calls `GET /api/search`, verifying it passes through query parameters (e.g., query, lang).
+Prerequisite: Axios client can be mocked; no real backend dependency is required.
+Test ID: UTC-21
+Test Function: searchAll(params)
+API/Method Mapping (中文说明): 通过前端 API 方法 `searchAll(params)`（`frontend/src/api.js`）调用后端接口 `GET /api/search`（控制器方法：`SearchController.search(query, lang)`），用于全局搜索社区与帖子。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-21-1: searchAll - success (passes through params) | `{ "params": { "query": "visa", "lang": "en" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/search", "params": { "query": "visa", "lang": "en" } }, "apiResponse": { "success": true, "communities": [], "posts": [] } }` |
+
+3.1.3 Feature 3 – Authentication and Profile System
+
+3.1.3.1 Unit Test Cases
+
+3.1.3.1.1 UTC-22: Test registerWithVerification() – Frontend Registration API Wrapper
+Description:Tests the frontend API wrapper method `registerWithVerification(payload)` which calls `POST /api/auth/register`.
+Prerequisite: Axios client can be mocked; no real backend dependency is required.
+Test ID: UTC-22
+Test Function: registerWithVerification(payload)
+API/Method Mapping (中文说明): 通过前端 API 封装方法 `registerWithVerification(payload)`（定义于 `frontend/src/api.js`）调用后端接口 `POST /api/auth/register`（控制器方法：`AuthController.register(request)`），用于完成带验证码的用户注册流程。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-22-1: registerWithVerification - success case | `{ "payload": { "username": "alice", "identifier": "alice@example.com", "password": "P@ssw0rd!", "code": "123456", "type": "email", "displayName": "alice", "preferredLanguage": "en" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/register", "body": { "username": "alice", "identifier": "alice@example.com", "password": "P@ssw0rd!", "code": "123456", "type": "email", "displayName": "alice", "preferredLanguage": "en" } }, "apiResponse": { "success": true, "token": "fake-jwt-token", "user": { "id": "u-1", "username": "alice" } } }` |
+| 2 | UTC-22-2: registerWithVerification - server error (mocked response) | `{ "payload": { "username": "bob", "identifier": "bob@example.com", "password": "Password123", "code": "654321", "type": "email", "displayName": "bob", "preferredLanguage": "en" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/register", "body": { "username": "bob", "identifier": "bob@example.com", "password": "Password123", "code": "654321", "type": "email", "displayName": "bob", "preferredLanguage": "en" } }, "apiResponse": { "success": false, "message": "Username already taken" } }` |
+
+3.1.3.1.2 UTC-23: Test login() – Frontend Login Flow
+Description:Tests the frontend login method ensuring it sends correct credentials, stores JWT token and user info on success, and handles invalid-credential errors.
+Prerequisite: Login page is wired to call `login()` which uses `/api/auth/login` backend endpoint; localStorage is available.
+Test ID: UTC-23
+Test Function: login()
+API/Method Mapping (中文说明): 通过前端页面方法 `LoginPage.login()` 调用后端接口 `POST /api/auth/login`（控制器方法：`AuthController.login(request)`），用于完成用户登录并获取 JWT。
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-23-1: login - success case | `{ "payload": { "username": "alice", "password": "P@ssw0rd!" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/login", "body": { "username": "alice", "password": "P@ssw0rd!" } }, "apiResponse": { "token": "jwt-token", "expiresIn": 3600, "user": { "id": "u-1", "username": "alice" } } }` |
+
+3.1.3.1.3 UTC-24: Auth API Wrapper Tests (as implemented in `frontend/src/__tests__/api.test.js`)
+
+The following API wrapper unit tests are implemented in `frontend/src/__tests__/api.test.js` and the TestPlan inputs/outputs below match the test code exactly.
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-24-1: Auth - sendVerificationCode (email) | `{ "input": { "identifier": "alice@example.com", "type": "email" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/send-verification-code", "body": { "identifier": "alice@example.com", "type": "email" }, "timeout": 60000 }, "apiResponse": { "success": true } }` |
+| 2 | UTC-24-2: Auth - verifyCode (REGISTER) | `{ "input": { "identifier": "alice@example.com", "code": "123456", "type": "email", "purpose": "REGISTER" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/verify-code", "body": { "identifier": "alice@example.com", "code": "123456", "type": "email", "purpose": "REGISTER" } }, "apiResponse": { "success": true, "verified": true } }` |
+| 3 | UTC-24-3: Auth - registerWithPhone (success) | `{ "payload": { "phone": "+66912345678", "username": "phoneUser", "password": "Password123" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/register/phone", "body": { "phone": "+66912345678", "username": "phoneUser", "password": "Password123" } }, "apiResponse": { "success": true, "userId": "u-phone" } }` |
+| 4 | UTC-24-4: Auth - sendPasswordResetCode (email) | `{ "input": { "identifier": "alice@example.com", "type": "email" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/forgot-password/send-code", "body": { "identifier": "alice@example.com", "type": "email" }, "timeout": 60000 }, "apiResponse": { "success": true } }` |
+| 5 | UTC-24-5: Auth - resetPassword (email) | `{ "input": { "identifier": "alice@example.com", "code": "123456", "newPassword": "Password123", "type": "email" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/forgot-password/reset", "body": { "identifier": "alice@example.com", "code": "123456", "newPassword": "Password123", "type": "email" } }, "apiResponse": { "success": true } }` |
+| 6 | UTC-24-6: Auth - resetPasswordWithPhone | `{ "input": { "phone": "+66912345678", "newPassword": "Password123" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/forgot-password/reset/phone", "body": { "phone": "+66912345678", "newPassword": "Password123" } }, "apiResponse": { "success": true } }` |
+
+3.1.3.1.4 UTC-25: User Follow API Wrapper Tests (as implemented in `frontend/src/__tests__/api.test.js`)
+
+**Test Cases (table format)**:
+
+| ID | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | UTC-25-1: getFollowers - returns empty list (empty state) | `{ "input": { "userId": "user123", "token": "fake-token" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/users/user123/followers", "headers": { "Authorization": "Bearer fake-token" } }, "apiResponse": { "success": true, "data": [], "count": 0 } }` |
+| 2 | UTC-25-2: getFollowers - returns follower list | `{ "input": { "userId": "user123", "token": "fake-token" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/users/user123/followers", "headers": { "Authorization": "Bearer fake-token" } }, "apiResponse": { "success": true, "data": [ { "id": "u1", "username": "alice", "displayName": "Alice", "avatar": null, "isFollowing": true }, { "id": "u2", "username": "bob", "displayName": "Bob", "avatar": null, "isFollowing": false } ], "count": 2 } }` |
+| 3 | UTC-25-3: getUserMutualFollows - returns empty list | `{ "input": { "userId": "user123", "token": "fake-token" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/users/user123/mutual-follows", "headers": { "Authorization": "Bearer fake-token" } }, "apiResponse": { "success": true, "data": [], "count": 0 } }` |
+| 4 | UTC-25-4: getUserMutualFollows - returns mutual follow list | `{ "input": { "userId": "user123", "token": "fake-token" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/users/user123/mutual-follows", "headers": { "Authorization": "Bearer fake-token" } }, "apiResponse": { "success": true, "data": [ { "id": "u10", "username": "carol", "displayName": "Carol", "avatar": null, "isFollowing": true } ], "count": 1 } }` |
+
 3.2 Feature 1 – Integration Test (Daily Briefing System)
 
 3.2.1 ITC-01: GET /api/news/daily-briefing with Database Filters

@@ -73,7 +73,7 @@ BridgeU aims to eliminate language barriers through AI technology and establish 
 The system architecture consists of a front-end built using Vue.js and a component library (Element UI / Element Plus), which provides a responsive user interface.  
 The back-end is built with Spring Boot, a robust Java framework, handling business logic and RESTful API requests.  
 MySQL 8 is used as the primary database for storing structured user and post data.  
-Elasticsearch (or other search mechanisms) can be integrated to provide high-performance semantic search capabilities.  
+Elasticsearch (or other search mechanisms) can be integrated to provide high-performance keyword / full-text search capabilities.  
 Additionally, the system connects to the Aliyun Qwen API to perform natural language processing tasks such as summarization and translation.  
 Axios is used for communication between the front-end and back-end.
 
@@ -564,12 +564,13 @@ The following sequence diagrams are intentionally **simplified** to show only **
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client (frontend/src/api.js)
+  actor User as User
+  participant Client as Client (frontend/src/api.js)
   participant NC as NewsController
   participant NR as NewsRepository
   participant LDS as LanguageDetectionService
 
+  User->>Client: Open Daily Briefings page / trigger load
   Client->>NC: GET /api/news/daily-briefing(page,size,lang,source,startDate,endDate,keyword)
   NC->>NC: Parse startDate/endDate (LocalDate.parse)
   alt No filters (no date, no keyword, no source)
@@ -588,12 +589,13 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant NC as NewsController
   participant NR as NewsRepository
   participant LDS as LanguageDetectionService
 
+  User->>Client: Click a news item to view details
   Client->>NC: GET /api/news/daily-briefing/{id}?lang=xx
   NC->>NR: findById(id)
   alt News not found
@@ -613,10 +615,11 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant NC as NewsController
 
+  User->>Client: Change language preference (e.g. English → Chinese)
   Client->>NC: GET /api/news/daily-briefing(..., lang="en")
   NC-->>Client: 200 data[].title/summary in English preference
   Client->>NC: GET /api/news/daily-briefing(..., lang="zh")
@@ -627,10 +630,11 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant NC as NewsController
 
+  User->>Client: Click "View original" link
   Client->>NC: GET /api/news/daily-briefing(...)
   NC-->>Client: 200 data[].originalUrl
   Client->>Client: window.open(originalUrl)
@@ -640,11 +644,12 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant NC as NewsController
   participant NR as NewsRepository
 
+  User->>Client: Set date range and click filter
   Client->>NC: Clicks filter button (startDate/endDate set)
   Client->>NC: GET /api/news/daily-briefing(..., startDate, endDate)
   NC->>NC: Parse dates and apply default/fallback window
@@ -656,8 +661,8 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant NC as NewsController
   participant NR as NewsRepository
 
@@ -759,7 +764,6 @@ classDiagram
     +postRepository: CommunityPostRepository
     +commentRepository: CommentRepository
     +postLikeRepository: PostLikeRepository
-    +semanticService: SemanticService
     +languageDetectionService: LanguageDetectionService
     +translationService: TranslationService
     +contentModerationService: ContentModerationService
@@ -780,11 +784,13 @@ classDiagram
   }
 
   class MessageController {
-    +getConversations(): ResponseEntity<List<ConversationResponse>>
-    +getMessages(conversationId: String): ResponseEntity<List<MessageResponse>>
-    +sendMessage(conversationId: String, request: SendMessageRequest): ResponseEntity<MessageResponse>
-    +markAsRead(conversationId: String): ResponseEntity<Map>
-    +deleteMessage(messageId: String): ResponseEntity<Map>
+    +getConversations(): ResponseEntity<Map>
+    +createOrGetConversation(request: Map<String,String>): ResponseEntity<Map>
+    +getConversationMessages(conversationId: String): ResponseEntity<Map>
+    +sendMessage(conversationId: String, request: Map<String,String>): ResponseEntity<Map>
+    +markAsRead(messageId: String): ResponseEntity<Map>
+    +markConversationAsRead(conversationId: String): ResponseEntity<Map>
+    +deleteConversation(conversationId: String): ResponseEntity<Map>
   }
 
   class CommunityPostRepository {
@@ -864,7 +870,10 @@ classDiagram
   PostController --> CommunityPostRepository : "uses"
   PostController --> CommentRepository : "uses"
   ReportController --> CommunityPostRepository : "uses"
-  MessageController --> CommunityPostRepository : "uses"
+  MessageController --> ConversationRepository : "uses"
+  MessageController --> MessageRepository : "uses"
+  MessageController --> UserFollowRepository : "uses"
+  MessageController --> AppUserRepository : "uses"
   CommunityPostRepository --> CommunityPost : "queries"
   CommentRepository --> Comment : "queries"
   CommunityPost --> AppUser : "author"
@@ -947,7 +956,7 @@ File: `springboot-backend/src/main/java/com/globalbuddy/controller/PostControlle
 | 1  | postRepository           | Instance of `CommunityPostRepository` for database operations                               | CommunityPostRepository |
 | 2  | commentRepository        | Instance of `CommentRepository` for comment operations                                      | CommentRepository       |
 | 3  | postLikeRepository       | Instance of `PostLikeRepository` for like operations                                         | PostLikeRepository      |
-| 4  | semanticService          | Instance of `SemanticService` for semantic search                                            | SemanticService         |
+
 | 5  | languageDetectionService | Instance of `LanguageDetectionService` for language detection                               | LanguageDetectionService |
 | 6  | translationService       | Instance of `TranslationService` for content translation                                     | TranslationService      |
 | 7  | contentModerationService | Instance of `ContentModerationService` for AI content moderation                            | ContentModerationService |
@@ -983,13 +992,15 @@ File: `springboot-backend/src/main/java/com/globalbuddy/controller/MessageContro
 
 **Methods**
 
-| ID | Name               | Description                                                                                       | Parameters                                                                                                       | Return Type                         |
-|----|--------------------|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------|
-| 1  | getConversations   | Returns all conversations for the current user                                                   | None                                                                                                             | `ResponseEntity<List<ConversationResponse>>` |
-| 2  | getMessages        | Returns all messages in a conversation                                                           | `conversationId: String`                                                                                        | `ResponseEntity<List<MessageResponse>>` |
-| 3  | sendMessage         | Sends a message in a conversation                                                                 | `conversationId: String`, `request: SendMessageRequest`                                                          | `ResponseEntity<MessageResponse>`   |
-| 4  | markAsRead         | Marks messages in a conversation as read                                                         | `conversationId: String`                                                                                        | `ResponseEntity<Map>`                |
-| 5  | deleteMessage      | Deletes a message from the current user's view                                                  | `messageId: String`                                                                                             | `ResponseEntity<Map>`                |
+| ID | Name                     | Description                                                                                                                                                                     | Parameters                                           | Return Type                |
+|----|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------|----------------------------|
+| 1  | getConversations         | Returns the list of conversations for the current user, wrapped in a map (e.g. list, pagination info, unread counts).                                                         | None                                                 | `ResponseEntity<Map>`      |
+| 2  | createOrGetConversation  | Creates a new conversation with the specified user or restores an existing soft-deleted conversation. Requires the current user to follow the target user.                   | `request: Map<String, String>` (contains `userId`)   | `ResponseEntity<Map>`      |
+| 3  | getConversationMessages  | Returns messages for the specified conversation, wrapped in a map (e.g. list, pagination info, unread status).                                                                 | `conversationId: String`                             | `ResponseEntity<Map>`      |
+| 4  | sendMessage              | Sends a message in the specified conversation. If the users are not mutually following, the current user is limited to a single message in that conversation until followed. | `conversationId: String`, `request: Map<String,String>` | `ResponseEntity<Map>`   |
+| 5  | markAsRead               | Marks a single message as read.                                                                                                                                                 | `messageId: String`                                  | `ResponseEntity<Map>`      |
+| 6  | markConversationAsRead   | Marks all messages in the specified conversation as read for the current user.                                                                                                 | `conversationId: String`                             | `ResponseEntity<Map>`      |
+| 7  | deleteConversation       | Soft-deletes a conversation from the current user's view without removing the underlying messages or the other user's conversation.                                           | `conversationId: String`                             | `ResponseEntity<Map>`      |
 
 #### 3.2.2.3 Repository
 
@@ -1049,9 +1060,9 @@ File: `springboot-backend/src/main/java/com/globalbuddy/model/CommunityPost.java
 | 13 | imageUrl       | String  | Image URL if post contains images                               |
 | 14 | aiResult       | String  | AI moderation result (TEXT)                                     |
 | 15 | aiConfidence   | Double  | AI confidence score (0.0 - 1.0)                                 |
-| 16 | status         | Status  | Post moderation status (PENDING_REVIEW, APPROVED, REJECTED, REPORTED_REMOVED) |
-| 17 | reviewNote     | String  | Review note from administrator                                  |
-| 18 | reviewedBy     | String  | Reviewer ID                                                     |
+| 16 | status         | Status  | Post moderation status:<br/>- PENDING_REVIEW: Requires additional AI-based safety checks (no manual review)<br/>- APPROVED: Post approved (can be by AI )<br/>- REJECTED: Post rejected (can be by AI or administrator)<br/>- REPORTED_REMOVED: Removed due to user report |
+| 17 | reviewNote     | String  | Review note (filled by AI system with reviewerId "AI_AUTOMOD") |
+| 18 | reviewedBy     | String  | Reviewer ID ("AI_AUTOMOD" for AI-approved/rejected posts）|
 | 19 | reviewedAt     | Instant | Review timestamp                                                |
 | 20 | embedding      | String  | Semantic embedding for search (TEXT)                            |
 | 21 | createdAt      | Instant | Time when the post was created                                 |
@@ -1061,7 +1072,7 @@ File: `springboot-backend/src/main/java/com/globalbuddy/model/CommunityPost.java
 
 | ID | Name           | Description                                                     | Parameters                        | Return Type |
 |----|----------------|-----------------------------------------------------------------|-----------------------------------|-------------|
-| 1  | needsManualReview | Checks if post needs manual review                            | None                              | boolean     |
+| 1  | needsManualReview | Indicates whether the post requires additional AI-based safety checks (no manual review). | None                              | boolean     |
 | 2  | approve        | Approves the post with reviewer information                    | `reviewerId: String`, `note: String` | void        |
 | 3  | reject         | Rejects the post with reviewer information                     | `reviewerId: String`, `note: String` | void        |
 
@@ -1108,31 +1119,28 @@ The following sequence diagrams show key interactions in Feature 2: Community In
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client (frontend)
+  actor User as User
+  participant Client as Client (frontend)
   participant PC as PostController
   participant PR as CommunityPostRepository
-  participant SS as SemanticService
   participant PLR as PostLikeRepository
   participant CR as CommentRepository
 
+  User->>Client: Open community feed / pull to refresh
   Client->>PC: GET /api/posts?lang=en&page=0&size=20&q=keyword&tag=Study
   PC->>PR: findAllByOrderByCreatedAtDesc()
   PR-->>PC: List<CommunityPost>
   PC->>PC: Filter approved posts only
-  PC->>PC: Filter out reported posts
   PC->>PC: Filter out system news posts
-  alt Keyword provided
-    loop For each post
-      PC->>SS: calculateScore(keyword, title + body)
-      PC->>PC: Filter posts with score > 0
-      PC->>PC: Sort by score descending
-    end
-  end
+  PC->>PC: Filter out empty-content posts
   loop For each post
+    PC->>PC: toPostResponse(post, lang)
     PC->>PLR: countByPost(post)
     PC->>CR: countByPost(post)
-    PC->>PC: toPostResponse(post, lang)
+    PC->>PC: Build PostListResponse (with likeCount/commentCount)
+  end
+  alt Keyword provided (q has text)
+    PC->>PC: Filter responses by keyword contains (title + " " + body, case-insensitive)
   end
   PC-->>Client: 200 List<PostListResponse>
 ```
@@ -1141,14 +1149,15 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant PC as PostController
   participant LDS as LanguageDetectionService
   participant TS as TranslationService
   participant CMS as ContentModerationService
   participant PR as CommunityPostRepository
 
+  User->>Client: Click "Create Post" and submit form
   Client->>PC: POST /api/posts (title, body, tags, category)
   PC->>LDS: detectLanguage(title + body)
   LDS-->>PC: detectedLang (zh/en/th)
@@ -1157,28 +1166,62 @@ sequenceDiagram
   PC->>PC: Create CommunityPost entity
   PC->>PC: Set translations
   PC->>CMS: moderatePost(post)
-  CMS-->>PC: ModerationResult (status, confidence, aiResult)
-  alt confidence < 60
-    PC->>PC: Set status = REJECTED
-  else confidence >= 60 && confidence < 80
+  Note over CMS: 1. Check sensitive words<br/>2. AI analysis (confidenceScore 0-100, isSafe)<br/>3. Image moderation (if applicable)
+  CMS-->>PC: ModerationResult (status, needsManualReview, confidence, aiResult, reason)
+  alt needsManualReview == false && status == APPROVED
+    PC->>PC: post.approve("AI_AUTOMOD", reason)
+  else needsManualReview == false && status == REJECTED
+    PC->>PC: post.reject("AI_AUTOMOD", reason)
+  else needsManualReview == true
+    Note over PC: Status = PENDING_REVIEW<br/>Requires additional AI-based safety checks
     PC->>PC: Set status = PENDING_REVIEW
-  else confidence >= 80
-    PC->>PC: Set status = APPROVED
   end
   PC->>PR: save(post)
   PR-->>PC: Saved CommunityPost
   PC-->>Client: 201 PostResponse
 ```
 
+**ContentModerationService.moderatePost() Logic:**
+
+The content moderation process follows these steps:
+
+1. **Sensitive Word Check**: If the post content contains any predefined sensitive words, it is immediately rejected with `status = REJECTED` and `needsManualReview = false`.
+
+2. **AI Content Analysis**: The service calls the AI model to analyze the post content. The AI returns:
+   - `isSafe` (boolean): Whether the content is safe
+   - `confidenceScore` (0-100): AI confidence level (raw score from AI)
+   - `reason` (string): Explanation for the decision
+   
+   Note: The `confidenceScore` (0-100) is stored in the database as `aiConfidence` (0.0-1.0) by dividing by 100.0. The raw JSON result with the original 0-100 score is preserved in the `aiResult` field.
+
+3. **Status Decision Based on Confidence**:
+   - If `confidenceScore > 70` (CONFIDENCE_THRESHOLD):
+     - `isSafe = true` → `status = APPROVED`, `needsManualReview = false`
+     - `isSafe = false` → `status = REJECTED`, `needsManualReview = false`
+   - If `confidenceScore ≤ 70`:
+     - `status = PENDING_REVIEW`, `needsManualReview = true` (requires additional AI-based safety checks)
+
+4. **Image Moderation** (if post contains images):
+   - If image is marked as `UNSAFE` → `status = REJECTED`
+   - If image is marked as `SUSPICIOUS` and text was `APPROVED` → `status = PENDING_REVIEW`, `needsManualReview = true`
+
+5. **Exception Handling**: If AI service fails, the post is marked as `PENDING_REVIEW` with `needsManualReview = true` for additional AI-based safety checks.
+
+**PostController Processing:**
+
+- If `needsManualReview = false` and status is `APPROVED` or `REJECTED`: The controller automatically calls `post.approve("AI_AUTOMOD", reason)` or `post.reject("AI_AUTOMOD", reason)`.
+- If `needsManualReview = true`: Only the status is set to `PENDING_REVIEW`, waiting for additional AI-based safety verification (no manual human review).
+
 #### SD-09: Like Post
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant PC as PostController
   participant PLR as PostLikeRepository
 
+  User->>Client: Click like / unlike button
   Client->>PC: POST /api/posts/{postId}/like
   PC->>PLR: findByPostAndUser(post, currentUser)
   alt Like exists
@@ -1200,13 +1243,14 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant PC as PostController
   participant PR as CommunityPostRepository
   participant PLR as PostLikeRepository
   participant CR as CommentRepository
 
+  User->>Client: Choose tag (e.g. "Study") / click filter
   Client->>PC: GET /api/posts?lang=en&page=0&size=20&tag=Study
   PC->>PR: findAllByOrderByCreatedAtDesc()
   PR-->>PC: List<CommunityPost>
@@ -1226,7 +1270,6 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
   actor Client as Client
   participant PC as PostController
   participant PR as CommunityPostRepository
@@ -1241,26 +1284,21 @@ sequenceDiagram
     PC-->>Client: 404 Not Found
   else Post found
     PR-->>PC: Optional<CommunityPost>
-    PC->>PC: Check post status (must be APPROVED)
-    alt Post not approved
-      PC-->>Client: 404 Not Found (or 403 Forbidden)
-    else Post approved
-      PC->>CR: findByPostOrderByCreatedAtDesc(post)
-      CR-->>PC: List<Comment>
-      PC->>PLR: existsByPostAndUser(post, currentUser)
-      PLR-->>PC: isLiked (boolean)
-      PC->>UFR: existsByFollowerAndFollowing(currentUser, post.author)
-      UFR-->>PC: isFollowing (boolean)
-      PC->>PLR: countByPost(post)
-      PLR-->>PC: likeCount
-      PC->>CR: countByPost(post)
-      CR-->>PC: commentCount
-      loop For each comment
-        PC->>PC: toCommentResponse(comment, lang)
-      end
-      PC->>PC: toPostResponse(post, lang)
-      PC-->>Client: 200 PostDetailResponse {post, comments, isLiked, isFollowing, likeCount, commentCount}
-    end
+    PC->>PC: getCurrentUser()
+    PC->>PC: toPostResponse(post, lang)
+    PC->>CR: findByPostOrderByCreatedAtDesc(post)
+    CR-->>PC: List<Comment>
+    PC->>PC: filter comments by status ACTIVE
+    PC->>PC: toCommentResponse(comment, lang) for each comment
+    PC->>PLR: countByPost(post)
+    PLR-->>PC: likeCount
+    PC->>PLR: existsByPostAndUser(post, currentUser)
+    PLR-->>PC: isLiked (boolean)
+    PC->>CR: countByPost(post)
+    CR-->>PC: commentCount
+    PC->>UFR: existsByFollowerAndFollowing(currentUser, post.author)
+    UFR-->>PC: isFollowing (boolean)
+    PC-->>Client: 200 PostDetailResponse
   end
 ```
 
@@ -1268,42 +1306,32 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant RC as ReportController
   participant RR as ReportRepository
-  participant PR as CommunityPostRepository
-  participant CR as CommentRepository
   participant RMS as ReportModerationService
 
-  Client->>RC: POST /api/reports (targetType, targetId, reason, description)
-  alt targetType == POST
-    RC->>PR: findById(targetId)
-    alt Post not found
-      PR-->>RC: Optional.empty()
-      RC-->>Client: 404 {error: "Post not found"}
-    else Post found
-      PR-->>RC: Optional<CommunityPost>
-      RC->>RC: Create Report entity
-      RC->>RMS: processReport(report)
-      RMS-->>RC: AI analysis result
-      RC->>RR: save(report)
-      RR-->>RC: Saved Report
-      RC-->>Client: 201 {success: true, message: "Report submitted"}
-    end
-  else targetType == COMMENT
-    RC->>CR: findById(targetId)
-    alt Comment not found
-      CR-->>RC: Optional.empty()
-      RC-->>Client: 404 {error: "Comment not found"}
-    else Comment found
-      CR-->>RC: Optional<Comment>
-      RC->>RC: Create Report entity
-      RC->>RMS: processReport(report)
-      RMS-->>RC: AI analysis result
-      RC->>RR: save(report)
-      RR-->>RC: Saved Report
-      RC-->>Client: 201 {success: true, message: "Report submitted"}
+  User->>Client: Click "Report" on post/comment and submit reasons
+  Client->>RC: POST /api/reports (targetType, targetId, reasons[], description)
+  RC->>RC: getCurrentUser()
+  alt User not authenticated
+    RC-->>Client: 401 Unauthorized
+  else User authenticated
+    RC->>RC: validate request (targetType, targetId, reasons)
+    alt Missing or invalid fields
+      RC-->>Client: 400 Bad Request {success: false, message}
+    else Fields valid
+      RC->>RC: parse targetType (POST or COMMENT)
+      alt Invalid targetType
+        RC-->>Client: 400 Bad Request {success: false, message: "Invalid targetType. Must be POST or COMMENT"}
+      else Valid targetType
+        RC->>RR: save(Report{ reporter=currentUser, targetType, targetId, reasons, description, status=PENDING })
+        RR-->>RC: Saved Report (with id)
+        RC->>RMS: processReport(reportId)
+        RMS-->>RC: (async processing started)
+        RC-->>Client: 200 OK { success: true, message: "Report submitted successfully. AI review is in progress.", reportId }
+      end
     end
   end
 ```
@@ -1313,12 +1341,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant PC as PostController
   participant LDS as LanguageDetectionService
   participant TS as TranslationService
   participant CR as CommentRepository
 
+  User->>Client: Submit comment under a post
   Client->>PC: POST /api/posts/{postId}/comments (content)
   PC->>LDS: detectLanguage(content)
   LDS-->>PC: detectedLang
@@ -1337,33 +1367,31 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant PC as PostController
   participant PR as CommunityPostRepository
-  participant SS as SemanticService
   participant PLR as PostLikeRepository
   participant CR as CommentRepository
 
+  User->>Client: Enter keyword and click search
   Client->>PC: GET /api/posts?lang=en&page=0&size=20&q=keyword
   PC->>PR: findAllByOrderByCreatedAtDesc()
   PR-->>PC: List<CommunityPost>
-  PC->>PC: Filter approved posts only
-  PC->>PC: Filter out reported posts
+  PC->>PC: Filter approved posts only (status == APPROVED)
   PC->>PC: Filter out system news posts
-  alt Keyword provided
-    loop For each post
-      PC->>SS: calculateScore(keyword, titleZh + contentZh + titleEn + contentEn)
-      SS-->>PC: relevanceScore
-      PC->>PC: Filter posts with score > 0
-    end
-    PC->>PC: Sort posts by relevanceScore descending
-  end
-  loop For each post
+  PC->>PC: Filter out empty-content posts
+  loop For each post (build response)
+    PC->>PC: toPostResponse(post, lang)
     PC->>PLR: countByPost(post)
     PC->>CR: countByPost(post)
-    PC->>PC: toPostResponse(post, lang)
+    PC->>PC: Build PostListResponse (with likeCount/commentCount)
   end
-  PC-->>Client: 200 List<PostListResponse> (sorted by relevance)
+  alt Keyword provided (q has text)
+    PC->>PC: Filter responses by keyword contains (title + " " + body, case-insensitive)
+  end
+  PC->>PC: Apply pagination (page,size) -> subList(start,end)
+  PC-->>Client: 200 List<PostListResponse>
 ```
 
 #### SD-15: AI Summary Comment
@@ -1371,22 +1399,38 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant PC as PostController
+  participant PR as CommunityPostRepository
   participant CR as CommentRepository
   participant AIS as AiSummaryService
 
+  User->>Client: Click "AI Summary" under comments
   Client->>PC: GET /api/posts/{postId}/comments/summary?lang=en
-  PC->>CR: findByPostOrderByCreatedAtDesc(post)
-  CR-->>PC: List<Comment>
-  PC->>PC: Filter active comments only
-  PC->>PC: Extract comment contents (based on lang)
-  alt Comments exist
-    PC->>AIS: generateCommentSummary(commentContents, lang)
-    AIS-->>PC: summary (String)
-    PC-->>Client: 200 {summary: String, commentCount: number}
-  else No comments
-    PC-->>Client: 200 {summary: "No comments", commentCount: 0}
+  PC->>PR: findById(postId)
+  alt Post not found
+    PC-->>Client: 404 Not Found
+  else Post found
+    PC->>CR: findByPostOrderByCreatedAtDesc(post)
+    CR-->>PC: List<Comment>
+    PC->>PC: Filter active comments only
+    alt No comments after filtering
+      PC-->>Client: 200 {summary: "No comments to summarize" (or zh), commentCount: 0}
+    else Has comments
+      PC->>PC: Extract non-empty comment contents (based on lang)
+      alt No valid comment contents
+        PC-->>Client: 200 {summary: "No valid comments to summarize" (or zh), commentCount: 0}
+      else Valid contents exist
+        PC->>AIS: generateCommentSummary(commentContents, lang)
+        alt AI summary success
+          AIS-->>PC: summary (String)
+          PC-->>Client: 200 {summary: String, commentCount: number}
+        else AI summary failed
+          PC-->>Client: 500 {error: String, message: String}
+        end
+      end
+    end
   end
 ```
 
@@ -1395,28 +1439,78 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant MC as MessageController
-  participant UFR as UserFollowRepository
   participant CR as ConversationRepository
   participant MR as MessageRepository
+  participant UFR as UserFollowRepository
 
+  Note over Client,MC: Step 1 - Create or get conversation (requires current user follows the target)
+  User->>Client: Click "Message/Chat" entry on another user's profile (or mutual-follow list)
+  Client->>MC: POST /api/messages/conversations { userId }
+  MC->>MC: Validate request.userId
+  alt userId missing
+    MC-->>Client: 400 {success:false, message:"userId is required"}
+  else userId provided
+    MC->>MC: Load otherUser by id
+    alt otherUser not found
+      MC-->>Client: 404 Not Found
+    else otherUser found
+      MC->>UFR: existsByFollowerAndFollowing(currentUser, otherUser)
+      alt currentUser does NOT follow otherUser
+        MC-->>Client: 400 {success:false, message:"You must follow this user to start a conversation"}
+      else currentUser follows otherUser
+        MC->>UFR: existsByFollowerAndFollowing(otherUser, currentUser)
+        MC->>CR: findByUser1AndUser2(currentUser, otherUser)\nOR findByUser2AndUser1(currentUser, otherUser)
+        alt Conversation exists (may be soft-deleted for current user)
+          CR-->>MC: Optional<Conversation>
+          alt deletedBy == currentUser
+            MC->>MC: Set conversation.deletedBy = null
+            MC->>CR: save(conversation)
+          end
+        else No conversation
+          CR-->>MC: Optional.empty()
+          MC->>MC: Create new Conversation(user1=currentUser, user2=otherUser)
+          MC->>CR: save(conversation)
+        end
+        MC-->>Client: 200 {success:true, conversationId, isMutualFollow: boolean}
+      end
+    end
+  end
+
+  Note over Client,MC: Step 2 - Send message with mutual-follow + single-message limit rules
+  User->>Client: Type message content and click "Send"
   Client->>MC: POST /api/messages/conversations/{conversationId}/messages (content)
   MC->>CR: findById(conversationId)
   CR-->>MC: Optional<Conversation>
-  alt Conversation exists
-    MC->>UFR: Check mutual follow (user1, user2)
-    alt Mutual follow exists
-      MC->>MC: Create Message entity
-      MC->>MR: save(message)
-      MC->>CR: Update lastMessageAt
-      CR-->>MC: Updated Conversation
-      MC-->>Client: 201 MessageResponse
+  alt Conversation not found
+    MC-->>Client: 404 {success:false, message:"Conversation not found"}
+  else Conversation found
+    MC->>MC: Verify currentUser is user1 or user2
+    MC->>UFR: existsByFollowerAndFollowing(currentUser, otherUser)
+    MC->>UFR: existsByFollowerAndFollowing(otherUser, currentUser)
+    alt Mutual follow == true
+      MC->>MC: allowUnlimited = true
     else Not mutual follow
-      MC-->>Client: 403 Forbidden
+      MC->>MR: countByConversationAndSender(conversation, currentUser)
+      MR-->>MC: messageCount
+      alt messageCount >= 1
+        MC-->>Client: 400 {success:false, code:"SINGLE_MESSAGE_LIMIT", message:"You can only send one message until the other user follows you back"}
+      else First message allowed
+        MC->>MC: allowUnlimited = false
+      end
     end
-  else Conversation not found
-    MC-->>Client: 404 Not Found
+
+    alt Message sending allowed
+      MC->>MC: Create Message entity (sender=currentUser, receiver=otherUser)
+      MC->>MR: save(message)
+      MC->>MC: Set conversation.lastMessageAt = now()
+      MC->>CR: save(conversation)
+      MC->>MR: countByConversationAndSender(conversation, currentUser)
+      MR-->>MC: messagesSentByCurrentUser
+      MC-->>Client: 200 {success:true, messageId, isMutualFollow, canSendMore: boolean}
+    end
   end
 ```
 
@@ -1424,13 +1518,14 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant MC as MessageController
   participant CR as ConversationRepository
   participant MR as MessageRepository
 
   alt Mark messages as read
+    User->>Client: Open a conversation and click "Mark as read" (or enter chat to mark all read)
     Client->>MC: PUT /api/messages/conversations/{conversationId}/read
     MC->>CR: findById(conversationId)
     CR-->>MC: Optional<Conversation>
@@ -1440,23 +1535,23 @@ sequenceDiagram
       loop For each unread message where receiver = currentUser
         MC->>MC: Set message.isRead = true
         MC->>MC: Set message.readAt = now()
-        MC->>MR: save(message)
       end
-      MC-->>Client: 200 {success: true, message: "Messages marked as read"}
+      MC->>MR: saveAll(messages)
+      MC-->>Client: 200 {success: true}
     else Conversation not found
-      MC-->>Client: 404 Not Found
+      MC-->>Client: 404 {success:false, message:"Conversation not found"}
     end
   else Delete conversation
+    User->>Client: Click "Delete conversation"
     Client->>MC: DELETE /api/messages/conversations/{conversationId}
     MC->>CR: findById(conversationId)
     CR-->>MC: Optional<Conversation>
     alt Conversation exists
       MC->>MC: Set conversation.deletedBy = currentUser
       MC->>CR: save(conversation)
-      CR-->>MC: Updated Conversation
-      MC-->>Client: 200 {success: true, message: "Conversation deleted"}
+      MC-->>Client: 200 {success: true, message: "Conversation deleted successfully"}
     else Conversation not found
-      MC-->>Client: 404 Not Found
+      MC-->>Client: 404 {success:false, message:"Conversation not found"}
     end
   end
 ```
@@ -1488,7 +1583,7 @@ The following files implement Feature 2: Community Interaction Platform.
   - `springboot-backend/src/main/java/com/globalbuddy/model/Message.java`
   - `springboot-backend/src/main/java/com/globalbuddy/model/Report.java`
 - **Service**
-  - `springboot-backend/src/main/java/com/globalbuddy/service/SemanticService.java`
+  - `springboot-backend/src/main/java/com/globalbuddy/service/SemanticService.java` (legacy / currently unused in controllers)
   - `springboot-backend/src/main/java/com/globalbuddy/service/LanguageDetectionService.java`
   - `springboot-backend/src/main/java/com/globalbuddy/service/TranslationService.java`
   - `springboot-backend/src/main/java/com/globalbuddy/service/ContentModerationService.java`
@@ -1505,6 +1600,7 @@ The Authentication and Profile System allows users to:
 - Register Account.  
 - Log In.  
 - Log Out.  
+- Forget Password.  
 - View/Edit Profile.  
 - View My Community Posts.  
 - View and Manage the mutual follow list.  
@@ -1529,6 +1625,8 @@ classDiagram
   class LoginPage {
     +login(): Promise<void>
     +logout(): void
+    +sendPasswordResetCode(): Promise<void>
+    +resetPassword(): Promise<void>
   }
 
   class ProfilePage {
@@ -1543,6 +1641,9 @@ classDiagram
     +getCurrentUser(): ResponseEntity<UserDTO>
     +sendVerificationCode(request: SendVerificationCodeRequest): ResponseEntity
     +verifyCode(request: VerifyCodeRequest): ResponseEntity
+    +sendPasswordResetCode(request: SendVerificationCodeRequest): ResponseEntity
+    +resetPassword(request: ResetPasswordRequest): ResponseEntity
+    +resetPasswordWithPhone(request: PhoneResetPasswordRequest): ResponseEntity
   }
 
   class UserController {
@@ -1615,9 +1716,12 @@ classDiagram
   class VerificationCode {
     +id: String
     +identifier: String
+    +type: CodeType
     +code: String
-    +expiresAt: Instant
-    +isUsed: Boolean
+    +purpose: CodePurpose
+    +expiresAt: LocalDateTime
+    +used: Boolean
+    +createdAt: LocalDateTime
   }
 
   class JwtService {
@@ -1629,6 +1733,14 @@ classDiagram
   class VerificationCodeService {
     +sendVerificationCode(identifier: String, type: String, purpose: String): Boolean
     +verifyCodeWithDetails(identifier: String, code: String, type: String, purpose: String): VerificationResult
+  }
+
+  class EmailService {
+    +sendVerificationCode(to: String, code: String, purpose: CodePurpose): Boolean
+  }
+
+  class SmsService {
+    +sendVerificationCode(phoneNumber: String, code: String, purpose: CodePurpose): Boolean
   }
 
   RegisterPage --> AuthController : "HTTP Request"
@@ -1646,6 +1758,8 @@ classDiagram
   UserFollow --> AppUser : "references"
   ReportRepository --> Report : "queries"
   VerificationCodeService --> VerificationCodeRepository : "uses"
+  VerificationCodeService --> EmailService : "uses"
+  VerificationCodeService --> SmsService : "uses"
   VerificationCodeRepository --> VerificationCode : "queries"
 ```
 
@@ -1669,7 +1783,7 @@ Frontend page component for user registration. Sends HTTP requests to `AuthContr
 
 ##### 3.3.2.1.2 LoginPage
 
-Frontend page component for user authentication. Sends HTTP requests to `AuthController` for login operations.
+Frontend page component for user authentication. Sends HTTP requests to `AuthController` for login operations. Also handles password reset functionality.
 
 **Methods**
 
@@ -1677,6 +1791,8 @@ Frontend page component for user authentication. Sends HTTP requests to `AuthCon
 |----|---------------------|--------------------------------------------------------------------------------------------------|------------|----------------|
 | 1  | login               | Authenticates user and logs in                                                                  | None       | Promise\<void> |
 | 2  | logout              | Logs out the current user                                                                       | None       | void           |
+| 3  | sendPasswordResetCode | Sends password reset verification code (email or phone)                                        | None       | Promise\<void> |
+| 4  | resetPassword       | Resets password using verification code                                                         | None       | Promise\<void> |
 
 ##### 3.3.2.1.3 ProfilePage
 
@@ -1707,6 +1823,9 @@ Handles authentication-related HTTP requests. Uses `AppUserRepository`, `Verific
 | 3  | getCurrentUser       | Retrieves current authenticated user information                                                                                    | None                                                                                                             | `ResponseEntity<UserDTO>`           |
 | 4  | sendVerificationCode | Sends verification code to email or phone                                                                                           | `request: SendVerificationCodeRequest`                                                                          | `ResponseEntity`                    |
 | 5  | verifyCode          | Verifies verification code                                                                                                           | `request: VerifyCodeRequest`                                                                                    | `ResponseEntity`                    |
+| 6  | sendPasswordResetCode | Sends password reset verification code to email or phone                                                                            | `request: SendVerificationCodeRequest`                                                                          | `ResponseEntity`                    |
+| 7  | resetPassword       | Resets password using email verification code                                                                                        | `request: ResetPasswordRequest`                                                                                 | `ResponseEntity`                    |
+| 8  | resetPasswordWithPhone | Resets password using phone (Firebase verified)                                                                                      | `request: PhoneResetPasswordRequest`                                                                            | `ResponseEntity`                    |
 
 ##### 3.3.2.2.2 Controller: `UserController`
 
@@ -1859,9 +1978,12 @@ Entity representing a verification code for email or phone verification.
 |----|----------------|--------|-----------------------------------------------------------------|
 | 1  | id             | String | Primary key ID                                                  |
 | 2  | identifier     | String | Email address or phone number                                   |
-| 3  | code           | String | Verification code                                               |
-| 4  | expiresAt      | Instant | Expiration time                                                |
-| 5  | isUsed         | Boolean | Whether the code has been used                                 |
+| 3  | type           | CodeType | Verification code type (EMAIL or SMS)                         |
+| 4  | code           | String | Verification code (6 digits)                                    |
+| 5  | purpose        | CodePurpose | Code purpose (REGISTER or RESET_PASSWORD)                  |
+| 6  | expiresAt      | LocalDateTime | Expiration time                                          |
+| 7  | used           | Boolean | Whether the code has been used                                 |
+| 8  | createdAt      | LocalDateTime | Creation time                                            |
 
 #### 3.3.2.5 Service
 
@@ -1883,7 +2005,7 @@ Service for JWT token generation and validation. Used by `AuthController`.
 
 File: `springboot-backend/src/main/java/com/globalbuddy/service/VerificationCodeService.java`
 
-Service for verification code generation and validation. Uses `VerificationCodeRepository`. Used by `AuthController`.
+Service for verification code generation and validation. Uses `VerificationCodeRepository`, `EmailService`, and `SmsService`. Used by `AuthController`.
 
 **Methods**
 
@@ -1892,58 +2014,274 @@ Service for verification code generation and validation. Uses `VerificationCodeR
 | 1  | sendVerificationCode | Sends a verification code to the specified identifier                                                                               | `identifier: String`, `type: String`, `purpose: String`                                                          | Boolean                             |
 | 2  | verifyCodeWithDetails | Verifies a verification code with detailed result                                                                                   | `identifier: String`, `code: String`, `type: String`, `purpose: String`                                          | VerificationResult                  |
 
+##### 3.3.2.5.3 Service: `EmailService`
+
+File: `springboot-backend/src/main/java/com/globalbuddy/service/EmailService.java`
+
+Service for sending verification code emails. Used by `VerificationCodeService`.
+
+**Methods**
+
+| ID | Name               | Description                                                                                                                          | Parameters                                                                                                       | Return Type                         |
+|----|--------------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------|
+| 1  | sendVerificationCode | Sends a verification code email to the specified email address                                                                      | `to: String`, `code: String`, `purpose: CodePurpose`                                                             | Boolean                             |
+
+##### 3.3.2.5.4 Service: `SmsService`
+
+File: `springboot-backend/src/main/java/com/globalbuddy/service/SmsService.java`
+
+Service for sending verification code SMS messages. Used by `VerificationCodeService`.
+
+**Methods**
+
+| ID | Name               | Description                                                                                                                          | Parameters                                                                                                       | Return Type                         |
+|----|--------------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------|
+| 1  | sendVerificationCode | Sends a verification code SMS to the specified phone number                                                                        | `phoneNumber: String`, `code: String`, `purpose: CodePurpose`                                                    | Boolean                             |
+
 ---
 
 ### 3.3.3 Sequence Diagrams (Mermaid)
 
 The following sequence diagrams show key interactions in Feature 3: Authentication and Profile System.
 
-#### SD-19: Register Account
+#### SD-18: View Followers/Friends List (UC-18)
 
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
+  participant UC as UserController
+  participant AUR as AppUserRepository
+  participant UFR as UserFollowRepository
+
+  User->>Client: Open a profile page (own or another user's)
+  Note over User,Client: Entry points: click Followers count or Friends (mutual follows) count
+  alt View Followers list
+    User->>Client: Click "Followers" count
+    Client->>UC: GET /api/users/{userId}/followers
+    UC->>UC: Get current user from SecurityContext
+    alt Not logged in
+      UC-->>Client: 401 Unauthorized
+    else Logged in
+      UC->>AUR: findById(userId)
+      alt Target user not found
+        UC-->>Client: 404 Not Found
+      else Target user found
+        UC->>UFR: Find all UserFollow where following = userId
+        loop For each follower
+          UC->>UFR: existsByFollowerAndFollowing(currentUser, follower)
+          UC->>UC: Build userInfo {id, username, displayName, avatar, isFollowing}
+        end
+        UC-->>Client: 200 {success:true, data: List<UserInfo>, count:number}
+        alt count == 0
+          Client->>Client: Show empty-state ("No users")
+        else count > 0
+          User->>Client: Click a user's avatar (or row)
+          Client->>Client: Close list modal and navigate to /profile/{selectedUserId}
+        end
+      end
+    end
+  else View Friends (mutual follows) list
+    User->>Client: Click "Friends" (mutual follows) count
+    Client->>UC: GET /api/users/{userId}/mutual-follows
+    UC->>UC: Get current user from SecurityContext
+    alt Not logged in
+      UC-->>Client: 401 Unauthorized
+    else Logged in
+      UC->>AUR: findById(userId)
+      alt Target user not found
+        UC-->>Client: 404 Not Found
+      else Target user found
+        UC->>UFR: Find all UserFollow where follower = userId (followingList)
+        UC->>UFR: Find all UserFollow where following = userId (followersList)
+        loop For each user in followingList
+          UC->>UC: Check if user also in followersList
+          alt Mutual follow
+            UC->>UFR: existsByFollowerAndFollowing(currentUser, mutualUser)
+            UC->>UC: Build userInfo {id, username, displayName, avatar, isFollowing}
+          end
+        end
+        UC-->>Client: 200 {success:true, data: List<UserInfo>, count:number}
+        alt count == 0
+          Client->>Client: Show empty-state ("No users")
+        else count > 0
+          User->>Client: Click a user's avatar (or row)
+          Client->>Client: Close list modal and navigate to /profile/{selectedUserId}
+        end
+      end
+    end
+  end
+```
+
+#### SD-19.1: Register Account (Email)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as User
+  participant Client as Client
   participant AC as AuthController
   participant VCS as VerificationCodeService
   participant ES as EmailService
   participant AUR as AppUserRepository
   participant PE as PasswordEncoder
   participant JS as JwtService
-
-  Client->>AC: POST /api/auth/send-verification-code (identifier, type="email")
-  AC->>AUR: existsByEmail(identifier)
-  alt Email not registered
-    AUR-->>AC: false
-    AC->>VCS: sendVerificationCode(identifier, type, "REGISTER")
-    VCS->>ES: sendEmail(identifier, subject, code)
-    ES-->>VCS: true
-    VCS-->>AC: true
-    AC-->>Client: 200 {success: true, message: "验证码已发送"}
-  else Email already registered
-    AUR-->>AC: true
-    AC-->>Client: 400 {error: "该邮箱已被注册"}
+  
+  User->>Client: Enter email and request verification code
+  Client->>AC: POST /api/auth/send-verification-code (identifier=email, type="email")
+  AC->>AC: Validate email format (regex)
+  alt Invalid email format
+    AC-->>Client: 400 {error:"Invalid email format", field:"identifier"}
+  else Email format OK
+    AC->>AUR: existsByEmail(identifier)
+    alt Email already registered
+      AUR-->>AC: true
+      AC-->>Client: 400 {error:"Email already registered", field:"identifier"}
+    else Email not registered
+      AUR-->>AC: false
+      AC->>VCS: sendVerificationCode(identifier, "email", "REGISTER")
+      Note over VCS: Generate code, save to DB, then send via EmailService
+      VCS->>ES: sendVerificationCode(identifier, generatedCode, REGISTER)
+      alt Send success
+        ES-->>VCS: true
+        VCS-->>AC: true
+        AC-->>Client: 200 {success:true, message:"Verification code sent"}
+      else Send failed / exception
+        ES-->>VCS: false
+        VCS-->>AC: false (or throws RuntimeException)
+        AC-->>Client: 500 {error:"Failed to send verification code. Please try again later"} OR 500 {error:reason, details:exception}
+      end
+    end
   end
   
-  Client->>AC: POST /api/auth/verify-code (identifier, code, type)
-  AC->>VCS: verifyCodeWithDetails(identifier, code, type, "REGISTER")
-  VCS-->>AC: VerificationResult (success: true)
-  AC-->>Client: 200 {success: true, message: "验证码验证成功"}
+  User->>Client: Enter code and click "Verify"
+  Client->>AC: POST /api/auth/verify-code (identifier=email, code, type="email", purpose? default REGISTER)
+  AC->>VCS: verifyCodeWithDetails(identifier, code, "email", purpose)
+  alt Code valid
+    VCS-->>AC: VerificationResult (success:true)
+    AC-->>Client: 200 {success:true, message:"Verification code verified"}
+  else Code invalid/expired/used/not found
+    VCS-->>AC: VerificationResult (success:false, errorMessage)
+    AC-->>Client: 400 {error:errorMessage}
+  else Backend error
+    AC-->>Client: 500 {error:"Verification failed"}
+  end
   
-  Client->>AC: POST /api/auth/register (username, password, displayName, preferredLanguage, identifier, code, type)
-  AC->>VCS: verifyCodeWithDetails(identifier, code, type, "REGISTER")
-  VCS-->>AC: VerificationResult (success: true)
-  AC->>VCS: markCodeAsUsed(identifier, type, "REGISTER")
-  AC->>AUR: existsByUsername(username)
-  AUR-->>AC: false
-  AC->>PE: encode(password)
-  PE-->>AC: hashedPassword
-  AC->>AC: Create AppUser entity
-  AC->>AUR: save(user)
-  AUR-->>AC: Saved AppUser
-  AC->>JS: generateToken(user)
-  JS-->>AC: jwtToken
-  AC-->>Client: 201 AuthResponse {token, expiresIn, user}
+  User->>Client: Submit registration form (email)
+  Client->>AC: POST /api/auth/register (username, password, displayName, preferredLanguage, identifier=email, code, type="email")
+  AC->>VCS: verifyCodeWithDetails(identifier, code, "email", "REGISTER")
+  alt Code invalid
+    VCS-->>AC: VerificationResult (success:false, errorMessage)
+    AC-->>Client: 400 {error:errorMessage, field:"code"}
+  else Code valid
+    VCS-->>AC: VerificationResult (success:true)
+    AC->>VCS: markCodeAsUsed(identifier, "email", "REGISTER") (best-effort)
+    AC->>AUR: existsByUsername(username)
+    alt Username already in use
+      AUR-->>AC: true
+      AC-->>Client: 400 {error:"Username already in use", field:"username"}
+    else Username available
+      AUR-->>AC: false
+      AC->>AUR: existsByEmail(identifier)
+      alt Email already registered
+        AUR-->>AC: true
+        AC-->>Client: 400 {error:"Email already registered", field:"identifier"}
+      else Email available
+        AUR-->>AC: false
+        AC->>PE: encode(password)
+        PE-->>AC: hashedPassword
+        AC->>AC: Create AppUser (email=identifier)
+        AC->>AUR: save(user)
+        AC->>JS: generateToken(user)
+        JS-->>AC: jwtToken
+        AC-->>Client: 201 AuthResponse {token, expiresIn, user}
+      end
+    end
+  end
+```
+
+#### SD-19.2: Register Account (Phone)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as User
+  participant Client as Client
+  participant AC as AuthController
+  participant VCS as VerificationCodeService
+  participant SS as SmsService
+  participant AUR as AppUserRepository
+  participant PE as PasswordEncoder
+  participant JS as JwtService
+  
+  User->>Client: Enter phone number and request verification code
+  Client->>AC: POST /api/auth/send-verification-code (identifier=phone, type="phone")
+  AC->>AUR: existsByPhone(identifier)
+  alt Phone number already registered
+    AUR-->>AC: true
+    AC-->>Client: 400 {error:"Phone number already registered", field:"identifier"}
+  else Phone number not registered
+    AUR-->>AC: false
+    AC->>VCS: sendVerificationCode(identifier, "phone", "REGISTER")
+    Note over VCS: Normalize type PHONE->SMS, generate code, save to DB, then send via SmsService
+    VCS->>SS: sendVerificationCode(identifier, generatedCode, REGISTER)
+    alt Send success
+      SS-->>VCS: true
+      VCS-->>AC: true
+      AC-->>Client: 200 {success:true, message:"Verification code sent"}
+    else Send failed / exception
+      SS-->>VCS: false
+      VCS-->>AC: false (or throws RuntimeException)
+      AC-->>Client: 500 {error:"Failed to send verification code. Please try again later"} OR 500 {error:reason, details:exception}
+    end
+  end
+  
+  User->>Client: Enter code and click "Verify"
+  Client->>AC: POST /api/auth/verify-code (identifier=phone, code, type="phone", purpose? default REGISTER)
+  AC->>VCS: verifyCodeWithDetails(identifier, code, "phone", purpose)
+  alt Code valid
+    VCS-->>AC: VerificationResult (success:true)
+    AC-->>Client: 200 {success:true, message:"Verification code verified"}
+  else Code invalid/expired/used/not found
+    VCS-->>AC: VerificationResult (success:false, errorMessage)
+    AC-->>Client: 400 {error:errorMessage}
+  else Backend error
+    AC-->>Client: 500 {error:"Verification failed"}
+  end
+  
+  User->>Client: Submit registration form (phone)
+  Client->>AC: POST /api/auth/register (username, password, displayName, preferredLanguage, identifier=phone, code, type="phone")
+  AC->>VCS: verifyCodeWithDetails(identifier, code, "phone", "REGISTER")
+  alt Code invalid
+    VCS-->>AC: VerificationResult (success:false, errorMessage)
+    AC-->>Client: 400 {error:errorMessage, field:"code"}
+  else Code valid
+    VCS-->>AC: VerificationResult (success:true)
+    AC->>VCS: markCodeAsUsed(identifier, "phone", "REGISTER") (best-effort)
+    AC->>AUR: existsByUsername(username)
+    alt Username already in use
+      AUR-->>AC: true
+      AC-->>Client: 400 {error:"Username already in use", field:"username"}
+    else Username available
+      AUR-->>AC: false
+      AC->>AUR: existsByPhone(identifier)
+      alt Phone number already registered
+        AUR-->>AC: true
+        AC-->>Client: 400 {error:"Phone number already registered", field:"identifier"}
+      else Phone number available
+        AUR-->>AC: false
+        AC->>PE: encode(password)
+        PE-->>AC: hashedPassword
+        Note over AC: For phone register-with-verification, backend generates temp email: phone@bridgeu.local
+        AC->>AC: Create AppUser (phone=identifier, email=phone@bridgeu.local)
+        AC->>AUR: save(user)
+        AC->>JS: generateToken(user)
+        JS-->>AC: jwtToken
+        AC-->>Client: 201 AuthResponse {token, expiresIn, user}
+      end
+    end
+  end
 ```
 
 #### SD-20: Log In
@@ -1951,25 +2289,26 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant AC as AuthController
   participant AM as AuthenticationManager
   participant AUR as AppUserRepository
   participant JS as JwtService
-
+  
+  User->>Client: Enter username/email/phone and password, then click "Log In"
   Client->>AC: POST /api/auth/login (username, password)
   AC->>AM: authenticate(UsernamePasswordAuthenticationToken)
-  AM->>AUR: findByUsername(username) or findByEmail(username)
-  AUR-->>AM: Optional<AppUser>
-  AM->>AM: Validate password
   alt Credentials valid
     AM-->>AC: Authentication (authenticated)
+    AC->>AUR: findByUsername(username) OR findByEmail(username) OR findByPhone(username)
+    AUR-->>AC: AppUser
     AC->>JS: generateToken(user)
     JS-->>AC: jwtToken
     AC-->>Client: 200 AuthResponse {token, expiresIn, user}
   else Credentials invalid
     AM-->>AC: BadCredentialsException
-    AC-->>Client: 401 {error: "用户名或密码错误"}
+    AC-->>Client: 401 {error: "Invalid username or password"}
   end
 ```
 
@@ -1978,13 +2317,19 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
-  participant LP as LoginPage
-
-  Client->>LP: Click "Log Out" button
-  LP->>LP: Clear JWT token from localStorage/sessionStorage
-  LP->>LP: Clear in-memory user/session state
-  LP-->>Client: Navigate to Login page (/login)
+  actor User as User
+  participant Client as Client
+  participant SB as Sidebar
+  participant APP as "App (App.vue)"
+  
+  User->>Client: Click "Log Out" (sidebar menu)
+  Client->>SB: emit navigate("logout")
+  SB-->>APP: navigate("logout")
+  APP->>APP: handleLogout()
+  APP->>APP: Set isLoggedIn = false and clear in-memory auth state
+  APP->>APP: localStorage.removeItem("token") and localStorage.removeItem("user")
+  APP->>APP: sessionStorage.removeItem("sessionActive")
+  APP-->>Client: UI switches to LoginPage (v-if !isLoggedIn)
 ```
 
 #### SD-22: View/Edit Profile
@@ -1992,32 +2337,43 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant UC as UserController
   participant AUR as AppUserRepository
-
-  Client->>UC: PUT /api/users/me (displayName, avatar, preferredLanguage)
+  
+  User->>Client: Edit profile fields and click "Save"
+  Client->>UC: PUT /api/users/me (updates: {displayName?, avatar?, preferredLanguage?})
   UC->>UC: Get current user from SecurityContext
-  alt displayName provided
-    UC->>AUR: existsByUsername(newDisplayName)
-    alt Username available
-      AUR-->>UC: false
-      UC->>UC: Update user.username = newDisplayName
-      UC->>UC: Update user.displayName = newDisplayName
-    else Username taken
-      AUR-->>UC: true
-      UC-->>Client: 400 {error: "用户名已被使用"}
+  alt displayName provided and non-empty
+    UC->>UC: newName = trim(displayName)
+    alt username will change (currentUsername != newName)
+      UC->>AUR: existsByUsername(newName)
+      alt Username already in use
+        AUR-->>UC: true
+        UC-->>Client: 400 {success:false, message:"Username already in use"}
+      else Username available
+        AUR-->>UC: false
+        UC->>UC: Update user.username = newName
+        UC->>UC: Update user.displayName = newName
+      end
+    else username unchanged
+      UC->>UC: Update user.displayName = newName
     end
   end
-  alt avatar provided
+  alt avatar provided (can be null)
     UC->>UC: Update user.avatar = avatar
   end
-  alt preferredLanguage provided
+  alt preferredLanguage provided (zh/en)
     UC->>UC: Update user.preferredLanguage = preferredLanguage
   end
-  UC->>AUR: save(user)
-  AUR-->>UC: Updated AppUser
-  UC-->>Client: 200 {success: true, data: UserDTO}
+  alt At least one field updated
+    UC->>AUR: save(user)
+    AUR-->>UC: Updated AppUser
+    UC-->>Client: 200 {success:true, message:"Profile updated successfully", data: UserDTO}
+  else No valid fields to update
+    UC-->>Client: 400 {success:false, message:"No valid fields to update"}
+  end
 ```
 
 #### SD-23: View My Community Posts
@@ -2025,21 +2381,33 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant UC as UserController
   participant CPR as CommunityPostRepository
+  participant PLR as PostLikeRepository
+  participant CR as CommentRepository
   participant PC as PostController
-
+  
+  User->>Client: Open "My Posts" page
   Client->>UC: GET /api/users/me/posts?lang=en
   UC->>UC: Get current user from SecurityContext
-  UC->>CPR: findByAuthorIdOrderByCreatedAtDesc(userId)
-  CPR-->>UC: List<CommunityPost> (all statuses)
-  loop For each post
-    UC->>PC: toPostResponse(post, lang)
-    PC-->>UC: PostResponse
-    UC->>UC: Add moderation status (status, reviewNote, reviewedAt)
+  alt Not logged in
+    UC-->>Client: 401 Unauthorized
+  else Logged in
+    UC->>CPR: findByAuthorIdOrderByCreatedAtDesc(currentUserId)
+    CPR-->>UC: List<CommunityPost> (all statuses)
+    loop For each post
+      UC->>PLR: countByPost(post)
+      PLR-->>UC: likeCount
+      UC->>CR: countByPost(post)
+      CR-->>UC: commentCount
+      UC->>PC: toPostResponse(post, lang)
+      PC-->>UC: PostResponse
+      UC->>UC: Build postMap + moderation fields (status, reviewNote, reviewedAt, reviewedBy)
+    end
+    UC-->>Client: 200 {success:true, data: List<PostMap>, count:number}
   end
-  UC-->>Client: 200 {success: true, data: List<PostMap>, count: number}
 ```
 
 #### SD-24: View and Manage the mutual follow list
@@ -2047,26 +2415,33 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant UC as UserController
   participant UFR as UserFollowRepository
-
+  
+  User->>Client: Open Mutual Follows page / search follows
   Client->>UC: GET /api/users/mutual-follows?q=keyword
   UC->>UC: Get current user from SecurityContext
-  UC->>UFR: Find all UserFollow where follower = currentUser
-  UFR-->>UC: List<UserFollow> (followingList)
-  UC->>UFR: Find all UserFollow where following = currentUser
-  UFR-->>UC: List<UserFollow> (followersList)
-  loop For each user in followingList
-    UC->>UC: Check if user also in followersList
-    alt Mutual follow
-      UC->>UC: Add to mutualFollows list
+  alt Not logged in
+    UC-->>Client: 401 Unauthorized
+  else Logged in
+    UC->>UFR: Find all UserFollow where follower = currentUser
+    UFR-->>UC: List<UserFollow> (followingList)
+    UC->>UFR: Find all UserFollow where following = currentUser
+    UFR-->>UC: List<UserFollow> (followersList)
+    loop For each user in followingList
+      UC->>UC: Check if user also in followersList
+      alt Mutual follow
+        UC->>UC: Build userInfo {id, username, displayName, email}
+        UC->>UC: Add to mutualFollows list
+      end
     end
+    alt Search keyword provided
+      UC->>UC: Filter mutualFollows by keyword (username/displayName contains)
+    end
+    UC-->>Client: 200 {success:true, data: List<{id, username, displayName, email}>, count:number}
   end
-  alt Search keyword provided
-    UC->>UC: Filter mutualFollows by keyword
-  end
-  UC-->>Client: 200 {success: true, data: List<UserInfo>, count: number}
 ```
 
 #### SD-25: View My Reports
@@ -2074,15 +2449,139 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Client as Client
+  actor User as User
+  participant Client as Client
   participant RC as ReportController
   participant RR as ReportRepository
-
+  
+  User->>Client: Open "My Reports" page
   Client->>RC: GET /api/reports/my
   RC->>RC: Get current user from SecurityContext
   RC->>RR: findByReporterIdOrderByCreatedAtDesc(userId)
   RR-->>RC: List<Report>
   RC-->>Client: 200 List<Report> (with status, reason, aiAnalysis, reviewNote)
+```
+
+#### SD-26: Forget Password (Email)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Client as Client
+  participant AC as AuthController
+  participant VCS as VerificationCodeService
+  participant ES as EmailService
+  participant AUR as AppUserRepository
+  participant PE as PasswordEncoder
+
+  Client->>AC: POST /api/auth/forgot-password/send-code (identifier, type="email")
+  AC->>AUR: existsByEmail(identifier)
+  alt User exists
+    AUR-->>AC: true
+    AC->>VCS: sendVerificationCode(identifier, type, "RESET_PASSWORD")
+    VCS->>ES: sendVerificationCode(identifier, generatedCode, RESET_PASSWORD)
+    alt Send success
+      ES-->>VCS: true
+      VCS-->>AC: true
+      AC-->>Client: 200 {success:true, message:"Verification code sent"}
+    else Send failed / exception
+      ES-->>VCS: false
+      VCS-->>AC: false (or throws RuntimeException)
+      AC-->>Client: 500 {success:false, message:"Failed to send verification code"}
+    end
+  else User not exists
+    AUR-->>AC: false
+    Note over AC: For security, return success even if user doesn't exist
+    AC-->>Client: 200 {success:true, message:"If this email is registered, a verification code has been sent"}
+  end
+  
+  Client->>AC: POST /api/auth/verify-code (identifier, code, type, purpose="RESET_PASSWORD")
+  AC->>VCS: verifyCodeWithDetails(identifier, code, type, "RESET_PASSWORD")
+  alt Code valid
+    VCS-->>AC: VerificationResult (success:true)
+    AC-->>Client: 200 {success:true, message:"Verification code verified"}
+  else Code invalid/expired/used/not found
+    VCS-->>AC: VerificationResult (success:false, errorMessage)
+    AC-->>Client: 400 {success:false, message:errorMessage}
+  end
+  
+  Client->>AC: POST /api/auth/forgot-password/reset (identifier, code, newPassword, type)
+  AC->>VCS: verifyCodeWithDetails(identifier, code, type, "RESET_PASSWORD")
+  alt Code invalid/expired/used/not found
+    VCS-->>AC: VerificationResult (success:false, errorMessage)
+    AC-->>Client: 400 {success:false, message:errorMessage, field:"code"}
+  else Code valid
+    VCS-->>AC: VerificationResult (success:true)
+    AC->>AUR: findByEmail(identifier)
+    alt User not found
+      AUR-->>AC: Optional.empty()
+      AC-->>Client: 400 {success:false, message:"User not found"}
+    else User found
+      AUR-->>AC: Optional<AppUser>
+      AC->>PE: encode(newPassword)
+      PE-->>AC: hashedPassword
+      AC->>AC: user.setPasswordHash(hashedPassword)
+      AC->>AUR: save(user)
+      AUR-->>AC: Updated AppUser
+      AC-->>Client: 200 {success:true, message:"Password reset successfully"}
+    end
+  end
+```
+
+#### SD-27: Forget Password (Phone)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Client as Client
+  participant LP as LoginPage
+  participant FB as Firebase
+  participant AC as AuthController
+  participant AUR as AppUserRepository
+  participant PE as PasswordEncoder
+
+  Client->>LP: Click "Forgot Password" and select Phone method
+  LP->>LP: Validate phone format (must start with "+")
+  LP->>LP: Check cooldown (60 seconds)
+  alt Cooldown elapsed
+    LP->>FB: sendSmsCode(phoneNumber)
+    FB-->>LP: confirmation object
+    Note over FB: Firebase sends SMS verification code
+    LP->>LP: Store confirmation object and clear previous errors
+    LP-->>Client: SMS code sent
+  else Cooldown not elapsed
+    LP-->>Client: Error: "Too many requests. Please try again in 1 minute."
+  end
+  
+  Client->>LP: Enter SMS code and click "Verify"
+  LP->>FB: confirmSmsCode(phoneNumber, code, confirmation)
+  alt Code valid
+    FB-->>LP: Phone verified
+    LP-->>Client: Code verified successfully
+  else Code invalid or expired
+    FB-->>LP: Verification failed
+    LP-->>Client: Error: "Incorrect verification code, please try again"
+  end
+  
+  Client->>LP: Enter new password and click "Reset Password"
+  LP->>LP: Validate password (must contain upper/lowercase and length ≥ 6, and match confirm password)
+  alt Password valid
+    LP->>AC: POST /api/auth/forgot-password/reset/phone (phone, newPassword)
+    AC->>AUR: findByPhone(phone)
+    AUR-->>AC: Optional<AppUser>
+    alt User exists
+      AC->>PE: encode(newPassword)
+      PE-->>AC: hashedPassword
+      AC->>AC: user.setPasswordHash(hashedPassword)
+      AC->>AUR: save(user)
+      AUR-->>AC: Updated AppUser
+      AC-->>Client: 200 {success:true, message:"Password reset successfully"}
+    else User not exists
+      AC-->>Client: 400 {error:"Phone number not registered"}
+    end
+  else Password invalid
+    LP-->>Client: Error: "Password does not meet requirements"
+  end
 ```
 
 ---
@@ -2112,5 +2611,5 @@ The following files implement Feature 3: Authentication and Profile System.
   - `springboot-backend/src/main/java/com/globalbuddy/service/SmsService.java`
   - `springboot-backend/src/main/java/com/globalbuddy/security/JwtService.java`
 - **Frontend API Wrappers**
-  - `frontend/src/api.js` (`login`, `register`, `getCurrentUser`, `updateProfile`, `getMyPosts`, `getMutualFollows`, `getMyReports`)
+  - `frontend/src/api.js` (`login`, `register`, `getCurrentUser`, `sendPasswordResetCode`, `resetPassword`, `resetPasswordWithPhone`, `updateProfile`, `getMyPosts`, `getMutualFollows`, `getMyReports`)
 

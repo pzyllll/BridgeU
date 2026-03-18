@@ -6,7 +6,6 @@ import com.globalbuddy.model.Community;
 import com.globalbuddy.model.CommunityPost;
 import com.globalbuddy.repository.CommunityPostRepository;
 import com.globalbuddy.repository.CommunityRepository;
-import com.globalbuddy.service.SemanticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,40 +24,32 @@ public class SearchController {
 
     private final CommunityRepository communityRepository;
     private final CommunityPostRepository postRepository;
-    private final SemanticService semanticService;
 
     @GetMapping
     public SearchResponse search(@RequestParam("q") String query) {
         if (!StringUtils.hasText(query)) {
             throw new IllegalArgumentException("查询参数 q 不能为空");
         }
+        final String needle = query.trim().toLowerCase();
 
-        List<CommunityResponseWithScore> communityScores = new ArrayList<>();
+        List<CommunityResponse> communityResult = new ArrayList<>();
         for (Community community : communityRepository.findAll()) {
-            double score = semanticService.calculateScore(query, buildCommunityText(community));
-            if (score > 0) {
-                communityScores.add(new CommunityResponseWithScore(toCommunityResponse(community), score));
+            String haystack = buildCommunityText(community).toLowerCase();
+            if (haystack.contains(needle)) {
+                communityResult.add(toCommunityResponse(community));
             }
         }
-        communityScores.sort(Comparator.comparingDouble(CommunityResponseWithScore::getScore).reversed());
 
-        List<PostResponseWithScore> postScores = new ArrayList<>();
+        List<PostResponse> postResult = new ArrayList<>();
         for (CommunityPost post : postRepository.findAll()) {
-            double score = semanticService.calculateScore(query, post.getTitle() + " " + post.getBody());
-            if (score > 0) {
-                postScores.add(new PostResponseWithScore(toPostResponse(post), score));
+            String haystack = ((post.getTitle() == null ? "" : post.getTitle()) + " " +
+                    (post.getBody() == null ? "" : post.getBody())).toLowerCase();
+            if (haystack.contains(needle)) {
+                postResult.add(toPostResponse(post));
             }
         }
-        postScores.sort(Comparator.comparingDouble(PostResponseWithScore::getScore).reversed());
-
-        List<CommunityResponse> communityResult = communityScores.stream()
-                .limit(10)
-                .map(CommunityResponseWithScore::toResponse)
-                .collect(Collectors.toList());
-        List<PostResponse> postResult = postScores.stream()
-                .limit(10)
-                .map(PostResponseWithScore::toResponse)
-                .collect(Collectors.toList());
+        communityResult = communityResult.stream().limit(10).collect(Collectors.toList());
+        postResult = postResult.stream().limit(10).collect(Collectors.toList());
 
         return new SearchResponse(query, communityResult, postResult);
     }
@@ -130,39 +120,4 @@ public class SearchController {
         }
     }
 
-    private static class CommunityResponseWithScore {
-        private final CommunityResponse response;
-        private final double score;
-
-        CommunityResponseWithScore(CommunityResponse response, double score) {
-            this.response = response;
-            this.score = score;
-        }
-
-        double getScore() {
-            return score;
-        }
-
-        CommunityResponse toResponse() {
-            return response;
-        }
-    }
-
-    private static class PostResponseWithScore {
-        private final PostResponse response;
-        private final double score;
-
-        PostResponseWithScore(PostResponse response, double score) {
-            this.response = response;
-            this.score = score;
-        }
-
-        double getScore() {
-            return score;
-        }
-
-        PostResponse toResponse() {
-            return response;
-        }
-    }
 }

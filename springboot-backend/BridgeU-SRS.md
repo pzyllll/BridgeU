@@ -1,4 +1,4 @@
-﻿# Software Requirement Specification
+# Software Requirement Specification
 
 ## BridgeU
 
@@ -80,7 +80,7 @@ This Software Requirement Specification (SRS) document defines the requirements 
 
 - **Feature #2: Community Interaction Platform**
   
-  This community interaction platform allows users to create, browse, and interact with posts through likes, comments, private messaging, and reporting, with Qwen AI-powered automatic translation, content moderation, and comment summarization. The system supports five predefined tags (Study, Housing, Travel, Part-time Job, Life Services). Users can browse the community feed with posts ordered from newest to oldest, showing title, preview, tags, like count, and comment count. The system only displays approved posts (status = APPROVED) and filters out rejected posts, reported posts, and system-generated news posts. Users can search posts by keyword using semantic search that searches across both Chinese and English versions of titles and body texts. Users can create posts with Chinese/English titles and content, upload images, and select tags. When submitting, the system automatically detects the language, translates content to both Chinese and English using Qwen AI, and performs AI content moderation. Posts go through an approval workflow: PENDING_REVIEW → APPROVED/REJECTED. Users can view their own posts with moderation status (pending, approved, rejected) in the "My Community Posts" page. On post detail pages, users can view full content, images, tags, like count, comment count, and author profile. Users can like/unlike posts, add comments (automatically translated), delete their own comments, and report posts/comments with predefined reasons (Spam, Fraud or Scam, Illegal Service Promotion, Abusive Language, Other). The system provides AI-generated comment summaries. Users can follow/unfollow other users, view mutual follow lists, and send private messages. Private messaging requires following the recipient (mutual follow allows unlimited messages; one-way follow allows one initial message). Users can manage conversations: mark as read/unread, delete conversations. API endpoints: `GET /api/posts` (with pagination, keyword search, lang parameter), `GET /api/posts/{id}`, `POST /api/posts`, `POST /api/posts/{postId}/like`, `POST /api/posts/{postId}/comments`, `DELETE /api/posts/{postId}/comments/{commentId}`, `GET /api/posts/{postId}/comments/summary`, `POST /api/reports`, `GET /api/users/mutual-follows`, `GET /api/messages/conversations`, `POST /api/messages/conversations`, `GET /api/messages/conversations/{conversationId}`, `POST /api/messages/conversations/{conversationId}/messages`.
+  This community interaction platform allows users to create, browse, and interact with posts through likes, comments, private messaging, and reporting, with Qwen AI-powered automatic translation, content moderation, and comment summarization. The system supports five predefined tags (Study, Housing, Travel, Part-time Job, Life Services). Users can browse the community feed with posts ordered from newest to oldest, showing title, preview, tags, like count, and comment count. The system only displays approved posts (status = APPROVED) and filters out rejected posts, reported/removed posts, and system-generated news posts. Users can search posts by keyword using **case-insensitive partial matching** on the post content that is displayed for the requested `lang` (the backend returns translated title/body when available). Users can create posts with Chinese/English titles and content, upload images, and select tags. When submitting, the system automatically detects the language, translates content to both Chinese and English using Qwen AI, and performs AI content moderation. Posts go through an approval workflow: PENDING_REVIEW → APPROVED/REJECTED. Users can view their own posts with moderation status (pending, approved, rejected) in the "My Community Posts" page. On post detail pages, users can view full content, images, tags, like count, comment count, and author profile. Users can like/unlike posts, add comments (automatically translated), delete their own comments, and report posts/comments with predefined reasons (Spam, Fraud or Scam, Illegal Service Promotion, Abusive Language, Other). The system provides AI-generated comment summaries. Users can follow/unfollow other users, view mutual follow lists, and send private messages. Private messaging requires following the recipient (mutual follow allows unlimited messages; one-way follow allows one initial message). Users can manage conversations: mark as read/unread, delete conversations. API endpoints: `GET /api/posts` (with pagination, keyword search, lang parameter), `GET /api/posts/{id}`, `POST /api/posts`, `POST /api/posts/{postId}/like`, `POST /api/posts/{postId}/comments`, `DELETE /api/posts/{postId}/comments/{commentId}`, `GET /api/posts/{postId}/comments/summary`, `POST /api/reports`, `GET /api/users/mutual-follows`, `GET /api/messages/conversations`, `POST /api/messages/conversations`, `GET /api/messages/conversations/{conversationId}`, `POST /api/messages/conversations/{conversationId}/messages`.
 
 - **Feature #3: Authentication and Profile System**
   
@@ -2026,11 +2026,11 @@ endif
 
 ##### 2.3.14.1 User Requirement Specification (URS) and System Requirement Specification (SRS)
 
-**URS-14**: The User can search posts by keyword across bilingual content (titles and body texts in both Chinese and English), and view posts ordered by relevance score (highest match score first) in the search results.
+**URS-14**: The User can search posts by keyword, and view posts whose displayed title/body contain the keyword (case-insensitive partial match).
 
 **SRS-66**: UI-Community-Feed shall provide a search box for post search. In the implemented version (`PostList.vue`), the search box sends the query as `q` to the `/api/posts` endpoint when the user presses Enter or clicks the search button.
 
-**SRS-67**: When a keyword is provided, the backend shall perform **keyword-based matching** using `SemanticService.calculateScore()` on the bilingual post fields (title and body in Chinese and English). The service uses tokenization, synonym expansion, and match score calculation. Posts with a positive match score (> 0) are returned, **ordered by descending match score** (highest relevance first), not by creation time.
+**SRS-67**: When a keyword is provided, the backend shall perform **case-insensitive partial match** (contains) on the post content displayed for the requested `lang` (title + body). Only matched posts are returned, and the result order remains **newest to oldest** (creation time descending) after filtering.
 
 **SRS-68**: When no keyword is provided, the backend shall return posts ordered from newest to oldest by creation time, filtered to only `APPROVED` posts and excluding system-generated news posts; the frontend shall display a user-friendly empty-state when no results match the search keyword or when there are no posts.
 
@@ -2056,14 +2056,14 @@ endif
 | Selected Tag(s) (optional) | String[] | Must be predefined tags | ["Housing"] |
 
 **Post conditions**:
-- Feed shows search result posts ordered by relevance score (highest match score first, or empty-state).
+- Feed shows only posts that match the keyword (or empty-state), with results ordered from newest to oldest.
 
 **Normal Flows**
 
 | User (Actions) | System (Responses) |
 |----------------|-------------------|
 | 1. User enters keyword and triggers search (Enter/Search). | 2. System trims keyword, resets page to 1, and requests search results (keyword + tag filter).<br>   • `[E1: Network timeout or connection error]` |
-| | 3. Backend performs keyword-based matching using SemanticService on bilingual titles/bodies and returns results ordered by descending match score (highest relevance first).<br>   • `[A1: No results]`<br>   • `[E2: Server error]` |
+| | 3. Backend filters posts by keyword contains (case-insensitive) on the content displayed for the requested `lang` (title + body), and returns results ordered from newest to oldest.<br>   • `[A1: No results]`<br>   • `[E2: Server error]` |
 | 4. User browses results. | 5. System renders results list and pagination; keyword remains in search box. |
 
 **Alternative Flow**
@@ -2086,8 +2086,8 @@ endif
 - E2.3 Use case end.
 
 **Note**:
-- Post search uses keyword-based matching with semantic scoring via `SemanticService.calculateScore()` on bilingual post fields (title and body in both Chinese and English).
-- Search results are ordered by descending match score (highest relevance first), not by creation time, to prioritize the most relevant posts for the user's query.
+- Post search uses keyword contains matching (case-insensitive) on the content displayed for the requested `lang` (title + body).
+- Search results keep the default feed order (newest to oldest) after filtering, not by relevance score.
 - The search functionality can be combined with tag filtering; when both keyword and tag filters are provided, the system searches only within posts that match both conditions.
 - When no keyword is provided, the system returns posts ordered from newest to oldest by creation time, filtered to only `APPROVED` posts and excluding system-generated news posts.
 
@@ -2112,7 +2112,7 @@ else ([Request succeeded])
     :shows empty state;
     stop
   else ([Results found])
-    :renders search results ordered by relevance score;
+    :renders search results ordered from newest to oldest;
     stop
   endif
 endif
@@ -3640,74 +3640,198 @@ endif
 
 ##### 2.3.26.1 User Requirement Specification (URS) and System Requirement Specification (SRS)
 
-**URS-20-FP**: The User can reset their password if they forget it, using email or phone verification.
+**URS-20-FP**: If the user forgets the password, they can reset it through email or mobile (phone) verification.
 
-**SRS-96**: When user clicks "Forgot Password", the system shall display a password reset form where user can choose **email** or **phone**, then complete the corresponding verification flow and set a new password.
+**SRS-96**: When the user clicks the **"Forgot Password"** button on the login page, the system shall display a **single-page password reset form** where the user can:
 
-**SRS-97**: The system shall send password reset verification code using the selected method:
-- **Email reset**: Send code via `POST /api/auth/forgot-password/send-code` with identifier (email) and type `"email"`.
-- **Phone reset**: Send SMS code via **Firebase Phone Authentication** on the client side (no backend `send-code` call for phone).
+- **Select reset method**: **Email** or **Phone**.  
+- **Enter identifier**: Enter the corresponding identifier (email address or phone number).  
+- **Send verification code**: Click to send the verification code.  
+- **Enter and verify code**: Enter and verify the received verification code.  
+- **Enter new password**: Enter the new password and confirm the new password.  
 
-**SRS-98**: The system shall reset password using the selected method:
-- **Email reset**: Reset via `POST /api/auth/forgot-password/reset` with identifier (email), verification code, new password, and type `"email"`.
-- **Phone reset**: After the SMS code is verified by Firebase on the client side, reset via `POST /api/auth/forgot-password/reset/phone` with phone and new password (verification code is not sent to this endpoint).
+The form shall also provide the following options:
 
-##### 2.3.26.2 Use Case Description
+- **Re-send Verification Code** (when a verification code has already been sent).  
+- **Return to Login Page** (navigate back to the normal login form).
 
-| Use Case ID | UC-26 |
-|------------|------|
-| Use Case Name | Forgot Password (Reset Password) |
+**SRS-97**: The system shall use the selected method to send password reset verification codes with a **cooling mechanism**:
+
+- **Cooling Mechanism**:  
+  - On the password reset page, before sending a verification code, the frontend shall check the timestamp of the last sent code (`lastPasswordResetCodeSentAt`).  
+  - If the user attempts to send a verification code again within **60 seconds**, the frontend shall **not** call the backend or Firebase, and shall display a localized error message:  
+    - Chinese: “发送频繁，请一分钟之后重试”  
+    - English: “Too many requests. Please try again in 1 minute.”  
+  - This timestamp shall be saved in `localStorage` with the key `"lastPasswordResetCodeSentAt"` to ensure that the 60‑second cooling mechanism remains effective when the page is reloaded or accessed again.
+
+- **Email Reset**:  
+  - The system shall send the email reset code via `POST /api/auth/forgot-password/send-code`.  
+  - Request parameters:  
+    - `identifier=<email address>`  
+    - `type="email"`  
+
+- **Phone Reset**:  
+  - The system shall send a text message verification code through **Firebase Phone Authentication** using the input phone number.  
+  - The phone number must include the country code (e.g. `+66...`); otherwise, the system shall display a localized validation error and shall **not** attempt to send the text message.
+
+**SRS-98**: Before allowing the user to perform the password reset operation, the system shall verify the password reset verification code:
+
+- **Email Reset**:
+  - The system requires the input of a **6‑digit verification code**. After cleaning the verification code (e.g. trimming spaces, keeping digits only), if it is not a 6‑digit number, the frontend shall display a localized validation error.  
+  - When the user requests to verify the verification code, the frontend shall call `POST /api/auth/verify-code` and pass the following parameters:  
+    - `identifier=<email address>`  
+    - `code=<6-digit verification code>`  
+    - `type="email"`  
+    - `purpose="RESET_PASSWORD"`  
+  - If the backend indicates that the verification code is invalid, the system shall display a localized error, for example:  
+    - “验证码错误，请重新输入” / “Incorrect verification code, please try again”.
+
+- **Phone Reset**:
+  - The system shall use the **Firebase confirmation object** returned when sending the SMS to verify the verification code, and shall mark the verification code as **verified** upon successful confirmation.  
+  - If the confirmation object is missing or verification fails, the system shall display the corresponding localized error message and keep the code status as **unverified**; in this case the password reset shall not be allowed to proceed.
+
+**SRS-99**: The system shall only reset the user’s password after successful verification of the reset method and shall enforce the following **password policy**:
+
+- **Password Policy**:
+  - The new password must contain at least **one lowercase letter** and **one uppercase letter**.  
+  - The new password must be at least **6 characters** long.  
+  - The **new password** and **confirm new password** fields must **match**.  
+  - If any of these conditions are not met, the system shall display a localized error and **shall not** call the backend, for example:  
+    - “密码不能少于六位数” / “Password must be at least 6 characters.”  
+    - For mismatch: use the localized `"passwordsNotMatch"` message (e.g. “两次输入的密码不一致” / “Passwords do not match”).
+
+- **Email Reset**:
+  - After the email verification code has been successfully verified and the password policy checks have passed, the frontend shall call:  
+    - `POST /api/auth/forgot-password/reset`  
+  - Request parameters:  
+    - `identifier=<email address>`  
+    - `code=<cleaned 6-digit verification code>`  
+    - `newPassword=<new password>`  
+    - `type="email"`
+
+- **Phone Reset**:
+  - After completing the SMS verification code validation through Firebase and passing the password policy check, the frontend shall call:  
+    - `POST /api/auth/forgot-password/reset/phone`  
+  - Request parameters:  
+    - `phone=<phone number>`  
+    - `newPassword=<new password>`.
+
+##### 2.3.26.2 Use Case Descriptions
+
+###### 2.3.26.2.1 UC-26-Email: Forgot Password by Email
+
+| Use Case ID | UC-26-Email |
+|------------|-------------|
+| Use Case Name | Forgot Password by Email |
 | Created By | ZhiYi Pan |
 | Date Created | 23/01/2026 |
 | Last Update By | |
 | Last Revision Date | |
 | Actors | User |
-| Supporting Actors | Email Service, SMS Service (Firebase) |
-| Description | User resets password via email verification code or phone verification (Firebase), then returns to login. |
-| Trigger | User clicks "Forgot Password" on login page. |
-| Preconditions | 1. User has a registered account.<br>2. Network connection is available. |
+| Supporting Actors | Email Service |
+| Description | User resets password using an email verification code and then returns to the login page. |
+| Trigger | User clicks "Forgot Password" on the login page and selects the Email method. |
+| Preconditions | 1. User has (or believes they have) a registered account with an email.<br>2. Network connection is available. |
 
-**Use Case Input Specification**
+**Use Case Input Specification (Email)**
 
 | Input | type | Constraint | Example |
 |-------|------|------------|---------|
-| Method | Enum | `email` or `phone` | `email` |
-| Identifier | String | Valid email or phone | `user@example.com` / `+8613812345678` |
-| Verification code | String | Required for email (and for phone, handled by Firebase) | `123456` |
+| Email | String | Email address used for the account (system does not disclose existence) | `user@example.com` |
+| Verification code | String | 6-digit numeric code (cleaned) | `123456` |
 | New password | String | Must meet password policy | `Password123` |
 
-**Post conditions**:
-- User password is updated successfully.
-- User is redirected back to login page and can log in with the new password.
+**Post conditions (Email)**:
+- User’s password associated with the email address is updated successfully.  
+- User is redirected back to the login page and can log in with the new password.
 
-**Normal Flows**
+**Normal Flows (Email – Swimlanes: User / System / Email Service)**
 
-| User (Actions) | System (Responses) | Email Service | SMS Service (Firebase) |
-|----------------|-------------------|--------------|------------------------|
-| 1. User clicks "Forgot Password" on the login page. | 2. System navigates to the password reset page and displays method tabs/options (email/phone), identifier input, code input (as applicable), and new password inputs. | - | - |
-| 3. User selects **email** method and enters email. | 4. System sends `POST /api/auth/forgot-password/send-code` with identifier=email and type=`"email"`, and requests Email Service to deliver a reset code.<br>   • `[E1: Send code failed]` | 5. Email Service sends verification code email to the user. | - |
-| 6. User enters the received email code and new password, then submits. | 7. System sends `POST /api/auth/forgot-password/reset` with identifier=email, verification code, new password, and type=`"email"`.<br>   • `[E2: Invalid/expired code]`<br>   • `[E3: Reset password failed]` | - | - |
-| 8. User selects **phone** method and enters phone number, then requests SMS code. | 9. System invokes Firebase Phone Authentication on the client side to request an SMS and later verify it.<br>   • `[E4: Firebase send/verify failed]` | - | 10. SMS Service (Firebase) sends SMS code and verifies the submitted code. |
-| 11. After Firebase verification succeeds, user enters new password and submits. | 12. System sends `POST /api/auth/forgot-password/reset/phone` with phone and new password.<br>   • `[E3: Reset password failed]` | - | - |
-| 13. User sees success result. | 14. System displays "Password reset successfully" (zh: "密码重置成功") and redirects to login page. | - | - |
+| User (Actions) | System (Responses) | Email Service |
+|----------------|--------------------|---------------|
+| 1. User clicks "Forgot Password" on the login page and selects the **Email** method. | 2. System displays the single-page password reset form with method selector, email input, verification code input and new password fields. | - |
+| 3. User enters their email address and clicks **"Send Code"**. | 4. System checks `lastPasswordResetCodeSentAt` in memory and `localStorage`.<br>   • `[A1: Cooldown not elapsed]`<br>5. If cooldown has elapsed, system sends `POST /api/auth/forgot-password/send-code` with `identifier=email`, `type="email"` and sets a new `lastPasswordResetCodeSentAt` timestamp (also saved in `localStorage`).<br>   • `[E1: Send code failed]` | 6. Email Service sends a password reset verification email with a 6-digit code to the user. |
+| 7. User receives the email, enters the 6-digit verification code into the form, and clicks **"Verify"**. | 8. System cleans the code (trim spaces and keep digits only); if the cleaned code is not 6 digits, it shows a localized validation error and does not call backend.<br>9. When the code is 6 digits, system calls `POST /api/auth/verify-code` with `identifier=email`, `code=<clean 6-digit code>`, `type="email"`, `purpose="RESET_PASSWORD"`. Backend verifies and returns success or failure.<br>   • `[E2: Invalid/expired code]` | - |
+| 10. After the code is verified successfully (UI shows "Verified"), user enters **New Password** and **Confirm New Password**, then clicks **"Reset Password"**. | 11. System validates the new password on the frontend according to the password policy (must contain at least one lowercase and one uppercase letter, length ≥ 6, and match confirmation). If validation fails it shows localized errors and **does not** call backend.<br>12. If validation passes, system cleans the stored verification code again and calls `POST /api/auth/forgot-password/reset` with `identifier=email`, `code=<clean 6-digit code>`, `newPassword=<new password>`, `type="email"`. Backend verifies the code again with purpose `"RESET_PASSWORD"`, locates the user by email and updates the password.<br>   • `[E3: Reset password failed]` | - |
+| 13. User sees the success result. | 14. System shows "密码重置成功" / "Password reset successfully" and navigates the user back to the login form, where they can log in with the new password. | - |
 
-**Exception Flows**
+**Alternative & Exception Flows (Email)**
 
-**`[E1: Send code failed]`**
-- E1.1 Backend returns error when sending email reset code.
-- E1.2 System displays error message: "Failed to send verification code, please try again" (zh: "发送验证码失败，请稍后重试") and allows retry.
+**`[A1: Cooldown not elapsed]`**  
+- A1.1 When user clicks **"Send Code"** again within 60 seconds since `lastPasswordResetCodeSentAt`, system detects the time difference is less than 60 seconds.  
+- A1.2 System shows localized message "发送频繁，请一分钟之后重试" / "Too many requests. Please try again in 1 minute." and **does not** call backend or Email Service.  
+- A1.3 User can wait until 60 seconds have passed and click "Send Code" again.
 
-**`[E2: Invalid/expired code]`**
-- E2.1 Backend indicates verification code is incorrect or expired.
-- E2.2 System displays error message: "Invalid or expired verification code" (zh: "验证码错误或已过期") and allows retry / resend.
+**`[E1: Send code failed]`**  
+- E1.1 Backend returns an error while handling `POST /api/auth/forgot-password/send-code` (e.g., internal server error or email sending failure).  
+- E1.2 System displays a localized error such as "发送验证码失败，请稍后重试" / "Failed to send verification code, please try again" and allows user to retry.
 
-**`[E3: Reset password failed]`**
-- E3.1 Backend returns error when resetting password (e.g., user not found, policy violation, server error).
-- E3.2 System displays error message: "Failed to reset password" (zh: "重置密码失败") and allows retry.
+**`[E2: Invalid/expired code]`**  
+- E2.1 Backend indicates that the verification code is incorrect, expired, already used, or invalid for purpose `"RESET_PASSWORD"`.  
+- E2.2 System displays a localized error message such as "验证码错误，请重新输入" / "Incorrect verification code, please try again" and keeps the code status as unverified.  
+- E2.3 User can re-enter the code or click "Re-send Code" and repeat the verification.
 
-**`[E4: Firebase send/verify failed]`**
-- E4.1 Firebase fails to send SMS or verification fails (invalid code / too many attempts / quota / network).
-- E4.2 System displays a localized error message and allows retry.
+**`[E3: Reset password failed]`**  
+- E3.1 Backend fails to reset password due to user not found, server error or other validation failures.  
+- E3.2 System displays a localized error message such as "重置密码失败" / "Failed to reset password" and allows user to retry after correcting issues (for example, by re-verifying the code or re-entering data).
+
+------
+
+###### 2.3.26.2.2 UC-26-Phone: Forgot Password by Phone (SMS / Firebase)
+
+| Use Case ID | UC-26-Phone |
+|------------|-------------|
+| Use Case Name | Forgot Password by Phone |
+| Created By | ZhiYi Pan |
+| Date Created | 23/01/2026 |
+| Last Update By | |
+| Last Revision Date | |
+| Actors | User |
+| Supporting Actors | SMS Service (Firebase) |
+| Description | User resets password using an SMS verification code sent and verified via Firebase Phone Authentication, and then returns to the login page. |
+| Trigger | User clicks "Forgot Password" on the login page and selects the Phone method. |
+| Preconditions | 1. User has (or believes they have) a registered account with a phone number.<br>2. Network connection is available.<br>3. Firebase Phone Authentication is correctly configured on the frontend. |
+
+**Use Case Input Specification (Phone)**
+
+| Input | type | Constraint | Example |
+|-------|------|------------|---------|
+| Phone number | String | Must include country code (e.g. starts with `+`) | `+66912345678` |
+| SMS verification code | String | Code returned by SMS and verified via Firebase | `123456` |
+| New password | String | Must meet password policy | `Password123` |
+
+**Post conditions (Phone)**:
+- User’s password associated with the phone number is updated successfully.  
+- User is redirected back to the login page and can log in with the new password.
+
+**Normal Flows (Phone – Swimlanes: User / System / SMS Service (Firebase))**
+
+| User (Actions) | System (Responses) | SMS Service (Firebase) |
+|----------------|--------------------|------------------------|
+| 1. User clicks "Forgot Password" on the login page and selects the **Phone** method. | 2. System displays the single-page password reset form with method selector, phone input, SMS code input and new password fields. | - |
+| 3. User enters phone number and clicks **"Send SMS Code"**. | 4. System checks `lastPasswordResetCodeSentAt` in memory and `localStorage`.<br>   • `[A2: Cooldown not elapsed]`<br>5. System validates that the phone number starts with `"+"` (contains country code); if not, it shows a localized error (e.g. "请输入带国家区号的手机号，如 +66..." / "Please enter phone with country code, e.g. +66...") and does not contact Firebase.<br>6. If validation and cooldown pass, system calls `sendSmsCode(phone)` to invoke Firebase Phone Authentication and stores the returned confirmation object (`forgotPasswordPhoneConfirmation`).<br>   • `[E4: Firebase send failed]` | 7. SMS Service (Firebase) sends an SMS verification code to the provided phone number. |
+| 8. User receives the SMS, enters the SMS verification code into the form and clicks **"Verify"**. | 9. System cleans the code (trim spaces and keep digits only) and uses the stored Firebase confirmation object to call `confirmation.confirm(cleanCode)`.<br>   • `[E5: Firebase verify failed or missing confirmation]`<br>10. If confirmation succeeds, system sets the code status as verified in the UI (e.g. shows "Verified"). | 11. SMS Service (Firebase) verifies the code and returns success or failure. |
+| 12. After SMS verification succeeds, user enters **New Password** and **Confirm New Password**, then clicks **"Reset Password"**. | 13. System validates the new password on the frontend according to the password policy (must contain at least one lowercase and one uppercase letter, length ≥ 6, and match confirmation). If validation fails it shows localized errors and **does not** call backend.<br>14. If validation passes and the SMS code has been verified, system calls `POST /api/auth/forgot-password/reset/phone` with `phone=<phone number>`, `newPassword=<new password>`. Backend locates the user by phone and updates the password.<br>   • `[E3: Reset password failed]` | - |
+| 15. User sees the success result. | 16. System shows "密码重置成功" / "Password reset successfully" and navigates the user back to the login form. | - |
+
+**Alternative & Exception Flows (Phone)**
+
+**`[A2: Cooldown not elapsed]`**  
+- A2.1 When user clicks **"Send SMS Code"** again within 60 seconds since `lastPasswordResetCodeSentAt`, system detects the time difference is less than 60 seconds.  
+- A2.2 System shows localized message "发送频繁，请一分钟之后重试" / "Too many requests. Please try again in 1 minute." and **does not** invoke Firebase.  
+- A2.3 User can wait until 60 seconds have passed and click "Send SMS Code" again.
+
+**`[E4: Firebase send failed]`**  
+- E4.1 `sendSmsCode(phone)` throws an error or Firebase fails to send the SMS due to network, quota, or configuration issues.  
+- E4.2 System displays a localized error message and allows user to retry sending the SMS code.
+
+**`[E5: Firebase verify failed or missing confirmation]`**  
+- E5.1 The Firebase confirmation object is missing (no active SMS session) or `confirmation.confirm(cleanCode)` fails (invalid/expired code, too many attempts, network error, etc.).  
+- E5.2 System displays a localized error (e.g. from Firebase error message) and keeps the code status as unverified; password reset is not allowed until verification succeeds.  
+- E5.3 User can request a new SMS code and retry verification.
+
+**`[E3: Reset password failed]`**  
+- Same as in UC-26-Email: backend fails to reset password for the given phone number (e.g., user not found or internal server error), and the system displays "重置密码失败" / "Failed to reset password" and allows retry.
 
 ##### 2.3.26.3 Activity Diagram
 
@@ -3859,7 +3983,7 @@ This chapter documents all API endpoints implemented in the BridgeU system based
 | POST | `/api/posts/upload-image` | Upload post image | Yes |
 
 **Query Parameters for `/api/posts`:**
-- `q` (string, optional): Search keyword (semantic search)
+- `q` (string, optional): Search keyword (case-insensitive contains match on displayed title/body)
 - `lang` (string, default: "en"): Language preference
 - `page` (int, default: 0): Page number
 - `size` (int, default: 20): Page size

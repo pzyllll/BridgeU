@@ -2,6 +2,7 @@ package com.globalbuddy;
 
 import com.globalbuddy.model.News;
 import com.globalbuddy.service.NewsCrawlerService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * list up to 5 sample items (title + URL) for each source.
  */
 @SpringBootTest
+@Disabled("Smoke test hits external sources; keep for local runs only.")
 public class NewsCrawlerSmokeTest {
 
     @Autowired

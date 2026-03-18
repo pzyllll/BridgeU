@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -30,7 +29,6 @@ import com.globalbuddy.config.CustomCookieLocaleResolver;
 
 @Slf4j
 @Configuration
-@EnableWebMvc
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Value("${file.upload.base-path:C:/Users/pzy/Documents/java/work/hh/pictures}")
@@ -51,9 +49,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         configurer.defaultContentType(MediaType.APPLICATION_JSON);
     }
 
-    @Bean("localeResolver")
+    @Bean
     @Primary
-    public LocaleResolver localeResolver() {
+    public LocaleResolver customLocaleResolver() {
         CustomCookieLocaleResolver resolver = new CustomCookieLocaleResolver();
         resolver.setCookieName("LOCALE_PREFERENCE");
         resolver.setCookieMaxAge(60 * 60 * 24 * 365); // 记住一年
@@ -64,7 +62,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
         LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
-        interceptor.setParamName("lang");
+        // Avoid clashing with API query param "lang" (used by endpoints for content language selection).
+        interceptor.setParamName("uiLang");
         return interceptor;
     }
 

@@ -6,7 +6,6 @@ import com.globalbuddy.repository.*;
 import com.globalbuddy.service.AiSummaryService;
 import com.globalbuddy.service.ContentModerationService;
 import com.globalbuddy.service.LanguageDetectionService;
-import com.globalbuddy.service.SemanticService;
 import com.globalbuddy.service.TranslationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -44,7 +43,6 @@ public class PostController {
     private final CommunityPostRepository postRepository;
     private final CommunityRepository communityRepository;
     private final AppUserRepository userRepository;
-    private final SemanticService semanticService;
     private final LanguageDetectionService languageDetectionService;
     private final TranslationService translationService;
     private final CommentRepository commentRepository;
@@ -161,23 +159,16 @@ public class PostController {
             log.info("Posts with English translation: {}/{}", enTranslatedCount, posts.size());
         }
         
-        // Apply search filter if query provided
+        // Apply keyword search filter if query provided (case-insensitive contains)
         if (StringUtils.hasText(q)) {
-            List<PostListResponse> filtered = new ArrayList<>();
-            for (PostListResponse response : responses) {
-                double score = semanticService.calculateScore(q, response.getTitle() + " " + response.getBody());
-                if (score > 0) {
-                    response.setScore(score);
-                    filtered.add(response);
-                }
-            }
-            filtered.sort((a, b) -> {
-                if (a.getScore() != null && b.getScore() != null) {
-                    return Double.compare(b.getScore(), a.getScore());
-                }
-                return 0;
-            });
-            responses = filtered;
+            final String needle = q.trim().toLowerCase();
+            responses = responses.stream()
+                    .filter(r -> {
+                        String haystack = ((r.getTitle() == null ? "" : r.getTitle()) + " " +
+                                (r.getBody() == null ? "" : r.getBody())).toLowerCase();
+                        return haystack.contains(needle);
+                    })
+                    .collect(Collectors.toList());
         }
         
         // Apply pagination
@@ -1037,24 +1028,6 @@ public class PostController {
                 post.getOriginalLanguage(),
                 post.getImageUrl()
         );
-    }
-
-    private static class PostResponseWithScore {
-        private final PostResponse response;
-        private final double score;
-
-        PostResponseWithScore(PostResponse response, double score) {
-            this.response = response;
-            this.score = score;
-        }
-
-        public double getScore() {
-            return score;
-        }
-
-        public PostResponse toResponse() {
-            return response;
-        }
     }
 }
 

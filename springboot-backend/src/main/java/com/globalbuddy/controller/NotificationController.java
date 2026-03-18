@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +102,7 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        notificationRepository.markAsRead(id);
+        notificationRepository.markAsRead(id, Instant.now());
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("message", "Notification marked as read");
@@ -119,7 +120,7 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        notificationRepository.markAllAsRead(currentUser.getId());
+        notificationRepository.markAllAsRead(currentUser.getId(), Instant.now());
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("message", "All notifications marked as read");

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.globalbuddy.NewsCrawlerSmokeTest" time="0.0" tests="1" errors="0" skipped="1" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.globalbuddy.controller.UserControllerTest" time="0.794" tests="2" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -61,7 +61,135 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="crawlAllThaiNews_smokeTest" classname="com.globalbuddy.NewsCrawlerSmokeTest" time="0.0">
-    <skipped message="Smoke test hits external sources; keep for local runs only."/>
+  <testcase name="utc32_getMyProfile_returnsProfileJson" classname="com.globalbuddy.controller.UserControllerTest" time="0.036">
+    <system-out><![CDATA[
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.0)
+
+2026-03-18T20:07:30.101+07:00  INFO 45176 --- [           main] c.g.controller.UserControllerTest        : Starting UserControllerTest using Java 17 with PID 45176 (started by pzy in C:\Users\pzy\Documents\java\work\hh\springboot-backend)
+2026-03-18T20:07:30.101+07:00  INFO 45176 --- [           main] c.g.controller.UserControllerTest        : No active profile set, falling back to 1 default profile: "default"
+2026-03-18T20:07:30.744+07:00  INFO 45176 --- [           main] com.globalbuddy.config.WebMvcConfig      : Registering resource handler for /pictures/** -> file:C:/Users/pzy/Documents/java/work/hh/pictures/
+2026-03-18T20:07:30.744+07:00  INFO 45176 --- [           main] com.globalbuddy.config.WebMvcConfig      : Resource handlers registered: true
+2026-03-18T20:07:30.772+07:00  INFO 45176 --- [           main] c.g.controller.UserControllerTest        : Started UserControllerTest in 0.715 seconds (process running for 6.24)
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /api/users/me
+       Parameters = {}
+          Headers = [Accept:"application/json"]
+             Body = <no character encoding set>
+    Session Attrs = {}
+
+Handler:
+             Type = com.globalbuddy.controller.UserController
+           Method = com.globalbuddy.controller.UserController#getMyProfile()
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"data":{"preferredLanguage":"en","merchantStatus":null,"role":"USER","languages":[],"displayName":"Alice","businessName":null,"avatar":null,"institution":null,"createdAt":null,"mutualFollowsCount":1,"nationality":"","phone":null,"studyingInCountry":"","id":"u-1","merchantDocType":null,"followersCount":2,"interests":[],"email":"alice@example.com","username":"alice"},"success":true}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+]]></system-out>
+  </testcase>
+  <testcase name="utc33_getMutualFollows_returnsFilteredList" classname="com.globalbuddy.controller.UserControllerTest" time="0.019">
+    <system-out><![CDATA[
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /api/users/mutual-follows
+       Parameters = {}
+          Headers = [Accept:"application/json"]
+             Body = <no character encoding set>
+    Session Attrs = {}
+
+Handler:
+             Type = com.globalbuddy.controller.UserController
+           Method = com.globalbuddy.controller.UserController#getMutualFollows(String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"data":[{"displayName":"Bob","id":"uB","email":"bob@example.com","username":"bob"},{"displayName":"Carol","id":"uC","email":"carol@example.com","username":"carol"}],"success":true,"count":2}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /api/users/mutual-follows
+       Parameters = {q=[bo]}
+          Headers = [Accept:"application/json"]
+             Body = <no character encoding set>
+    Session Attrs = {}
+
+Handler:
+             Type = com.globalbuddy.controller.UserController
+           Method = com.globalbuddy.controller.UserController#getMutualFollows(String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"data":[{"displayName":"Bob","id":"uB","email":"bob@example.com","username":"bob"}],"success":true,"count":1}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+]]></system-out>
   </testcase>
 </testsuite>

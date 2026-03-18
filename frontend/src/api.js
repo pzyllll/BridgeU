@@ -412,6 +412,14 @@ export const verifyCode = (identifier, code, type, purpose = 'REGISTER') => {
   }).then((res) => res.data);
 };
 
+// Login
+export const login = (username, password) => {
+  return client.post('/api/auth/login', {
+    username,
+    password,
+  }).then((res) => res.data);
+};
+
 // Register with verification（主要用于邮箱注册）
 export const registerWithVerification = (payload) => {
   return client.post('/api/auth/register', payload).then((res) => res.data);

@@ -171,7 +171,12 @@ public class CommunityPost {
     // ============ Convenience Methods ============
 
     /**
-     * Check if manual review is needed
+     * Indicates whether this post is currently marked for additional AI-based safety checks.
+     *
+     * Note:
+     * - This no longer implies any human/manual review.
+     * - It is typically true when the AI model's confidence is low or content is considered suspicious
+     *   and another round of automated safety verification is required.
      */
     public boolean needsManualReview() {
         return status == Status.PENDING_REVIEW;
