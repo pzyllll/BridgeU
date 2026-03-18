@@ -3956,13 +3956,11 @@ This chapter documents all API endpoints implemented in the BridgeU system based
 |--------|----------|-------------|------------------------|
 | GET | `/api/news/daily-briefing` | Get paginated news list with filters | No |
 | GET | `/api/news/daily-briefing/{id}` | Get news detail by ID | No |
-| GET | `/api/news/sources` | Get list of available news sources | No |
 
 **Query Parameters for `/api/news/daily-briefing`:**
 - `page` (int, default: 0): Page number
 - `size` (int, default: 10): Page size
 - `lang` (string, default: "en"): Language preference ("zh" or "en")
-- `source` (string, optional): Filter by source name
 - `startDate` (string, optional): Start date (yyyy-MM-dd)
 - `endDate` (string, optional): End date (yyyy-MM-dd)
 - `keyword` (string, optional): Search keyword

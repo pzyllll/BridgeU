@@ -42,12 +42,11 @@ public class NewsController {
 
     /**
      * Get today's news briefing
-     * Supports pagination, filtering by source and date, returns news list with summaries and original links
+     * Supports pagination and optional keyword/date filters, returns news list with summaries and original links
      * 
      * @param page Page number, starting from 0, default is 0
      * @param size Page size, default is 10
      * @param lang Language preference (zh/en), default is en
-     * @param source News source filter (optional, e.g., "Bangkok Post")
      * @param startDate Start date filter (optional, format: yyyy-MM-dd)
      * @param endDate End date filter (optional, format: yyyy-MM-dd)
      * @return Paginated news briefing list
@@ -57,14 +56,13 @@ public class NewsController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false, defaultValue = "en") String lang,
-            @RequestParam(required = false) String source,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,
             @RequestParam(required = false) String keyword) {
         
         try {
-            log.info("Fetching news briefing, page: {}, size: {}, lang: {}, source: {}, startDate: {}, endDate: {}, keyword: {}", 
-                    page, size, lang, source, startDate, endDate, keyword);
+            log.info("Fetching news briefing, page: {}, size: {}, lang: {}, startDate: {}, endDate: {}, keyword: {}",
+                    page, size, lang, startDate, endDate, keyword);
 
             // Parse date filters
             Date startDateFilter = null;
@@ -101,12 +99,11 @@ public class NewsController {
             // Handle keyword search
             String keywordTrimmed = (keyword != null) ? keyword.trim() : null;
             boolean hasKeyword = keywordTrimmed != null && !keywordTrimmed.isEmpty();
-            boolean hasSource = source != null && !source.isEmpty();
             boolean useDateFilter = hasUserDateFilter;
 
-            // Default behavior when NO filters are provided (no date, no keyword, no source):
+            // Default behavior when NO filters are provided (no date, no keyword):
             // show ALL news (paginated) instead of forcing a recent date window.
-            if (!hasUserDateFilter && !hasKeyword && !hasSource) {
+            if (!hasUserDateFilter && !hasKeyword) {
                 useDateFilter = false;
                 log.debug("No filters provided, returning ALL news with pagination (no default date window).");
             } else if (hasUserDateFilter) {
@@ -140,45 +137,20 @@ public class NewsController {
             Page<News> newsPage;
             
             if (hasKeyword) {
-                if (hasSource) {
-                    if (useDateFilter) {
-                        // Filter by keyword, source, and date range on publishDate
-                        newsPage = newsRepository.findByKeywordAndSourceAndPublishDateBetween(
-                        keywordTrimmed, source, startDateFilter, endDateFilter, pageable);
-                        log.info("Using filtered query with keyword: {}, source: {}, publish date range: {} to {}",
-                            keywordTrimmed, source, startDateFilter, endDateFilter);
-                    } else {
-                        // Filter by keyword and source only (all historical news)
-                        newsPage = newsRepository.findByKeywordAndSource(keywordTrimmed, source, pageable);
-                        log.info("Using filtered query with keyword: {}, source: {} (no date range, search in ALL news)",
-                                keywordTrimmed, source);
-                    }
-                } else {
-                    if (useDateFilter) {
-                        // Filter by keyword and publish date range
-                        newsPage = newsRepository.findByKeywordAndPublishDateBetween(
-                        keywordTrimmed, startDateFilter, endDateFilter, pageable);
-                        log.info("Using filtered query with keyword: {}, publish date range: {} to {}",
-                            keywordTrimmed, startDateFilter, endDateFilter);
-                    } else {
-                        // Filter by keyword only (all historical news)
-                        newsPage = newsRepository.findByKeyword(keywordTrimmed, pageable);
-                        log.info("Using filtered query with keyword: {} (no date range, search in ALL news)",
-                                keywordTrimmed);
-                    }
-                }
-            } else if (hasSource) {
                 if (useDateFilter) {
-                    // Filter by source and publish date range
-                    newsPage = newsRepository.findBySourceAndPublishDateBetween(source, startDateFilter, endDateFilter, pageable);
-                    log.info("Using filtered query with source: {}, publish date range: {} to {}", source, startDateFilter, endDateFilter);
+                    // Filter by keyword and publish date range
+                    newsPage = newsRepository.findByKeywordAndPublishDateBetween(
+                            keywordTrimmed, startDateFilter, endDateFilter, pageable);
+                    log.info("Using filtered query with keyword: {}, publish date range: {} to {}",
+                            keywordTrimmed, startDateFilter, endDateFilter);
                 } else {
-                    // Filter by source only (all historical news)
-                    newsPage = newsRepository.findBySourceOrdered(source, pageable);
-                    log.info("Using filtered query with source: {} (no date range, search in ALL news)", source);
+                    // Filter by keyword only (all historical news)
+                    newsPage = newsRepository.findByKeyword(keywordTrimmed, pageable);
+                    log.info("Using filtered query with keyword: {} (no date range, search in ALL news)",
+                            keywordTrimmed);
                 }
             } else {
-                // No keyword/source filters; either user-provided date range OR no date filter (all news)
+                // No keyword filter; either user-provided date range OR no date filter (all news)
                 if (useDateFilter) {
                     newsPage = newsRepository.findByPublishDateBetweenOrdered(startDateFilter, endDateFilter, pageable);
                     log.info("Using publish date range filter: {} to {}", startDateFilter, endDateFilter);
@@ -222,9 +194,6 @@ public class NewsController {
             response.put("data", dtoPage.getContent());
             response.put("pagination", pagination);
             response.put("date", LocalDate.now().toString());
-            if (source != null) {
-                response.put("filterSource", source);
-            }
             if (startDate != null) {
                 response.put("filterStartDate", startDate);
             }
@@ -487,85 +456,6 @@ public class NewsController {
             errorResponse.put("message", "Failed to fetch news detail: " + e.getMessage());
             return ResponseEntity.internalServerError().body(errorResponse);
         }
-    }
-
-    /**
-     * Get list of available news sources for filtering
-     * Extracts original media names from sources like "Google News (Thailand) - Bangkok Post"
-     * Returns clean source names like "Bangkok Post", "The Nation Thailand", etc.
-     * 
-     * @return List of distinct original media sources
-     */
-    @GetMapping("/sources")
-    public ResponseEntity<Map<String, Object>> getNewsSources() {
-        try {
-            List<String> allSources = newsRepository.findDistinctSources();
-            
-            // Extract original media names from sources
-            // Format: "Google News (Thailand) - Bangkok Post" -> "Bangkok Post"
-            // Format: "NewsAPI.org - The Nation Thailand" -> "The Nation Thailand"
-            Set<String> originalMediaNames = new HashSet<>();
-            
-            for (String source : allSources) {
-                if (source == null || source.isEmpty()) {
-                    continue;
-                }
-                
-                // Extract original media name (after " - ")
-                String originalMedia = extractOriginalMediaName(source);
-                if (originalMedia != null && !originalMedia.isEmpty()) {
-                    originalMediaNames.add(originalMedia);
-                } else {
-                    // If no " - " separator, use the source as-is (for direct sources)
-                    originalMediaNames.add(source);
-                }
-            }
-            
-            // Sort alphabetically
-            List<String> sortedSources = new ArrayList<>(originalMediaNames);
-            Collections.sort(sortedSources);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", sortedSources);
-            log.info("Found {} distinct original media sources (from {} total sources)", 
-                    sortedSources.size(), allSources.size());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Failed to fetch news sources: {}", e.getMessage(), e);
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("message", "Failed to fetch news sources: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(errorResponse);
-        }
-    }
-    
-    /**
-     * Extract original media name from source string
-     * Examples:
-     *   "Google News (Thailand) - Bangkok Post" -> "Bangkok Post"
-     *   "NewsAPI.org - The Nation Thailand" -> "The Nation Thailand"
-     *   "Bangkok Post" -> "Bangkok Post"
-     * 
-     * @param source Full source string
-     * @return Original media name, or null if not found
-     */
-    private String extractOriginalMediaName(String source) {
-        if (source == null || source.isEmpty()) {
-            return null;
-        }
-        
-        // Look for " - " separator (common pattern: "RSS Source - Original Media")
-        int separatorIndex = source.lastIndexOf(" - ");
-        if (separatorIndex >= 0 && separatorIndex < source.length() - 3) {
-            String originalMedia = source.substring(separatorIndex + 3).trim();
-            if (!originalMedia.isEmpty()) {
-                return originalMedia;
-            }
-        }
-        
-        // If no separator, return the source as-is
-        return source;
     }
 }
 

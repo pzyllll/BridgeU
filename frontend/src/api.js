@@ -171,11 +171,6 @@ export const fetchDailyBriefing = (params = {}) => {
   return client.get('/api/news/daily-briefing', { params: { ...params, lang } }).then((res) => res.data);
 };
 
-// Get available news sources for filtering
-export const fetchNewsSources = () => {
-  return client.get('/api/news/sources').then((res) => res.data);
-};
-
 // Post Detail API
 export const fetchPostDetail = (postId, lang) => {
   const langToUse = lang || getLanguagePreference();

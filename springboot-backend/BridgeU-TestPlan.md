@@ -71,20 +71,20 @@ The scope of testing covers all BridgeU system essential functions using unit te
 
 2.3 Test Duration
 The planned testing schedule for the BridgeU project is organised by feature and test level.  
-Each feature follows the same 4‑week cycle (unit → integration → system), for a **total of 12 weeks** across all three features:
+Each feature follows the same 4?week cycle (unit ? integration ? system), for a **total of 12 weeks** across all three features:
 - **Weeks 1–4 – Feature 1: Daily Briefing System**  
-  - Weeks 1–2: Design and execute unit tests (UTC) for frontend Daily Briefing components and backend news pipeline (controllers, services, repositories).  
+  - Weeks 1?2: Design and execute unit tests (UTC) for frontend Daily Briefing components and backend news pipeline (controllers, services, repositories).  
   - Week 3: Design and execute integration tests (ITC) for `/api/news/daily-briefing` and `/api/news/daily-briefing/{id}`, verifying interaction with the `news` table.  
-  - Week 4: Execute system tests (STC‑01 ~ STC‑06) for Feature 1, validating end‑to‑end user scenarios in the browser.  
+  - Week 4: Execute system tests (STC?01 ~ STC?06) for Feature 1, validating end?to?end user scenarios in the browser.  
 - **Weeks 5–8 – Feature 2: Community Interaction Platform**  
-  - Weeks 5–6: Unit tests for community posts, comments, likes, follows, and report‑related controllers/services.  
+  - Weeks 5?6: Unit tests for community posts, comments, likes, follows, and report?related controllers/services.  
   - Week 7: Integration tests for community REST APIs and database tables (`posts`, `comments`, `post_likes`, `user_follows`, `reports`).  
   - Week 8: System tests for community UI flows (feed, posting, commenting, following, reporting, AI moderation).  
 - **Weeks 9–12 – Feature 3: Auth & Profile / Private Messaging**  
-  - Weeks 9–10: Unit tests for authentication, verification codes, profile management, conversations and messages.  
+  - Weeks 9?10: Unit tests for authentication, verification codes, profile management, conversations and messages.  
   - Week 11: Integration tests for auth/messaging APIs and their interaction with `users`, `verification_codes`, `conversations`, `messages`.  
   - Week 12: System tests for login/registration, profile update, mutual follow and private messaging flows.  
-The schedule may be refined during the project, but all three features must complete their 4‑week test cycles before final acceptance.
+The schedule may be refined during the project, but all three features must complete their 4?week test cycles before final acceptance.
 
 2.4 Test Responsibility
 Name	Responsibility
@@ -124,7 +124,7 @@ The tests for BridgeU are executed in a controlled environment to ensure reprodu
 
 - **Hardware**:  
   - Laptop-class machine with at least Intel i5 (or equivalent) CPU, 16 GB RAM, 512 GB SSD.  
-  - Screen resolution 1920×1080 or higher for verifying responsive UI layouts.  
+  - Screen resolution 1920?1080 or higher for verifying responsive UI layouts.  
 - **Operating System**:  
   - Windows 10 / Windows 11 64-bit.  
 - **Backend Software Stack**:  
@@ -171,7 +171,7 @@ API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.fetchDailyB
 Test Cases: 
 ID	Description	Input	Expected Result
 1	Verify that fetchDailyBriefing() successfully retrieves news list with default parameters	{
-  "currentPage": 1,
+  "currentPage": 0,
   "pageSize": 10,
   "currentLang": "en",
   "searchKeyword": "",
@@ -179,6 +179,11 @@ ID	Description	Input	Expected Result
   "filterEndDate": null
 }
 	{
+  "apiRequest": {
+    "method": "GET",
+    "url": "/api/news/daily-briefing",
+    "params": { "page": 0, "size": 10, "lang": "en" }
+  },
   "newsList": "array of news items",
   "pagination": {
     "totalElements": "> 0",
@@ -219,7 +224,7 @@ ID	Description	Input	Expected Result
   }
 }
 5	Verify that fetchDailyBriefing() includes language parameter	currentLang = 'zh'
-	API request includes params.lang = "zh"
+	API request includes params.lang = "zh" (and page=0, size=10)
 
 3.1.2 UTC-02: Test fetchNewsDetail()
 Description:Tests the frontend component method for fetching news details, verifying it correctly retrieves news details based on news ID and language parameters, and handles 404 errors and network errors.
@@ -246,7 +251,7 @@ ID	Description	Input	Expected Result
     "status": 404
   }
 }	{
-  "error": "News not found (localized message)",
+  "error": "dailyBriefingDetail.notFound",
   "loading": false,
   "news": null
 }
@@ -280,21 +285,14 @@ Description:Tests the frontend component method for handling search operations, 
 Prerequisite: Daily Briefing page is loaded successfully and `fetchDailyBriefing()` is available on the component instance.
 Test ID: UTC-03
 Test Function: handleSearch()
-API/Method Mapping (中文说明): 通过调用前端方法 `DailyBriefing.handleSearch()`，再触发 `fetchDailyBriefing()`，最终访问接口 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）以带上搜索关键字参数 `keyword`。
+API/Method Mapping (中文说明): 通过调用前端方法 `DailyBriefing.handleSearch()`，触发 `fetchDailyBriefing()`，最终请求接口 `GET /api/news/daily-briefing` 并携带 `keyword` 参数（方法：`NewsController.getDailyBriefing()`）。
 Test Cases:
 ID	Description	Input	Expected Result
-1	Verify that handleSearch() resets currentPage to 1	{
-  "currentPage": 5,
-  "searchKeyword": "Thailand"
+1	UTC-03: handleSearch() resets currentPage=1 and triggers fetchDailyBriefing()	{
+  "currentPage": 5
 }	{
   "currentPage": 1,
   "fetchDailyBriefingCalled": true
-}
-2	Verify that handleSearch() triggers fetchDailyBriefing()	{
-  "searchKeyword": "test"
-}	{
-  "fetchDailyBriefingCalled": true,
-  "searchKeyword": "test"
 }
 
 3.1.1.4 UTC-04: Test applyFilters()
@@ -302,36 +300,15 @@ Description:Tests the frontend component method for applying date filters, verif
 Prerequisite: Daily Briefing page is loaded with date filter controls rendered and bound to component state.
 Test ID: UTC-04
 Test Function: applyFilters()
-API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.applyFilters()`，重置分页并调用 `fetchDailyBriefing()`，从而以 `startDate`、`endDate` 参数访问接口 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）。
+API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.applyFilters()` 重置分页并调用 `fetchDailyBriefing()`，从而以 `startDate`、`endDate` 参数请求 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）。
 Test Cases:
 ID	Description	Input	Expected Result
-1	Verify that applyFilters() validates invalid date range	{
+1	UTC-04-1: applyFilters() validates invalid date range and does not fetch	{
   "filterStartDate": "2026-01-31",
   "filterEndDate": "2026-01-01"
 }	{
-  "warningMessage": "displayed",
+  "warningMessageDisplayed": true,
   "fetchDailyBriefingCalled": false
-}
-2	Verify that applyFilters() resets currentPage to 1 on valid date range	{
-  "filterStartDate": "2026-01-01",
-  "filterEndDate": "2026-01-31"
-}	{
-  "currentPage": 1,
-  "fetchDailyBriefingCalled": true
-}
-3	Verify that applyFilters() works with only startDate	{
-  "filterStartDate": "2026-01-01",
-  "filterEndDate": null
-}	{
-  "fetchDailyBriefingCalled": true,
-  "startDateParameter": "2026-01-01"
-}
-4	Verify that applyFilters() works with only endDate	{
-  "filterStartDate": null,
-  "filterEndDate": "2026-01-31"
-}	{
-  "fetchDailyBriefingCalled": true,
-  "endDateParameter": "2026-01-31"
 }
 
 3.1.1.5 UTC-05: Test resetFilters()
@@ -339,7 +316,7 @@ Description:Tests the frontend component method for resetting filters, verifying
 Prerequisite: Daily Briefing page is loaded and at least one filter (keyword or date) has been applied.
 Test ID: UTC-05
 Test Function: resetFilters()
-API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.resetFilters()` 清空筛选条件并调用 `fetchDailyBriefing()`，最终访问接口 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）以获取未过滤的新闻列表。
+API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.resetFilters()` 清空筛选条件并调用 `fetchDailyBriefing()`，最终请求 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that resetFilters() clears all filter values	{
@@ -361,24 +338,15 @@ Description:Tests the frontend component method for handling page changes, verif
 Prerequisite: Daily Briefing list is visible with pagination controls rendered.
 Test ID: UTC-06
 Test Function: handlePageChange(page)
-API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.handlePageChange(page)` 更新分页参数，并再次调用 `fetchDailyBriefing()`，从而以新的 `page` 参数请求 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）。
+API/Method Mapping (中文说明): 通过前端方法 `DailyBriefing.handlePageChange(page)` 更新分页并再次调用 `fetchDailyBriefing()`，从而以新的 `page` 参数请求 `GET /api/news/daily-briefing`（方法：`NewsController.getDailyBriefing()`）。
 Test Cases:
 ID	Description	Input	Expected Result
-1	Verify that handlePageChange() updates currentPage	{
-  "currentPage": 1,
+1	UTC-06: handlePageChange(page) updates currentPage, triggers fetch, and scrolls to top	{
   "page": 3
 }	{
   "currentPage": 3,
-  "fetchDailyBriefingCalled": true
-}
-2	Verify that handlePageChange() scrolls to top	{
-  "page": 2
-}	{
-  "windowScrollToCalled": true,
-  "scrollOptions": {
-    "top": 0,
-    "behavior": "smooth"
-  }
+  "fetchDailyBriefingCalled": true,
+  "windowScrollToCalledWith": { "top": 0, "behavior": "smooth" }
 }
 
 
@@ -388,33 +356,14 @@ Description:Tests the utility method for normalizing date values, verifying it c
 Prerequisite: JavaScript date utilities and localization libraries used by the component are loaded (no external API dependency).
 Test ID: UTC-07
 Test Function: normalizeDateValue(value)
-API/Method Mapping (中文说明): 本单元测试仅验证前端工具方法 `DailyBriefing.normalizeDateValue()` 的日期转换逻辑，不直接调用任何后端接口。
+API/Method Mapping (中文说明): 本单元测试仅验证前端工具方法 `DailyBriefing.normalizeDateValue()` 的日期转换逻辑，不直接调用后端接口。
 Test Cases:
 ID	Description	Input	Expected Result
-1	Verify that normalizeDateValue() converts Date object to yyyy-MM-dd	{
-  "value": "2026-01-15"
+1	UTC-07: normalizeDateValue(value) normalizes Date and string inputs	{
+  "inputs": ["Date(2026-01-02)", "2026-12-25", "yyyy-01-Tu"]
 }	{
-  "returnValue": "2026-01-15"
+  "returnValues": ["2026-01-02", "2026-12-25", null]
 }
-2	Verify that normalizeDateValue() handles yyyy-MM-dd string	{
-  "value": "2026-01-15"
-}	{
-  "returnValue": "2026-01-15"
-}
-3	Verify that normalizeDateValue() handles ISO date string	{
-  "value": "2026-01-15T00:00:00Z"
-}	{
-  "returnValue": "2026-01-15"
-}
-4	Verify that normalizeDateValue() returns null for null input	{
-  "value": null
-}	{
-  "returnValue": null
-}
-5	Verify that normalizeDateValue() handles invalid string containing letters	{
-  "value": "invalid-date"
-}	{
-  "returnValue": null    }
 
 3.1.1.8 UTC-08: Test formatDate()
 Description: Tests the utility method for formatting dates, verifying it correctly formats date displays based on the current interface language (Chinese or English) and handles various date input formats.
@@ -424,25 +373,10 @@ Test Function: formatDate(date)
 API/Method Mapping (中文说明): 本单元测试仅验证前端显示方法 `DailyBriefing.formatDate()` 的格式化逻辑，不直接调用后端接口。
 Test Cases:
 ID	Description	Input	Expected Result
-1	Verify that formatDate() formats date correctly	{
-  "date": "2026-01-15T14:30:00"
+1	UTC-08: formatDate(date) returns dd-MM-yyyy HH:mm and handles invalid input	{
+  "inputs": ["Date(2026-01-02 03:04)", "invalid-date"]
 }	{
-  "returnValue": "15-01-2026 14:30"
-}
-2	Verify that formatDate() handles null input	{
-  "date": null
-}	{
-  "returnValue": ""
-}
-3	Verify that formatDate() handles invalid date	{
-  "date": "invalid"
-}	{
-  "returnValue": ""
-}
-4	Verify that formatDate() pads single digit months and days	{
-  "date": "2026-01-05T09:05:00"
-}	{
-  "returnValue": "05-01-2026 09:05"
+  "returnValues": ["02-01-2026 03:04", ""]
 }
 
 3.1.1.9 UTC-09: Test convertToDTO()
@@ -450,77 +384,35 @@ Description:Tests the backend service method for converting news entities to Dat
 Prerequisite: News entity objects are instantiated in memory with various combinations of original and translated fields; no database access is required.
 Test ID: UTC-09
 Test Function: convertToDTO(news, lang)
-API/Method Mapping (中文说明): 本单元测试直接调用后端控制器内部私有方法 `NewsController.convertToDTO()`（或通过可访问的包装/辅助类调用），不经由对外 REST 接口，只验证 DTO 转换逻辑。
+API/Method Mapping (中文说明): 本单元测试验证 `NewsController.convertToDTO()` 的 DTO 转换逻辑，不经由对外 REST 接口。
 Test Cases:
 
 ID	Description	Input	Expected Result
-1	Verify that convertToDTO() uses Chinese translation when lang='zh'	{
-  "news": {
-    "titleZh": "中文标题",
-    "summaryZh": "中文摘要"
-  },
+1	UTC-09: convertToDTO(news, lang) Thai title never leaks; uses EN fallback when lang=zh and EN translation exists	{
+  "news": { "title": "Thai", "summary": "Thai", "titleZh": "", "summaryZh": "", "titleEn": "English Title", "summaryEn": "English Summary" },
   "lang": "zh"
 }	{
-  "dto": {
-    "title": "中文标题",
-    "summary": "中文摘要"
-  }
+  "dto": { "title": "English Title", "summary": "English Summary" }
 }
-2	 Verify that convertToDTO() uses English translation when lang='en'	{
-  "news": {
-    "titleEn": "English Title",
-    "summaryEn": "English Summary"
-  },
+2	UTC-09-1: convertToDTO(news, lang) uses Chinese translation when lang=zh	{
+  "news": { "titleZh": "中文标题", "summaryZh": "中文摘要" },
+  "lang": "zh"
+}	{
+  "dto": { "title": "中文标题", "summary": "中文摘要" }
+}
+3	UTC-09-2: convertToDTO(news, lang) uses English translation when lang=en	{
+  "news": { "titleEn": "English Title", "summaryEn": "English Summary" },
   "lang": "en"
 }	{
-  "dto": {
-    "title": "English Title",
-    "summary": "English Summary"
-  }
-}
-3	Verify that convertToDTO() never shows Thai content	{
-  "news": {
-    "title": "contains Thai characters",
-    "titleZh": null
-  },
-  "lang": "zh"
-}	{
-  "dto": {
-    "title": "does not contain Thai characters",
-    "titleType": "either English translation or placeholder"
-  }
-}
-4	Verify that convertToDTO() falls back to English when Chinese translation unavailable	{
-  "news": {
-    "titleZh": null,
-    "titleEn": "English Title",
-    "title": "not Thai"
-  },
-  "lang": "zh"
-}	{
-  "dto": {
-    "title": "English Title"
-  }
-}
-5	 Verify that convertToDTO() sets placeholder when no translation available for Thai content	{
-  "news": {
-    "title": "contains Thai",
-    "titleZh": null,
-    "titleEn": null
-  },
-  "lang": "zh"
-}	{
-  "dto": {
-    "title": "[新闻标题翻译中...]"
-  }
+  "dto": { "title": "English Title", "summary": "English Summary" }
 }
 
-3.1.1.10 UTC-10: Test getDailyBriefing() – Backend
+3.1.1.10 UTC-10: Test getDailyBriefing() ? Backend
 Description:Tests the backend controller API method for retrieving daily briefing list, verifying it correctly handles pagination, language, date filtering, keyword search parameters, and returns appropriate response data.
 Prerequisite: Spring Boot backend is running with access to the `news` table in the MySQL `bridgeu` database; `NewsRepository` is correctly wired.
 Test ID: UTC-10
 Test Function: getDailyBriefing()
-API/Method Mapping (中文说明): 通过直接调用后端接口 `GET /api/news/daily-briefing`（控制器方法：`NewsController.getDailyBriefing()`）进行单元/集成测试，可使用 `MockMvc` 或 Postman 发送请求。
+API/Method Mapping (中文说明): 通过后端接口 `GET /api/news/daily-briefing`（控制器方法：`NewsController.getDailyBriefing()`）进行测试（通常使用 `MockMvc` 发送请求并断言响应）。
 Test Cases:
 ID	Description	Input	Expected Result
 1	Verify that getDailyBriefing() returns paginated news list with default parameters	{
@@ -539,43 +431,68 @@ ID	Description	Input	Expected Result
   },
   "note": "When no filters are provided (no date, no keyword), the method returns ALL news items with pagination (no default date window applied)"
 }
-2	Verify that getDailyBriefing() filters by keyword	{
+2	UTC-10-2: getDailyBriefing() filters by keyword (trimmed)	{
   "keyword": "Thailand"
 }	{
-  "response": "contains only news items matching keyword in title, summary, or translations"
+  "httpStatus": 200,
+  "success": true,
+  "data": "array size >= 0 (test asserts size=1 for prepared mock page)",
+  "assertions": [
+    "keyword is trimmed before repository call",
+    "NewsRepository.findByKeyword(\"Thailand\", pageable) is called",
+    "NewsRepository.findAll(pageable) is NOT called"
+  ]
 }
-3	Verify that getDailyBriefing() filters by date range	{
+3	UTC-10-3: getDailyBriefing() filters by publish date range	{
   "startDate": "2026-01-01",
   "endDate": "2026-01-31"
 }	{
-  "response": "contains only news items with publishDate between startDate and endDate"
+  "httpStatus": 200,
+  "success": true,
+  "data": "array size >= 0 (test asserts size=1 for prepared mock page)",
+  "assertions": [
+    "NewsRepository.findByPublishDateBetweenOrdered(start,end,pageable) is called",
+    "NewsRepository.findAll(pageable) is NOT called"
+  ]
 }
-4	Verify that getDailyBriefing() combines multiple filters	{
+4	UTC-10-4: getDailyBriefing() combines keyword + publish date filters	{
   "keyword": "Thailand",
   "startDate": "2026-01-01",
   "endDate": "2026-01-31"
 }	{
-  "response": "contains news items matching all filter criteria"
+  "httpStatus": 200,
+  "success": true,
+  "data": "array size >= 0 (test asserts size=1 for prepared mock page)",
+  "assertions": [
+    "NewsRepository.findByKeywordAndPublishDateBetween(\"Thailand\", start, end, pageable) is called"
+  ]
 }
-5	Verify that getDailyBriefing() handles invalid date format	{
+5	UTC-10-5: getDailyBriefing() ignores invalid date format and returns ALL news	{
   "startDate": "invalid-date"
 }	{
-  "dateFilter": "ignored",
-  "result": "all news returned"
+  "httpStatus": 200,
+  "success": true,
+  "data": "array size >= 0 (test asserts size=0 for prepared empty page)",
+  "assertions": [
+    "invalid date is ignored",
+    "NewsRepository.findAll(pageable) is called",
+    "NewsRepository.findByPublishDateBetweenOrdered(...) is NOT called"
+  ]
 }
-6	Verify that getDailyBriefing() returns error response on exception	{
+6	UTC-10-6: getDailyBriefing() returns error response on exception	{
   "error": "Database connection error"
 }	{
+  "httpStatus": 500,
   "success": false,
-  "message": "contains error details"
+  "message": "contains 'Database connection error'"
 }
 
-3.1.1.11 UTC-11: Test getNewsDetail() – Backend
+3.1.1.11 UTC-11: Test getNewsDetail() ? Backend
 Description:Tests the backend controller API method for retrieving news details, verifying it correctly returns news details based on news ID and language parameters, and handles cases where news does not exist.
 Prerequisite: Backend is running and the `news` table contains at least one valid record and one non-existent ID to test 404 behaviour.
 Test ID: UTC-11
 Test Function: getNewsDetail()
-API/Method Mapping (中文说明): 通过后端接口 `GET /api/news/daily-briefing/{id}`（控制器方法：`NewsController.getNewsDetail()`）进行测试，重点验证 `id` 与 `lang` 参数处理和 404/500 异常分支。
+API/Method Mapping (中文说明): 通过后端接口 `GET /api/news/daily-briefing/{id}`（控制器方法：`NewsController.getNewsDetail()`）进行测试，重点验证 `id` 与 `lang` 参数处理以及 404/500 分支。
 Test Cases:
 
 ID	Description	Input	Expected Result
@@ -596,7 +513,7 @@ ID	Description	Input	Expected Result
 }	{
   "status": 404,
   "success": false,
-  "message": "News not found"
+  "message": "contains 'News not found'"
 }
 3	Verify that getNewsDetail() returns Chinese translation when lang='zh'	{
   "id": 123,
@@ -610,7 +527,7 @@ ID	Description	Input	Expected Result
     "summary": "news.summaryZh"
   }
 }
-4	Verify that getNewsDetail() excludes Thai originalContent	{
+4	UTC-11-4: getNewsDetail() hides originalContent when Thai	{
   "news": {
     "originalContent": "contains Thai characters"
   }
@@ -629,67 +546,48 @@ ID	Description	Input	Expected Result
 }	{
   "status": 500,
   "success": false,
-  "message": "contains error details"
+  "message": "contains 'Database error'"
 }
 3.1.1.12 UTC-12: Test findByKeyword()
 Description: Tests the backend repository method for searching news by keyword, verifying it performs fuzzy matching searches across multiple fields (titles, summaries, Chinese and English versions) and supports pagination.
 Prerequisite: `NewsRepository` is available in a Spring test context with test data inserted into the `news` table.
 Test ID: UTC-12
 Test Function: findByKeyword(keyword, pageable)
-API/Method Mapping (中文说明): 本单元测试直接调用仓库接口 `NewsRepository.findByKeyword(...)`，不经由 HTTP 接口；该方法在 `NewsController.getDailyBriefing()` 中被间接使用以支持关键字搜索。
+API/Method Mapping (中文说明): 本单元测试直接调用仓库方法 `NewsRepository.findByKeyword(...)`，不经由 HTTP；该方法在 `NewsController.getDailyBriefing()` 中被用于关键字搜索。
 Test Cases:
 
 ID	Description	Input	Expected Result
-1	Verify that findByKeyword() searches in title field	{
-  "keyword": "Thailand",
+1	UTC-12: findByKeyword(keyword, pageable) returns matched news ordered by publishDate desc (case-insensitive)	{
+  "keyword": "visa"
+}	{
+  "returnValue": "Page totalElements = 2, ordered by publishDate desc (test asserts titles order: 'Other topic' then 'Thailand visa update')"
+}
+2	UTC-12-3: findByKeyword(keyword, pageable) searches in translation fields	{
+  "keyword": "关键字",
   "news": {
-    "title": "contains 'Thailand'"
+    "titleZh": "中文 标题 包含 关键字"
   }
 }	{
-  "returnValue": "Page containing news items with 'Thailand' in title"
+  "returnValue": "Page totalElements = 1, matched by translation fields (titleZh/titleEn/summaryZh/summaryEn)"
 }
-2	Verify that findByKeyword() searches in summary field	{
-  "keyword": "economy",
-  "news": {
-    "summary": "contains 'economy'"
-  }
-}	{
-  "returnValue": "Page containing news items with 'economy' in summary"
-}
-3	Verify that findByKeyword() searches in translation fields	{
-  "keyword": "中文",
-  "news": {
-    "titleZh": "contains '中文'"
-  }
-}	{
-  "returnValue": "Page containing news items with '中文' in titleZh"
-}
-4	Verify that findByKeyword() is case-insensitive	{
-  "keyword": "THAILAND",
-  "news": {
-    "title": "Thailand"
-  }
-}	{
-  "returnValue": "Page containing matching news items"
-}
-5	Verify that findByKeyword() returns empty page when no matches	{
+3	UTC-12-5: findByKeyword(keyword, pageable) returns empty page when no matches	{
   "keyword": "nonexistentkeyword12345"
 }	{
-  "returnValue": "empty Page with totalElements = 0"
+  "returnValue": "Page totalElements = 0, content size = 0"
 }
-6	Verify that findByKeyword() respects pagination	{
+4	UTC-12-6: findByKeyword(keyword, pageable) respects pagination	{
   "keyword": "Thailand",
   "pageable": {
     "page": 0,
     "size": 10
   }}	{
-  "returnValue": "Page with size <= 10"
+  "returnValue": "Page0 content size = 10, Page1 content size = 5 (totalElements = 15)"
 }
 
 3.1.1.13 UTC-13: Test findByPublishDateBetweenOrdered()
 Description:Tests the backend repository method for querying news by publication date range, verifying it correctly filters news within the specified date range, orders by publication date in descending order, and supports pagination.
 Prerequisite: `NewsRepository` is available in a Spring test context with multiple news records covering different publish dates for the target range.
-API/Method Mapping (中文说明): 本单元测试直接调用仓库方法 `NewsRepository.findByPublishDateBetweenOrdered(...)`，该方法在 `NewsController.getDailyBriefing()` 中被用来实现日期范围过滤逻辑。
+API/Method Mapping (中文说明): 本单元测试直接调用仓库方法 `NewsRepository.findByPublishDateBetweenOrdered(...)`，不经由 HTTP；该方法在 `NewsController.getDailyBriefing()` 中被用于日期范围过滤。
 Test ID: UTC-13
 Test Function: findByPublishDateBetweenOrdered(startDate, endDate, pageable)`
 Test Cases:
@@ -701,12 +599,7 @@ ID	Description	Input	Expected Result
     "publishDate": "in range"
   }
 }	{
-  "returnValue": "Page containing only news items with publishDate between startDate and endDate"
-}
-2	Verify that findByPublishDateBetweenOrdered() orders by publishDate DESC	{
-  "newsItems": "multiple in date range"
-}	{
-  "order": "from newest to oldest by publishDate"
+  "returnValue": "Page totalElements = 2, ordered by publishDate desc (test asserts titles order: 'InRange-2' then 'InRange-1')"
 }
 3	Verify that findByPublishDateBetweenOrdered() includes boundary dates	{
   "startDate": "2026-01-15T00:00:00",
@@ -715,14 +608,14 @@ ID	Description	Input	Expected Result
     "publishDate": "2026-01-15"
   }
 }	{
-  "returnValue": "Page containing news item with publishDate = 2026-01-15"
+  "returnValue": "Page totalElements = 3, includes boundary dates, ordered DESC (AtEnd, Middle, AtStart)"
 }
 4	Verify that findByPublishDateBetweenOrdered() returns empty page when no matches	{
   "startDate": "2026-12-01",
   "endDate": "2026-12-31",
   "news": "none in this range"
 }	{
-  "returnValue": "empty Page with totalElements = 0"
+  "returnValue": "Page totalElements = 0, content size = 0"
 }
 5	Verify that findByPublishDateBetweenOrdered() respects pagination	{
   "startDate": "2026-01-01",
@@ -732,7 +625,7 @@ ID	Description	Input	Expected Result
     "size": 10
   }
 }	{
-  "returnValue": "Page with size <= 10"
+  "returnValue": "Page0 content size = 10 (totalElements = 12)"
 }
 
 
@@ -756,12 +649,12 @@ ID	Description	Input	Expected Result
 
 3.1.2.1 Unit Test Cases
 
-3.1.2.1.1 UTC-14: Test fetchPosts() – Community Feed List
+3.1.2.1.1 UTC-14: Test fetchPosts() ? Community Feed List
 Description:Tests the frontend API wrapper method for fetching the community feed list, verifying it correctly attaches the language parameter, passes through query parameters (page, size, q), and handles success and error responses from the backend `GET /api/posts` endpoint.
 Prerequisite: Vue frontend is configured with `frontend/src/api.js` and Axios client; no real backend dependency is required when using mocked Axios responses.
 Test ID: UTC-14
 Test Function: fetchPosts(params)
-API/Method Mapping (中文说明): 通过前端 API 封装方法 `fetchPosts(params)`（定义于 `frontend/src/api.js`），最终访问后端接口 `GET /api/posts`（控制器方法：`PostController.listPosts(q, lang, page, size)`），用于在社区首页展示分页帖子列表。
+API/Method Mapping (中文说明): 通过前端 API 方法 `fetchPosts(params)`（`frontend/src/api.js`）调用后端接口 `GET /api/posts`（控制器方法：`PostController.listPosts(q, lang, page, size)`）。
 
 **Test Cases (table format)**:
 
@@ -771,25 +664,25 @@ API/Method Mapping (中文说明): 通过前端 API 封装方法 `fetchPosts(par
 | 2 | UTC-14-2: fetchPosts - when lang omitted uses language preference | `{ "params": { "q": "visa", "page": 1, "size": 5 }, "getLanguagePreference()": "en" }` | `{ "apiRequest": { "method": "GET", "url": "/api/posts", "params": { "q": "visa", "page": 1, "size": 5, "lang": "en" }, "timeout": 60000 }, "apiResponse": { "success": true, "data": [] } }` |
 
 
-3.1.2.1.2 UTC-15: Test fetchPostDetail() – View Post Details
+3.1.2.1.2 UTC-15: Test fetchPostDetail() ? View Post Details
 Description:Tests the frontend API wrapper method for fetching a single post detail, verifying it correctly sends the `postId` path parameter and `lang` query parameter, and correctly unwraps the backend response payload into the component.
 Prerequisite: Post detail view component is wired to call `fetchPostDetail(postId, lang)` when opening a post; Axios calls can be mocked in unit tests.
 Test ID: UTC-15
 Test Function: fetchPostDetail(postId, lang)
-API/Method Mapping (中文说明): 通过前端 API 方法 `fetchPostDetail(postId, lang)`（`frontend/src/api.js`）调用后端接口 `GET /api/posts/{id}`（控制器方法：`PostController.getPost(id, lang)`），用于在帖子详情页加载指定帖子的完整内容与评论统计信息。
+API/Method Mapping (中文说明): 通过前端 API 方法 `fetchPostDetail(postId, lang)`（`frontend/src/api.js`）调用后端接口 `GET /api/posts/{id}`（控制器方法：`PostController.getPost(id, lang)`），用于帖子详情页加载指定帖子的内容与统计信息。
 
 **Test Cases (table format)**:
 
 | ID | Description | Input | Expected Result |
 |----|-------------|-------|-----------------|
-| 1 | UTC-15-1: fetchPostDetail - with explicit lang=zh | `{ "postId": "post-123", "lang": "zh" }` | `{ "apiRequest": { "method": "GET", "url": "/api/posts/post-123", "params": { "lang": "zh" } }, "apiResponse": { "success": true, "post": { "id": "post-123", "title": "测试帖子详情（中文）" } } }` |
+| 1 | UTC-15-1: fetchPostDetail - with explicit lang=zh | `{ "postId": "post-123", "lang": "zh" }` | `{ "apiRequest": { "method": "GET", "url": "/api/posts/post-123", "params": { "lang": "zh" } }, "apiResponse": { "success": true, "post": { "id": "post-123", "title": "test post detail" } } }` |
 
-3.1.2.1.3 UTC-16: Test createPost() – Create a New Post
+3.1.2.1.3 UTC-16: Test createPost() ? Create a New Post
 Description: Tests the frontend API wrapper method `createPost(payload, token)` which calls `POST /api/posts`, verifying it sends the request body and attaches the `Authorization` header when a token is provided.
 Prerequisite: Axios client can be mocked; no real backend dependency is required.
 Test ID: UTC-16
 Test Function: createPost(payload, token)
-API/Method Mapping (中文说明): 通过前端 API 封装方法 `createPost(payload, token)`（定义于 `frontend/src/api.js`）调用后端接口 `POST /api/posts`（控制器方法：`PostController.createPost(...)`），用于在社区中发布新帖子。
+API/Method Mapping (中文说明): 通过前端 API 封装方法 `createPost(payload, token)`（`frontend/src/api.js`）调用后端接口 `POST /api/posts`（控制器方法：`PostController.createPost(...)`），用于发布新帖子，并在请求头中携带 `Authorization: Bearer <token>`。
 
 **Test Cases (table format)**:
 
@@ -797,12 +690,12 @@ API/Method Mapping (中文说明): 通过前端 API 封装方法 `createPost(pay
 |----|-------------|-------|-----------------|
 | 1 | UTC-16-1: createPost - success (with token header) | `{ "payload": { "title": "Hello", "body": "First post", "lang": "en" }, "token": "fake-token" }` | `{ "apiRequest": { "method": "POST", "url": "/api/posts", "headers": { "Authorization": "Bearer fake-token" }, "body": { "title": "Hello", "body": "First post", "lang": "en" } }, "apiResponse": { "success": true, "post": { "id": "p100", "title": "Hello" } } }` |
 
-3.1.2.1.4 UTC-17: Test addComment() – Add Comment to Post
+3.1.2.1.4 UTC-17: Test addComment() ? Add Comment to Post
 Description: Tests the frontend API wrapper method `addComment(postId, content, lang, token)` which calls `POST /api/posts/{postId}/comments`, verifying it sends the comment payload, includes `lang` as a query parameter, and attaches `Authorization` when a token is provided.
 Prerequisite: Axios client can be mocked; no real backend dependency is required.
 Test ID: UTC-17
 Test Function: addComment(postId, content, lang, token)
-API/Method Mapping (中文说明): 通过前端 API 方法 `addComment(...)`（`frontend/src/api.js`）调用后端接口 `POST /api/posts/{id}/comments`（控制器方法：`CommentController.addComment(...)` 或 `PostController.addComment(...)`），用于对帖子发表评论。
+API/Method Mapping (中文说明): 通过前端 API 方法 `addComment(...)`（`frontend/src/api.js`）调用后端接口 `POST /api/posts/{id}/comments`（控制器方法：`PostController.addComment(...)`），用于对帖子发表评论（请求体为 `{ content }`，并带 `lang` 参数与 token）。
 
 **Test Cases (table format)**:
 
@@ -810,12 +703,12 @@ API/Method Mapping (中文说明): 通过前端 API 方法 `addComment(...)`（`
 |----|-------------|-------|-----------------|
 | 1 | UTC-17-1: addComment - success (lang omitted uses preference + token header) | `{ "postId": "p100", "content": "Nice post", "lang": null, "token": "fake-token", "getLanguagePreference()": "en" }` | `{ "apiRequest": { "method": "POST", "url": "/api/posts/p100/comments", "params": { "lang": "en" }, "headers": { "Authorization": "Bearer fake-token" }, "body": { "content": "Nice post" } }, "apiResponse": { "success": true, "comment": { "id": "c1", "content": "Nice post" } } }` |
 
-3.1.2.1.5 UTC-18: Test getCommentSummary() – Comment Summary
+3.1.2.1.5 UTC-18: Test getCommentSummary() ? Comment Summary
 Description: Tests the frontend API wrapper method `getCommentSummary(postId, lang)` which calls `GET /api/posts/{postId}/comments/summary`, verifying it includes the `lang` query parameter.
 Prerequisite: Axios client can be mocked; no real backend dependency is required.
 Test ID: UTC-18
 Test Function: getCommentSummary(postId, lang)
-API/Method Mapping (中文说明): 通过前端 API 方法 `getCommentSummary(...)`（`frontend/src/api.js`）调用后端接口 `GET /api/posts/{id}/comments/summary`，用于获取评论统计信息（如总数等）。
+API/Method Mapping (中文说明): 通过前端 API 方法 `getCommentSummary(...)`（`frontend/src/api.js`）调用后端接口 `GET /api/posts/{id}/comments/summary`，用于获取评论摘要/统计信息（带 `lang` 参数）。
 
 **Test Cases (table format)**:
 
@@ -823,12 +716,12 @@ API/Method Mapping (中文说明): 通过前端 API 方法 `getCommentSummary(..
 |----|-------------|-------|-----------------|
 | 1 | UTC-18-1: getCommentSummary - success (explicit lang=zh) | `{ "postId": "p100", "lang": "zh" }` | `{ "apiRequest": { "method": "GET", "url": "/api/posts/p100/comments/summary", "params": { "lang": "zh" } }, "apiResponse": { "success": true, "summary": { "total": 2 } } }` |
 
-3.1.2.1.6 UTC-19: Test deleteComment() – Delete Comment
+3.1.2.1.6 UTC-19: Test deleteComment() ? Delete Comment
 Description: Tests the frontend API wrapper method `deleteComment(postId, commentId, token)` which calls `DELETE /api/posts/{postId}/comments/{commentId}`, verifying it attaches the `Authorization` header.
 Prerequisite: Axios client can be mocked; no real backend dependency is required.
 Test ID: UTC-19
 Test Function: deleteComment(postId, commentId, token)
-API/Method Mapping (中文说明): 通过前端 API 方法 `deleteComment(...)`（`frontend/src/api.js`）调用后端接口 `DELETE /api/posts/{postId}/comments/{commentId}`，用于删除指定评论。
+API/Method Mapping (中文说明): 通过前端 API 方法 `deleteComment(...)`（`frontend/src/api.js`）调用后端接口 `DELETE /api/posts/{postId}/comments/{commentId}`，用于删除评论（带 token）。
 
 **Test Cases (table format)**:
 
@@ -836,12 +729,12 @@ API/Method Mapping (中文说明): 通过前端 API 方法 `deleteComment(...)`�
 |----|-------------|-------|-----------------|
 | 1 | UTC-19-1: deleteComment - success (with token header) | `{ "postId": "p100", "commentId": "c1", "token": "fake-token" }` | `{ "apiRequest": { "method": "DELETE", "url": "/api/posts/p100/comments/c1", "headers": { "Authorization": "Bearer fake-token" } }, "apiResponse": { "success": true } }` |
 
-3.1.2.1.7 UTC-20: Test toggleLike() – Like / Unlike Post
+3.1.2.1.7 UTC-20: Test toggleLike() ? Like / Unlike Post
 Description: Tests the frontend API wrapper method `toggleLike(postId, token)` which calls `POST /api/posts/{postId}/like`, verifying it attaches the `Authorization` header.
 Prerequisite: Axios client can be mocked; no real backend dependency is required.
 Test ID: UTC-20
 Test Function: toggleLike(postId, token)
-API/Method Mapping (中文说明): 通过前端 API 方法 `toggleLike(...)`（`frontend/src/api.js`）调用后端接口 `POST /api/posts/{id}/like`，用于点赞/取消点赞（由后端根据当前状态切换）。
+API/Method Mapping (中文说明): 通过前端 API 方法 `toggleLike(...)`（`frontend/src/api.js`）调用后端接口 `POST /api/posts/{id}/like`，用于点赞/取消点赞（带 token）。
 
 **Test Cases (table format)**:
 
@@ -849,12 +742,12 @@ API/Method Mapping (中文说明): 通过前端 API 方法 `toggleLike(...)`（`
 |----|-------------|-------|-----------------|
 | 1 | UTC-20-1: toggleLike - success (with token header) | `{ "postId": "p100", "token": "fake-token" }` | `{ "apiRequest": { "method": "POST", "url": "/api/posts/p100/like", "headers": { "Authorization": "Bearer fake-token" }, "body": {} }, "apiResponse": { "success": true, "liked": true, "likeCount": 1 } }` |
 
-3.1.2.1.8 UTC-21: Test searchAll() – Global Search (Posts & Communities)
+3.1.2.1.8 UTC-21: Test searchAll() ? Global Search (Posts & Communities)
 Description: Tests the frontend API wrapper method `searchAll(params)` which calls `GET /api/search`, verifying it passes through query parameters (e.g., query, lang).
 Prerequisite: Axios client can be mocked; no real backend dependency is required.
 Test ID: UTC-21
 Test Function: searchAll(params)
-API/Method Mapping (中文说明): 通过前端 API 方法 `searchAll(params)`（`frontend/src/api.js`）调用后端接口 `GET /api/search`（控制器方法：`SearchController.search(query, lang)`），用于全局搜索社区与帖子。
+API/Method Mapping (中文说明): 通过前端 API 方法 `searchAll(params)`（`frontend/src/api.js`）调用后端接口 `GET /api/search`（控制器方法：`SearchController.search(q)`），用于全局搜索。
 
 **Test Cases (table format)**:
 
@@ -862,16 +755,16 @@ API/Method Mapping (中文说明): 通过前端 API 方法 `searchAll(params)`�
 |----|-------------|-------|-----------------|
 | 1 | UTC-21-1: searchAll - success (passes through params) | `{ "params": { "query": "visa", "lang": "en" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/search", "params": { "query": "visa", "lang": "en" } }, "apiResponse": { "success": true, "communities": [], "posts": [] } }` |
 
-3.1.3 Feature 3 – Authentication and Profile System
+3.1.3 Feature 3 ? Authentication and Profile System
 
 3.1.3.1 Unit Test Cases
 
-3.1.3.1.1 UTC-22: Test registerWithVerification() – Frontend Registration API Wrapper
+3.1.3.1.1 UTC-22: Test registerWithVerification() ? Frontend Registration API Wrapper
 Description:Tests the frontend API wrapper method `registerWithVerification(payload)` which calls `POST /api/auth/register`.
 Prerequisite: Axios client can be mocked; no real backend dependency is required.
 Test ID: UTC-22
 Test Function: registerWithVerification(payload)
-API/Method Mapping (中文说明): 通过前端 API 封装方法 `registerWithVerification(payload)`（定义于 `frontend/src/api.js`）调用后端接口 `POST /api/auth/register`（控制器方法：`AuthController.register(request)`），用于完成带验证码的用户注册流程。
+API/Method Mapping (中文说明): 通过前端 API 方法 `registerWithVerification(payload)`（`frontend/src/api.js`）调用后端接口 `POST /api/auth/register`（控制器方法：`AuthController.register(request)`）。
 
 **Test Cases (table format)**:
 
@@ -880,12 +773,12 @@ API/Method Mapping (中文说明): 通过前端 API 封装方法 `registerWithVe
 | 1 | UTC-22-1: registerWithVerification - success case | `{ "payload": { "username": "alice", "identifier": "alice@example.com", "password": "P@ssw0rd!", "code": "123456", "type": "email", "displayName": "alice", "preferredLanguage": "en" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/register", "body": { "username": "alice", "identifier": "alice@example.com", "password": "P@ssw0rd!", "code": "123456", "type": "email", "displayName": "alice", "preferredLanguage": "en" } }, "apiResponse": { "success": true, "token": "fake-jwt-token", "user": { "id": "u-1", "username": "alice" } } }` |
 | 2 | UTC-22-2: registerWithVerification - server error (mocked response) | `{ "payload": { "username": "bob", "identifier": "bob@example.com", "password": "Password123", "code": "654321", "type": "email", "displayName": "bob", "preferredLanguage": "en" } }` | `{ "apiRequest": { "method": "POST", "url": "/api/auth/register", "body": { "username": "bob", "identifier": "bob@example.com", "password": "Password123", "code": "654321", "type": "email", "displayName": "bob", "preferredLanguage": "en" } }, "apiResponse": { "success": false, "message": "Username already taken" } }` |
 
-3.1.3.1.2 UTC-23: Test login() – Frontend Login Flow
+3.1.3.1.2 UTC-23: Test login() ? Frontend Login Flow
 Description:Tests the frontend login method ensuring it sends correct credentials, stores JWT token and user info on success, and handles invalid-credential errors.
 Prerequisite: Login page is wired to call `login()` which uses `/api/auth/login` backend endpoint; localStorage is available.
 Test ID: UTC-23
 Test Function: login()
-API/Method Mapping (中文说明): 通过前端页面方法 `LoginPage.login()` 调用后端接口 `POST /api/auth/login`（控制器方法：`AuthController.login(request)`），用于完成用户登录并获取 JWT。
+API/Method Mapping (中文说明): 通过前端页面方法 `LoginPage.login()` 调用后端接口 `POST /api/auth/login`（控制器方法：`AuthController.login(request)`），用于登录获取 JWT。
 
 **Test Cases (table format)**:
 
@@ -910,6 +803,8 @@ The following API wrapper unit tests are implemented in `frontend/src/__tests__/
 
 3.1.3.1.4 UTC-25: User Follow API Wrapper Tests (as implemented in `frontend/src/__tests__/api.test.js`)
 
+Description: Tests the frontend API wrapper methods for user follow-related queries, verifying they call the correct endpoints (`/api/users/{userId}/followers`, `/api/users/{userId}/mutual-follows`), attach the `Authorization: Bearer <token>` header, and correctly unwrap the backend response payload. These are API wrapper unit tests with mocked Axios (no real backend dependency).
+
 **Test Cases (table format)**:
 
 | ID | Description | Input | Expected Result |
@@ -919,7 +814,7 @@ The following API wrapper unit tests are implemented in `frontend/src/__tests__/
 | 3 | UTC-25-3: getUserMutualFollows - returns empty list | `{ "input": { "userId": "user123", "token": "fake-token" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/users/user123/mutual-follows", "headers": { "Authorization": "Bearer fake-token" } }, "apiResponse": { "success": true, "data": [], "count": 0 } }` |
 | 4 | UTC-25-4: getUserMutualFollows - returns mutual follow list | `{ "input": { "userId": "user123", "token": "fake-token" } }` | `{ "apiRequest": { "method": "GET", "url": "/api/users/user123/mutual-follows", "headers": { "Authorization": "Bearer fake-token" } }, "apiResponse": { "success": true, "data": [ { "id": "u10", "username": "carol", "displayName": "Carol", "avatar": null, "isFollowing": true } ], "count": 1 } }` |
 
-3.2 Feature 1 – Integration Test (Daily Briefing System)
+3.2 Feature 1 ? Integration Test (Daily Briefing System)
 
 3.2.1 ITC-01: GET /api/news/daily-briefing with Database Filters
 
@@ -936,7 +831,7 @@ The following API wrapper unit tests are implemented in `frontend/src/__tests__/
 4. Send `GET /api/news/daily-briefing?page=0&size=10&lang=en&startDate=2026-01-01&endDate=2026-01-31`.  
 5. Verify that all returned items have `publishDate` between `2026-01-01 00:00:00` and `2026-01-31 23:59:59`, and that the number of items matches the SQL query for this range.  
 6. Send `GET /api/news/daily-briefing?...&keyword=Thailand`.  
-7. Confirm that all returned news rows contain “Thailand” (case-insensitive) in at least one of: `title`, `summary`, `titleEn`, `summaryEn`, `titleZh`, or `summaryZh`.  
+7. Confirm that all returned news rows contain ?Thailand? (case-insensitive) in at least one of: `title`, `summary`, `titleEn`, `summaryEn`, `titleZh`, or `summaryZh`.  
 8. Send `GET /api/news/daily-briefing?...&keyword=Thailand&source=Bangkok%20Post`.  
 9. Verify that every result matches **both** the keyword and the source, and that no unexpected errors occur.  
 
@@ -998,7 +893,7 @@ Chapter 4 System test
 **Test script**:  
 1. Open the BridgeU website in a web browser and navigate to the **Daily Briefing** page.  
 2. Observe that no search keyword, date filter, or source filter is selected (default state).  
-3. Verify that the page displays a list of **10 news items** with titles, summaries, sources, publish dates, and actions (such as “View Detail” and “Open Original”).  
+3. Verify that the page displays a list of **10 news items** with titles, summaries, sources, publish dates, and actions (such as ?View Detail? and ?Open Original?).  
 4. Verify that the pagination bar shows at least 2 pages when the total number of news records is greater than 10.  
 5. Open the browser **Network** tab and confirm that the frontend sends a `GET /api/news/daily-briefing?page=0&size=10&lang=en` request without `keyword`, `startDate`, `endDate`, or `source` parameters.  
 6. Check the API response body and confirm it contains `{ "success": true, "data": [...], "pagination": {...} }`.  
@@ -1008,7 +903,7 @@ Chapter 4 System test
 
 | No | Description | Input | Expected Result |
 |----|-------------|-------|-----------------|
-| 1 | Open Daily Briefing page with default state | Open BridgeU in a browser and navigate to “Daily Briefing” page with no filters applied. | Page shows 10 news cards with title, summary, source, publish date and actions; no search keyword, date or source filter is selected. |
+| 1 | Open Daily Briefing page with default state | Open BridgeU in a browser and navigate to ?Daily Briefing? page with no filters applied. | Page shows 10 news cards with title, summary, source, publish date and actions; no search keyword, date or source filter is selected. |
 | 2 | Verify backend request parameters | Observe Network tab for list request. | Request is `GET /api/news/daily-briefing?page=0&size=10&lang=en` with **no** `keyword`, `startDate`, `endDate` or `source` parameters. |
 | 3 | Verify pagination behaviour | Scroll to bottom of list. | Pagination bar shows at least 2 pages when total news records > 10. |
 | 4 | Check UI language rule | Inspect all items on first page. | All visible titles and summaries are in Chinese or English only; **no Thai characters** appear anywhere in the list. |
@@ -1040,10 +935,10 @@ Chapter 4 System test
 
 | No | Description | Input | Expected Result |
 |----|-------------|-------|-----------------|
-| 1 | Filter list by fixed date range | Set start date `01‑01‑2026`, end date `07‑01‑2026` and click “Apply Filters”. | Network request is `GET /api/news/daily-briefing?...&startDate=2026-01-01&endDate=2026-01-07`; returned list only contains news with `publishDate` between these timestamps and `pagination.totalElements` equals DB count for that period. |
-| 2 | Filter with only start date | Clear filters, set start date `10‑01‑2026`, leave end date empty, click “Apply Filters”. | Request contains `startDate=2026-01-10` and **no** `endDate`; backend returns news from `2026‑01‑10` up to today only, without error. |
-| 3 | Filter with only end date and inferred start date | Clear filters, set end date `20‑01‑2026`, leave start date empty, click “Apply Filters”. | Backend infers start date as 30 days before `20-01-2026`; results only include news in this computed range. |
-| 4 | Validate invalid date range | Set start date `10‑02‑2026`, end date `01‑02‑2026`, click “Apply Filters”. | Frontend shows validation warning (start date cannot be later than end date), **no API request** is sent and list content remains unchanged. |
+| 1 | Filter list by fixed date range | Set start date `01?01?2026`, end date `07?01?2026` and click ?Apply Filters?. | Network request is `GET /api/news/daily-briefing?...&startDate=2026-01-01&endDate=2026-01-07`; returned list only contains news with `publishDate` between these timestamps and `pagination.totalElements` equals DB count for that period. |
+| 2 | Filter with only start date | Clear filters, set start date `10?01?2026`, leave end date empty, click ?Apply Filters?. | Request contains `startDate=2026-01-10` and **no** `endDate`; backend returns news from `2026?01?10` up to today only, without error. |
+| 3 | Filter with only end date and inferred start date | Clear filters, set end date `20?01?2026`, leave start date empty, click ?Apply Filters?. | Backend infers start date as 30 days before `20-01-2026`; results only include news in this computed range. |
+| 4 | Validate invalid date range | Set start date `10?02?2026`, end date `01?02?2026`, click ?Apply Filters?. | Frontend shows validation warning (start date cannot be later than end date), **no API request** is sent and list content remains unchanged. |
 
 ---
 
@@ -1053,26 +948,26 @@ Chapter 4 System test
 
 **Prepared Data**:  
 - Same environment as STC-01.  
-- Database contains news items whose `title`, `summary`, or translation fields (`titleZh`, `titleEn`, `summaryZh`, `summaryEn`) contain the keyword **“Thailand”**.  
+- Database contains news items whose `title`, `summary`, or translation fields (`titleZh`, `titleEn`, `summaryZh`, `summaryEn`) contain the keyword **?Thailand?**.  
 
 **Test script**:  
 1. Open the Daily Briefing page in the browser.  
-2. In the search box, enter the keyword **“Thailand”** and click the **Search** button.  
+2. In the search box, enter the keyword **?Thailand?** and click the **Search** button.  
 3. Verify that the UI resets the current page to **1** (first page).  
 4. In the Network tab, confirm that the frontend sends `GET /api/news/daily-briefing?...&keyword=Thailand`.  
-5. Check that the returned list only contains items whose `title`, `originalContent`, `summary`, or any translation field includes “thailand” (case-insensitive), and that `pagination.totalElements ≥ 1`.  
+5. Check that the returned list only contains items whose `title`, `originalContent`, `summary`, or any translation field includes ?thailand? (case-insensitive), and that `pagination.totalElements ? 1`.  
 6. Clear the search box so that it is empty and click **Search** again.  
 7. Confirm that the new request does **not** contain the `keyword` parameter and that the list shows unfiltered results (respecting only any active date/source filters).  
-8. Enter a different keyword such as **“student”**, set a valid date range, and click **Search**.  
+8. Enter a different keyword such as **?student?**, set a valid date range, and click **Search**.  
 9. Verify that the API request includes both `keyword` and `startDate`/`endDate`, and that results only include items matching **both** the keyword and the date range.  
 
 **Test Case (table format)**:  
 
 | No | Description | Input | Expected Result |
 |----|-------------|-------|-----------------|
-| 1 | Search by keyword | Enter `Thailand` in search box and click “Search”. | UI resets current page to 1; request is `GET /api/news/daily-briefing?...&keyword=Thailand`; returned list only contains news whose title, originalContent, summary or any translation field includes “thailand” (case‑insensitive). |
-| 2 | Clear keyword search | Clear search box and click “Search” again. | New request has no `keyword` parameter; list shows unfiltered results (respecting only any active date/source filters). |
-| 3 | Combine keyword and date filters | Enter `student`, set a valid date range, click “Search”. | Request includes both `keyword` and `startDate`/`endDate`; results only include items matching both the keyword and the date range. |
+| 1 | Search by keyword | Enter `Thailand` in search box and click ?Search?. | UI resets current page to 1; request is `GET /api/news/daily-briefing?...&keyword=Thailand`; returned list only contains news whose title, originalContent, summary or any translation field includes ?thailand? (case?insensitive). |
+| 2 | Clear keyword search | Clear search box and click ?Search? again. | New request has no `keyword` parameter; list shows unfiltered results (respecting only any active date/source filters). |
+| 3 | Combine keyword and date filters | Enter `student`, set a valid date range, click ?Search?. | Request includes both `keyword` and `startDate`/`endDate`; results only include items matching both the keyword and the date range. |
 
 ---
 
@@ -1100,7 +995,7 @@ Chapter 4 System test
 | 1 | Load list in English | Set interface language to `en`, open Daily Briefing list. | News list shows titles/summaries in English when available; others fall back to Chinese or placeholder texts; no Thai characters displayed. |
 | 2 | Switch to Chinese | Use language toggle to switch to `zh`. | Network request is resent with `lang=zh`; items with `titleZh`/`summaryZh` display Chinese text; items without Chinese translations show English or placeholder `[新闻标题翻译中...]` / `[新闻内容翻译中...]`; still no Thai characters. |
 | 3 | Switch back to English | Switch language back to `en`. | Request is resent with `lang=en`; list displays English titles/summaries when available, otherwise Chinese or placeholders; no Thai characters. |
-| 4 | Thai‑only records | Select a news item whose original title/summary is Thai and has no translations, toggle between `zh` and `en`. | Only placeholder texts are shown in all languages; original Thai text is never displayed. |
+| 4 | Thai?only records | Select a news item whose original title/summary is Thai and has no translations, toggle between `zh` and `en`. | Only placeholder texts are shown in all languages; original Thai text is never displayed. |
 
 ---
 
@@ -1114,45 +1009,381 @@ Chapter 4 System test
 
 **Test script**:  
 1. Open the Daily Briefing list and locate a news item with ID = **N** (non-Thai `originalContent`).  
-2. Click the **“View Detail”** action for this item.  
+2. Click the **?View Detail?** action for this item.  
 3. In the Network tab, confirm that the frontend sends `GET /api/news/daily-briefing/N?lang=<currentLang>`.  
 4. Verify that the backend response is `{ success: true, data: NewsBriefDTO, originalContent: "..." }` and that the detail page shows title, summary, source, publish date, and the **original content** section.  
 5. Return to the list and choose another item whose `originalContent` in the database is primarily Thai.  
-6. Click **“View Detail”** for this Thai-content item and verify that the response still has `success = true` but `originalContent = null`.  
+6. Click **?View Detail?** for this Thai-content item and verify that the response still has `success = true` but `originalContent = null`.  
 7. Confirm that the detail page displays only translated title/summary (or placeholders) and **does not** show any Thai original text.  
 8. Manually modify the browser URL to `/daily-briefing/999999` (an ID that does not exist) and press Enter.  
-9. Confirm that the backend returns HTTP 404 with `success = false` and message `"News not found with id: 999999"`, and that the frontend shows a localized “News not found” message with a way to navigate back to the list, without any uncaught error.  
+9. Confirm that the backend returns HTTP 404 with `success = false` and message `"News not found with id: 999999"`, and that the frontend shows a localized ?News not found? message with a way to navigate back to the list, without any uncaught error.  
 
 **Test Case (table format)**:  
 
 | No | Description | Input | Expected Result |
 |----|-------------|-------|-----------------|
-| 1 | Open detail for non‑Thai content | From list, click “View Detail” on news item N whose `originalContent` is non‑Thai. | Network sends `GET /api/news/daily-briefing/N?lang=<currentLang>`; response `{ success: true, data: NewsBriefDTO, originalContent: "..." }`; detail page shows title, summary, source, publish date and original content section. |
-| 2 | Open detail for Thai content | From list, click “View Detail” on news item T whose `originalContent` is primarily Thai. | Backend returns `success = true` with `originalContent = null`; detail page only shows translated title/summary or placeholders and **no Thai original text**. |
-| 3 | Handle non‑existent ID | Manually open `/daily-briefing/999999` in browser. | Backend returns HTTP 404 with `success = false` and message `"News not found with id: 999999"`; frontend shows localized “News not found” message with navigation back to list and no uncaught error. |
+| 1 | Open detail for non?Thai content | From list, click ?View Detail? on news item N whose `originalContent` is non?Thai. | Network sends `GET /api/news/daily-briefing/N?lang=<currentLang>`; response `{ success: true, data: NewsBriefDTO, originalContent: "..." }`; detail page shows title, summary, source, publish date and original content section. |
+| 2 | Open detail for Thai content | From list, click ?View Detail? on news item T whose `originalContent` is primarily Thai. | Backend returns `success = true` with `originalContent = null`; detail page only shows translated title/summary or placeholders and **no Thai original text**. |
+| 3 | Handle non?existent ID | Manually open `/daily-briefing/999999` in browser. | Backend returns HTTP 404 with `success = false` and message `"News not found with id: 999999"`; frontend shows localized ?News not found? message with navigation back to list and no uncaught error. |
 
 ---
 
 4.1.6 STC-06: Open Original News Link
 
-**Description**: This system test verifies that the **“Open Original”** action correctly opens the original news article URL from backend data, both from the list and from the detail view.
+**Description**: This system test verifies that the **?Open Original?** action correctly opens the original news article URL from backend data, both from the list and from the detail view.
 
 **Prepared Data**:  
 - Same environment as STC-01.  
 - Selected news items have a valid `originalUrl` field in the database.  
 
 **Test script**:  
-1. Open the Daily Briefing list and find a news item that has a visible **“Open Original”** action.  
-2. Click **“Open Original”** on this item.  
+1. Open the Daily Briefing list and find a news item that has a visible **?Open Original?** action.  
+2. Click **?Open Original?** on this item.  
 3. Verify that the browser opens a **new tab** pointing to the `originalUrl` value from the backend and that the BridgeU tab remains open.  
 4. Confirm in the Network tab that no additional API call other than the initial list request is required to open the original link.  
-5. From the Daily Briefing list, click **“View Detail”** on the same news item to open the detail page.  
-6. On the detail page, click **“Open Original”** again.  
+5. From the Daily Briefing list, click **?View Detail?** on the same news item to open the detail page.  
+6. On the detail page, click **?Open Original?** again.  
 7. Verify that a new browser tab opens with the **same URL** as in step 3 and that this URL matches the `originalUrl` field returned by the backend for that news item.  
 
 **Test Case (table format)**:  
 
 | No | Description | Input | Expected Result |
 |----|-------------|-------|-----------------|
-| 1 | Open original link from list | On Daily Briefing list, click “Open Original” for a news item with valid `originalUrl`. | Browser opens a **new tab** with the URL equal to the `originalUrl` from backend; existing BridgeU tab stays open; Network tab shows no extra API calls beyond the list request. |
-| 2 | Open original link from detail | From the same item, click “View Detail” then “Open Original” on detail page. | New tab opens with the **same URL** as in test 1; this URL matches the `originalUrl` value returned by the backend for that news item. |
+| 1 | Open original link from list | On Daily Briefing list, click "Open Original" for a news item with valid `originalUrl`. | Browser opens a **new tab** with the URL equal to the `originalUrl` from backend; existing BridgeU tab stays open; Network tab shows no extra API calls beyond the list request. |
+| 2 | Open original link from detail | From the same item, click "View Detail" then "Open Original" on detail page. | New tab opens with the **same URL** as in test 1; this URL matches the `originalUrl` value returned by the backend for that news item. |
+
+---
+
+## 4.2 Progress II – Feature 2: Community Interaction Platform
+
+**Prepared Data (common for Feature 2):**
+- Backend Spring Boot application running on port 8080.
+- Frontend Vue application running and configured to proxy `/api` to backend.
+- User is logged in (has valid JWT token in localStorage).
+- Database contains at least 5 approved posts in `community_posts` table with various tags (study, housing, travel, part-time-job, life-services).
+
+---
+
+### 4.2.1 STC-07: View Community Feed List
+
+**Description**: This system test verifies that the community feed (`PostList.vue`) correctly displays posts by calling `GET /api/posts` with `q`, `page`, `size`, `lang`, and that tag filters and search work as implemented.
+
+**Prepared Data**: Same as 4.2 above.
+
+**Test script**:
+1. Log in to BridgeU and click **Community** (🏠) in the sidebar.
+2. Verify that the page displays the community feed with a search box and tag pills (All, #Study, #Housing, #Travel, #Part-time Job, #Life Services).
+3. In the Network tab, confirm that the frontend sends `GET /api/posts?page=0&size=20&lang=<currentLang>` (and optionally `q` if search is used).
+4. Verify that posts are displayed with title, body, author, tags, like count, comment count, and created time.
+5. Click a tag pill (e.g. #Study) and verify that the **frontend filters posts locally** (the current backend `GET /api/posts` does not accept a `tag` query parameter; tag filtering is implemented in `PostList.vue`).
+6. Enter a keyword in the search box and click **Search** or press Enter.
+7. Confirm that the request includes `q=<keyword>` and that the displayed posts match the search.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Open community feed | Click "Community" in sidebar. | Page shows post list with search box and tag pills; request is `GET /api/posts?page=0&size=20&lang=<lang>`. |
+| 2 | Search posts by keyword | Enter keyword in search box, click "Search". | Request includes `q=<keyword>`; displayed posts match search. |
+| 3 | Filter by tag | Click a tag pill (e.g. #Study). | List updates to show posts with selected tag (or all if tag filter not applied by backend). |
+
+---
+
+### 4.2.2 STC-08: View Post Detail and Interact (Like, Comment, Follow)
+
+**Description**: This system test verifies that clicking a post opens the detail view (`PostDetail.vue`), which fetches via `GET /api/posts/{id}?lang=`, and that like, comment, and follow actions call the correct APIs.
+
+**Prepared Data**: Same as 4.2 above. At least one post exists with ID known.
+
+**Test script**:
+1. From the community feed, click a post card.
+2. In the Network tab, confirm `GET /api/posts/<postId>?lang=<currentLang>`.
+3. Verify that the detail page shows title, body, author, like count, comment count, and a **Back** button.
+4. Click the **Like** button (🤍/❤️). Confirm `POST /api/posts/<postId>/like` with `Authorization: Bearer <token>`.
+5. Enter a comment in the comment input and submit. Confirm `POST /api/posts/<postId>/comments` with `{ content }`, `params: { lang }`, and `Authorization` header.
+6. If the post author is not the current user, click the **Follow** button. Confirm `POST /api/users/<authorId>/follow` or `DELETE` for unfollow.
+7. Click **Back** and verify return to the previous page.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Open post detail | Click a post in the feed. | Request `GET /api/posts/<id>?lang=<lang>`; detail page shows title, body, author, like count, comment count. |
+| 2 | Toggle like | Click Like button. | Request `POST /api/posts/<id>/like` with token; like count updates. |
+| 3 | Add comment | Enter comment, submit. | Request `POST /api/posts/<id>/comments` with `{ content }`, `lang`, token; comment appears. |
+| 4 | Follow author | Click Follow on another user's post. | Request `POST /api/users/<authorId>/follow` with token; button text changes to "Following". |
+| 5 | Navigate back | Click Back. | Returns to community feed or previous page. |
+
+---
+
+### 4.2.3 STC-09: Create New Post
+
+**Description**: This system test verifies that the **New Post** flow (`NewPostForm.vue`) correctly creates a post via `POST /api/posts` with title, body, tags, and optional image.
+
+**Prepared Data**: Same as 4.2 above.
+
+**Test script**:
+1. Click **New Post** (➕) in the sidebar.
+2. Verify that the form displays tag selection (Study, Housing, Travel, Part-time Job, Life Services), title input, content textarea, and optional image upload.
+3. Select a tag, enter title and body, and click **Submit** (or equivalent).
+4. In the Network tab, confirm `POST /api/posts` with body `{ title, body, tags, lang }` and `Authorization: Bearer <token>`.
+5. Verify that the response indicates success and that the user is redirected or the new post appears in the feed.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Open new post form | Click "New Post" in sidebar. | Form shows tag selection, title, content, image upload. |
+| 2 | Submit post | Fill title, body, select tag, submit. | Request `POST /api/posts` with `{ title, body, tags, lang }` and token; post is created and visible in feed. |
+
+---
+
+### 4.2.4 STC-10: Global Search (SearchPanel)
+
+**Description**: This system test verifies that the global search page (`SearchPanel.vue`) calls `GET /api/search?q=<query>` and displays matching posts and communities as returned by the backend.
+
+**Prepared Data**: Same as 4.2 above. Search page is accessible (e.g. via navigation or URL if the app exposes it).
+
+**Test script**:
+1. Navigate to the Search page (if the application provides an entry point; otherwise access via `currentPage === 'search'` for testing).
+2. Enter a keyword (e.g. "visa" or "住宿") and click **搜索** (Search).
+3. In the Network tab, confirm `GET /api/search?q=<keyword>`.
+4. Verify that the result displays a "帖子匹配" section with matching posts (title, body), and optionally communities if the backend returns them.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Search by keyword | Enter keyword, click "搜索". | Request `GET /api/search?q=<keyword>`; result displays matching posts (title, body). |
+
+---
+
+## 4.3 Progress III – Feature 3: Authentication and Profile System
+
+**Prepared Data (common for Feature 3):**
+- Backend Spring Boot application running on port 8080.
+- Frontend Vue application running.
+- Database has at least one test user (e.g. username `alice`, password `P@ssw0rd!`).
+- For email registration tests: email service or verification code stub is configured.
+- For phone registration tests: Firebase Phone Authentication is configured in the frontend (`frontend/src/firebase.js`) and the browser can receive SMS codes.
+
+---
+
+### 4.3.1 STC-11: Login
+
+**Description**: This system test verifies that the login page (`LoginPage.vue`) sends `POST /api/auth/login` with username and password, and that the frontend stores token and user in localStorage and enters the main app.
+
+**Prepared Data**: Same as 4.3 above.
+
+**Test script**:
+1. Open BridgeU in a browser (ensure user is logged out: clear localStorage if needed).
+2. Verify that the login form is displayed with username/email and password fields, and links for "Create account" and "Forgot Password".
+3. Enter valid credentials and click **Login**.
+4. In the Network tab, confirm `POST /api/auth/login` with body `{ username, password }`.
+5. Verify that the response contains `token` and `user`, and that the main app (sidebar, briefing/community) is displayed.
+6. Verify that `localStorage` contains `token` and `user`.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Login with valid credentials | Enter username and password, click Login. | Request `POST /api/auth/login`; response has token and user; main app displayed; token and user in localStorage. |
+| 2 | Login with invalid credentials | Enter wrong password, click Login. | Error message displayed; user remains on login page. |
+
+---
+
+### 4.3.2 STC-12: Logout
+
+**Description**: This system test verifies that clicking logout clears local auth state and returns the UI to the login page.
+
+**Prepared Data**: User is logged in (token exists in localStorage).
+
+**Test script**:
+1. From any page in the main app, click **Logout** (🚪) in the sidebar.
+2. Verify that the login page is displayed.
+3. Verify that `localStorage` no longer contains `token` and `user`.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Logout | Click Logout in sidebar. | Login page shown; token and user removed from localStorage. |
+
+---
+
+### 4.3.3 STC-13: Registration with Email Verification
+
+**Description**: This system test verifies that the registration flow sends verification code via `POST /api/auth/send-verification-code`, verifies via `POST /api/auth/verify-code`, and registers via `POST /api/auth/register`.
+
+**Prepared Data**: Same as 4.3 above. Email service or stub is configured to send/receive verification codes.
+
+**Test script**:
+1. On the login page, click **Create account** (or equivalent).
+2. Select **Email** method, enter email, and click **Send Code**.
+3. In the Network tab, confirm `POST /api/auth/send-verification-code` with body `{ identifier, type: "email" }`.
+4. Enter the 6-digit code received and click **Verify**.
+5. Confirm `POST /api/auth/verify-code` with body `{ identifier, code, type, purpose: "REGISTER" }`.
+6. Fill username, password, displayName, preferredLanguage and click **Register**.
+7. Confirm `POST /api/auth/register` with the full payload including `code`, `identifier`, `type`.
+8. Verify that registration succeeds and the user is logged in or redirected to login.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Send verification code | Enter email, click Send Code. | Request `POST /api/auth/send-verification-code`; code sent to email. |
+| 2 | Verify code and register | Enter code, verify, fill form, register. | Requests `POST /api/auth/verify-code` and `POST /api/auth/register`; registration succeeds. |
+
+---
+
+### 4.3.4 STC-14: Registration with Phone (Firebase SMS + Backend Register)
+
+**Description**: This system test verifies the phone registration flow in `LoginPage.vue`: Firebase SMS verification is performed on the frontend, then the account is created via `POST /api/auth/register/phone`.
+
+**Prepared Data**: Same as 4.3 above. Firebase Phone Authentication is configured. A phone number that can receive SMS is available.
+
+**Test script**:
+1. On the login page, click **Create account**.
+2. Select **Phone** method.
+3. Enter a phone number including country code (e.g. `+66912345678`) and click **Send Code** (this calls Firebase; no backend request is expected at this step).
+4. Enter the SMS code and click **Verify** (Firebase confirmation).
+5. Fill username and password fields and click **Register**.
+6. In the Network tab, confirm `POST /api/auth/register/phone` with body `{ phone, username, password, displayName, preferredLanguage }`.
+7. Verify that registration succeeds and the user is logged in (token stored) or redirected according to the UI behaviour.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Send SMS code (Firebase) | Enter phone `+66...`, click Send Code. | Firebase sends SMS; no backend `/api/auth/send-verification-code` request occurs for phone method. |
+| 2 | Verify SMS and register | Enter SMS code, verify, fill form, register. | Request `POST /api/auth/register/phone`; registration succeeds. |
+
+---
+
+### 4.3.5 STC-15: Forgot Password (Email)
+
+**Description**: This system test verifies that the forgot password flow sends code via `POST /api/auth/forgot-password/send-code` and resets password via `POST /api/auth/forgot-password/reset`.
+
+**Prepared Data**: Same as 4.3 above.
+
+**Test script**:
+1. On the login page, click **Forgot Password**.
+2. Select Email method, enter email, and click **Send Code**.
+3. Confirm `POST /api/auth/forgot-password/send-code` with body `{ identifier, type: "email" }`.
+4. Enter the 6-digit code and new password, then click **Reset Password**.
+5. Confirm `POST /api/auth/forgot-password/reset` with body `{ identifier, code, newPassword, type: "email" }`.
+6. Verify success message and that the user can log in with the new password.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Send reset code | Enter email, click Send Code. | Request `POST /api/auth/forgot-password/send-code`. |
+| 2 | Reset password | Enter code and new password, submit. | Request `POST /api/auth/forgot-password/reset`; success; can login with new password. |
+
+---
+
+### 4.3.6 STC-16: View and Edit My Profile
+
+**Description**: This system test verifies that the **Profile** page (`MyProfile.vue`) displays the current user's profile, and that editing updates via the profile API.
+
+**Prepared Data**: Same as 4.3 above. User is logged in.
+
+**Test script**:
+1. Click **Profile** (👤) in the sidebar.
+2. Verify that the profile displays avatar, displayName, username, posts count, followers count, mutual follows count.
+3. Click **Edit Profile** and change displayName (and optionally avatar).
+4. Submit the form and verify that the profile is updated (via the appropriate API, e.g. `PUT /api/users/me` or similar).
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | View profile | Click Profile in sidebar. | Profile shows avatar, displayName, username, stats (posts, followers, mutual follows). |
+| 2 | Edit profile | Click Edit Profile, change displayName, submit. | Profile is updated; new displayName is shown. |
+
+---
+
+### 4.3.7 STC-17: View My Community Posts
+
+**Description**: This system test verifies that the user can open **My Community Posts** from `MyProfile.vue` and view their posts list (`MyPosts.vue`).
+
+**Prepared Data**: User is logged in and has at least 1 post.
+
+**Test script**:
+1. Click **Profile** (👤) in the sidebar.
+2. Click **My Community Posts**.
+3. Verify navigation to the `MyPosts` list view.
+4. Click a post entry to open its detail (if supported by the UI).
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | View my posts list | Click Profile → My Community Posts. | Navigates to MyPosts list and displays user's posts. |
+
+---
+
+### 4.3.8 STC-18: View My Reports
+
+**Description**: This system test verifies that the user can open **My Reports** from `MyProfile.vue` and view their reports list (`MyReports.vue`).
+
+**Prepared Data**: User is logged in. (Optional) user has at least 1 report.
+
+**Test script**:
+1. Click **Profile** (👤) in the sidebar.
+2. Click **My Reports**.
+3. Verify navigation to the `MyReports` view and that the list is displayed.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | View my reports list | Click Profile → My Reports. | Navigates to MyReports view and displays user's reports (or empty state). |
+
+---
+
+### 4.3.9 STC-19: View User Profile, Follow, and Send Message
+
+**Description**: This system test verifies that clicking an author opens `UserProfile.vue`, which fetches user data, and that follow and "Send Message" work correctly.
+
+**Prepared Data**: Same as 4.3 above. At least two users exist; current user is logged in.
+
+**Test script**:
+1. From the community feed or a post detail, click an author's name or avatar.
+2. Verify that the User Profile page is displayed (in the messages area) with the user's posts, followers, mutual follows, and **Follow** / **Send Message** buttons.
+3. Click **Follow**. Confirm `POST /api/users/<userId>/follow` with token.
+4. If the user is now a mutual follow (Friend), click **Send Message**.
+5. Confirm `POST /api/messages/conversations` with body `{ userId }` (or that a conversation is created/opened).
+6. Verify that the chat window opens for the conversation.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | View user profile | Click author name/avatar from feed or post. | User profile shows posts, stats, Follow and Send Message buttons. |
+| 2 | Follow user | Click Follow. | Request `POST /api/users/<userId>/follow`; button changes to "Following". |
+| 3 | Send message (mutual follow) | Click Send Message when users are Friends. | Conversation is created/opened; chat window displays. |
+
+---
+
+### 4.3.10 STC-20: Private Messaging (Conversation List and Chat)
+
+**Description**: This system test verifies that the **Messages** page (`ConversationList.vue`, `ChatWindow.vue`) lists conversations, allows sending messages, and uses the correct APIs.
+
+**Prepared Data**: Same as 4.3 above. Current user has at least one conversation (mutual follow with another user who has exchanged messages).
+
+**Test script**:
+1. Click **Messages** (💬) in the sidebar.
+2. Verify that the page shows a conversation list (left) and chat area (right).
+3. In the Network tab, confirm `GET /api/messages/conversations` with `Authorization` header.
+4. Select a conversation. Confirm `GET /api/messages/conversations/<conversationId>` to load messages.
+5. Type a message and send. Confirm `POST /api/messages/conversations/<conversationId>/messages` with body `{ content }` and token.
+6. Verify that the new message appears in the chat.
+
+**Test Case (table format)**:
+
+| No | Description | Input | Expected Result |
+|----|-------------|-------|-----------------|
+| 1 | Open messages page | Click Messages in sidebar. | Request `GET /api/messages/conversations`; conversation list displayed. |
+| 2 | Select conversation and send message | Select a conversation, type message, send. | Request `GET /api/messages/conversations/<id>` for messages; `POST .../messages` with `{ content }`; message appears in chat. |

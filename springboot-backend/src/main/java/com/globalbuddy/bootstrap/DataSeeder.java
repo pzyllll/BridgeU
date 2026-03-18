@@ -130,9 +130,12 @@ public class DataSeeder implements CommandLineRunner {
 
         postRepository.saveAll(Arrays.asList(p1, p2, p3, p4, p5));
 
-        // 创建一些测试用的清迈大学新闻（如果数据库中没有清迈大学新闻）
-        List<News> existingCmuNews = newsRepository.findBySource("清迈大学 (CMU)");
-        if (existingCmuNews == null || existingCmuNews.isEmpty()) {
+        // 创建一些测试用的清迈大学新闻（如果数据库中没有这些记录）
+        // 由于产品侧已移除“按来源筛选”，这里用 originalUrl 做幂等性判断。
+        boolean cmuSeedExists = newsRepository
+                .findByOriginalUrl("https://www.cmu.ac.th/en/news/international-student-exchange")
+                .isPresent();
+        if (!cmuSeedExists) {
             System.out.println("创建测试用的清迈大学新闻数据...");
             
             News cmuNews1 = News.builder()

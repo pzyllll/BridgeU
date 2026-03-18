@@ -152,26 +152,17 @@ classDiagram
     -languageDetectionService: LanguageDetectionService
     +getDailyBriefing(...): ResponseEntity<Map<String,Object>>
     +getNewsDetail(...): ResponseEntity<Map<String,Object>>
-    +getNewsSources(): ResponseEntity<Map<String,Object>>
     -convertToDTO(news: News, lang: String): NewsBriefDTO
-    -extractOriginalMediaName(source: String): String
   }
 
   class NewsRepository {
     <<interface>>
     +findByOriginalUrl(originalUrl: String): Optional<News>
-    +findBySource(source: String): List<News>
-    +findBySourceAndTitle(source: String, title: String): Optional<News>
     +findByCreateTimeBetween(startDate: Date, endDate: Date, pageable: Pageable): Page<News>
     +findTodayNews(startOfDay: Date, endOfDay: Date, pageable: Pageable): Page<News>
-    +findBySourceAndPublishDateBetween(source: String, startDate: Date, endDate: Date, pageable: Pageable): Page<News>
     +findByPublishDateBetweenOrdered(startDate: Date, endDate: Date, pageable: Pageable): Page<News>
-    +findDistinctSources(): List<String>
     +findByKeywordAndPublishDateBetween(keyword: String, startDate: Date, endDate: Date, pageable: Pageable): Page<News>
-    +findByKeywordAndSourceAndPublishDateBetween(keyword: String, source: String, startDate: Date, endDate: Date, pageable: Pageable): Page<News>
     +findByKeyword(keyword: String, pageable: Pageable): Page<News>
-    +findByKeywordAndSource(keyword: String, source: String, pageable: Pageable): Page<News>
-    +findBySourceOrdered(source: String, pageable: Pageable): Page<News>
   }
 
   class NewsScheduler {
@@ -306,9 +297,7 @@ File: `springboot-backend/src/main/java/com/globalbuddy/controller/NewsControlle
 |----|--------------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------|
 | 1  | getDailyBriefing   | Handles GET request to retrieve paginated Daily Briefing news list with optional filters (keyword, date range, source). Returns paginated news data. | `page: int`, `size: int`, `lang: String`, `source: String`, `startDate: String`, `endDate: String`, `keyword: String` | `ResponseEntity<Map<String,Object>>` |
 | 2  | getNewsDetail      | Handles GET request to retrieve detailed information of a single news item by ID. Returns DTO data and optional original content.   | `id: Long`, `lang: String`                                                                                       | `ResponseEntity<Map<String,Object>>` |
-| 3  | getNewsSources     | Handles GET request to retrieve list of distinct news sources for filter dropdown.                                                  | None                                                                                                             | `ResponseEntity<Map<String,Object>>` |
-| 4  | convertToDTO       | Converts `News` entity to `NewsBriefDTO` based on language preference, enforcing “no Thai content on UI” rule.                     | `news: News`, `lang: String`                                                                                    | `NewsBriefDTO`                      |
-| 5  | extractOriginalMediaName | Extracts original media name from `source` string (e.g., `"Google News (Thailand) - Bangkok Post"` → `"Bangkok Post"`).        | `source: String`                                                                                                 | `String`                            |
+| 3  | convertToDTO       | Converts `News` entity to `NewsBriefDTO` based on language preference, enforcing “no Thai content on UI” rule.                     | `news: News`, `lang: String`                                                                                    | `NewsBriefDTO`                      |
 
 #### 3.1.2.3 Repository
 
@@ -321,18 +310,11 @@ File: `springboot-backend/src/main/java/com/globalbuddy/repository/NewsRepositor
 | ID | Name                                      | Description                                                                                                          | Parameters                                                                                               | Return Type      |
 |----|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|------------------|
 | 1  | findByOriginalUrl                         | Finds a news item by its original URL (used for deduplication during crawling).                                     | `originalUrl: String`                                                                                    | Optional\<News>  |
-| 2  | findBySource                              | Finds all news items by source website name.                                                                        | `source: String`                                                                                         | List\<News>      |
-| 3  | findBySourceAndTitle                      | Finds a news item by source website name and title.                                                                 | `source: String`, `title: String`                                                                        | Optional\<News>  |
-| 4  | findByCreateTimeBetween                   | Finds news items within specified date range based on `createTime` (with pagination).                               | `startDate: Date`, `endDate: Date`, `pageable: Pageable`                                                | Page\<News>      |
-| 5  | findTodayNews                             | Finds today's news items based on `publishDate` (with pagination).                                                  | `startOfDay: Date`, `endOfDay: Date`, `pageable: Pageable`                                              | Page\<News>      |
-| 6  | findBySourceAndPublishDateBetween         | Finds news items by source and publish date range (with pagination).                                                | `source: String`, `startDate: Date`, `endDate: Date`, `pageable: Pageable`                              | Page\<News>      |
-| 7  | findByPublishDateBetweenOrdered           | Finds news items within publish date range, ordered by `publishDate` DESC (with pagination).                        | `startDate: Date`, `endDate: Date`, `pageable: Pageable`                                                | Page\<News>      |
-| 8  | findDistinctSources                       | Returns list of distinct news source names.                                                                         | None                                                                                                     | List\<String>    |
-| 9  | findByKeywordAndPublishDateBetween        | Searches news items by keyword (in title, content, summary, translations) and publish date range (with pagination). | `keyword: String`, `startDate: Date`, `endDate: Date`, `pageable: Pageable`                             | Page\<News>      |
-| 10 | findByKeywordAndSourceAndPublishDateBetween | Searches news items by keyword, source, and publish date range (with pagination).                                   | `keyword: String`, `source: String`, `startDate: Date`, `endDate: Date`, `pageable: Pageable`           | Page\<News>      |
-| 11 | findByKeyword                             | Searches news items by keyword across all historical news (with pagination).                                        | `keyword: String`, `pageable: Pageable`                                                                  | Page\<News>      |
-| 12 | findByKeywordAndSource                    | Searches news items by keyword and source across all historical news (with pagination).                             | `keyword: String`, `source: String`, `pageable: Pageable`                                                | Page\<News>      |
-| 13 | findBySourceOrdered                       | Finds news items by source, ordered by `publishDate` DESC (with pagination).                                        | `source: String`, `pageable: Pageable`                                                                   | Page\<News>      |
+| 2  | findByCreateTimeBetween                   | Finds news items within specified date range based on `createTime` (with pagination).                               | `startDate: Date`, `endDate: Date`, `pageable: Pageable`                                                | Page\<News>      |
+| 3  | findTodayNews                             | Finds today's news items based on `publishDate` (with pagination).                                                  | `startOfDay: Date`, `endOfDay: Date`, `pageable: Pageable`                                              | Page\<News>      |
+| 4  | findByPublishDateBetweenOrdered           | Finds news items within publish date range, ordered by `publishDate` DESC (with pagination).                        | `startDate: Date`, `endDate: Date`, `pageable: Pageable`                                                | Page\<News>      |
+| 5  | findByKeywordAndPublishDateBetween        | Searches news items by keyword (in title, content, summary, translations) and publish date range (with pagination). | `keyword: String`, `startDate: Date`, `endDate: Date`, `pageable: Pageable`                             | Page\<News>      |
+| 6  | findByKeyword                             | Searches news items by keyword across all historical news (with pagination).                                        | `keyword: String`, `pageable: Pageable`                                                                  | Page\<News>      |
 
 #### 3.1.2.4 Model
 
@@ -388,7 +370,7 @@ Endpoint `GET /api/news/daily-briefing` returns a `Map<String,Object>` with:
 - `pagination`:
   - `page, size, totalElements, totalPages, hasNext, hasPrevious`  
 - `date: String` – current server date (`LocalDate.now().toString()`)  
-- Optional echo fields: `filterSource`, `filterStartDate`, `filterEndDate`
+- Optional echo fields: `filterStartDate`, `filterEndDate`
 
 ---
 
@@ -414,14 +396,9 @@ File: `springboot-backend/src/main/java/com/globalbuddy/repository/NewsRepositor
 **Main methods used by Feature 1**:
 
 - `Page<News> findAll(Pageable pageable)` – default, no filter.  
-- `List<String> findDistinctSources()` – distinct non-null `source` values, sorted.  
 - `Page<News> findByPublishDateBetweenOrdered(Date startDate, Date endDate, Pageable pageable)` – date-only filter, ordered by `publishDate DESC`.  
-- `Page<News> findBySourceAndPublishDateBetween(String source, Date startDate, Date endDate, Pageable pageable)` – partial match on `source` + date range.  
-- `Page<News> findBySourceOrdered(String source, Pageable pageable)` – partial match on `source`, no date filter.  
 - `Page<News> findByKeywordAndPublishDateBetween(String keyword, Date startDate, Date endDate, Pageable pageable)` – keyword across multiple fields + date filter.  
-- `Page<News> findByKeywordAndSourceAndPublishDateBetween(String keyword, String source, Date startDate, Date endDate, Pageable pageable)` – keyword + source + date filter.  
 - `Page<News> findByKeyword(String keyword, Pageable pageable)` – keyword only (no date).  
-- `Page<News> findByKeywordAndSource(String keyword, String source, Pageable pageable)` – keyword + source (no date).  
 - `Optional<News> findByOriginalUrl(String originalUrl)` – used for deduplication during crawling.
 
 #### 3.1.2.3 Scheduler: `NewsScheduler`
@@ -457,7 +434,6 @@ File: `springboot-backend/src/main/java/com/globalbuddy/scheduler/NewsScheduler.
 | page      | int    | 0       | Zero-based page index                      |
 | size      | int    | 10      | Page size                                  |
 | lang      | string | "en"    | Language preference (`"zh"` or `"en"`)     |
-| source    | string | null    | Optional source filter (partial match)     |
 | startDate | string | null    | Optional start date (`yyyy-MM-dd`)         |
 | endDate   | string | null    | Optional end date (`yyyy-MM-dd`)           |
 | keyword   | string | null    | Optional keyword (trimmed before use)      |
@@ -477,7 +453,6 @@ File: `springboot-backend/src/main/java/com/globalbuddy/scheduler/NewsScheduler.
     "hasPrevious": false
   },
   "date": "2026-02-06",
-  "filterSource": "optional",
   "filterStartDate": "optional",
   "filterEndDate": "optional"
 }
@@ -531,29 +506,6 @@ File: `springboot-backend/src/main/java/com/globalbuddy/scheduler/NewsScheduler.
 }
 ```
 
-#### 3.1.3.3 Get Available News Sources
-
-- **Endpoint**: `GET /api/news/sources`  
-- **Purpose**: Provide a list of original media names to populate the source filter dropdown.
-
-**Success Response (200)**:
-
-```json
-{
-  "success": true,
-  "data": ["Bangkok Post", "The Nation Thailand", "..."]
-}
-```
-
-**Error Response (500)**:
-
-```json
-{
-  "success": false,
-  "message": "Failed to fetch news sources: <details>"
-}
-```
-
 ---
 
 ### 3.1.4 Sequence Diagrams (Mermaid)
@@ -571,11 +523,11 @@ sequenceDiagram
   participant LDS as LanguageDetectionService
 
   User->>Client: Open Daily Briefings page / trigger load
-  Client->>NC: GET /api/news/daily-briefing(page,size,lang,source,startDate,endDate,keyword)
+  Client->>NC: GET /api/news/daily-briefing(page,size,lang,startDate,endDate,keyword)
   NC->>NC: Parse startDate/endDate (LocalDate.parse)
-  alt No filters (no date, no keyword, no source)
+  alt No filters (no date, no keyword)
     NC->>NR: findAll(pageable sort publishDate DESC)
-  else Some filters (keyword/source/date)
+  else Some filters (keyword/date)
     NC->>NR: Select appropriate findBy* query
   end
   loop For each News
@@ -653,7 +605,7 @@ sequenceDiagram
   Client->>NC: Clicks filter button (startDate/endDate set)
   Client->>NC: GET /api/news/daily-briefing(..., startDate, endDate)
   NC->>NC: Parse dates and apply default/fallback window
-  NC->>NR: Use appropriate date-based query\n(e.g. findByPublishDateBetweenOrdered or\nfindBySourceAndPublishDateBetween)
+  NC->>NR: Use appropriate date-based query\n(e.g. findByPublishDateBetweenOrdered)
   NC-->>Client: 200 {success:true, data:[NewsBriefDTO], pagination:{...}}
 ```
 
@@ -668,7 +620,7 @@ sequenceDiagram
 
   Client->>NC: GET /api/news/daily-briefing(..., keyword="Thailand")
   NC->>NC: Trim keyword, detect presence of filters
-  NC->>NR: Use appropriate keyword-based query\n(findByKeyword*, with/without date/source)
+  NC->>NR: Use appropriate keyword-based query\n(findByKeyword*, with/without date)
   NC-->>Client: 200 {success:true, data:[NewsBriefDTO], pagination:{...}}
 ```
 
@@ -694,7 +646,7 @@ The following files implement Feature 1: Daily Briefing System.
   - `springboot-backend/src/main/java/com/globalbuddy/service/AiSummaryService.java`
   - `springboot-backend/src/main/java/com/globalbuddy/service/TranslationService.java`
 - **Frontend API Wrappers**
-  - `frontend/src/api.js` (`fetchDailyBriefing`, `fetchNewsSources`)
+  - `frontend/src/api.js` (`fetchDailyBriefing`)
   - `frontend/vite.config.js` (dev proxy for `/api`)
 
 ---

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.globalbuddy.controller.NewsControllerTest" time="4.897" tests="18" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.globalbuddy.controller.NewsControllerTest" time="4.474" tests="14" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="CN"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-17\bin"/>
-    <property name="sun.java.command" value="C:\Users\pzy\AppData\Local\Temp\surefire7072438236985909420\surefirebooter-20260318200724398_3.jar C:\Users\pzy\AppData\Local\Temp\surefire7072438236985909420 2026-03-18T20-07-24_208-jvmRun1 surefire-20260318200724398_1tmp surefire_0-20260318200724398_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\pzy\AppData\Local\Temp\surefire12339876133275289497\surefirebooter-20260319022550026_3.jar C:\Users\pzy\AppData\Local\Temp\surefire12339876133275289497 2026-03-19T02-25-49_852-jvmRun1 surefire-20260319022550026_1tmp surefire_0-20260319022550026_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\pzy\Documents\java\work\hh\springboot-backend\target\test-classes;C:\Users\pzy\Documents\java\work\hh\springboot-backend\target\classes;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.2.0\spring-boot-starter-web-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter\3.2.0\spring-boot-starter-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot\3.2.0\spring-boot-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.2.0\spring-boot-autoconfigure-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.2.0\spring-boot-starter-logging-3.2.0.jar;C:\Users\pzy\.m2\repository\ch\qos\logback\logback-classic\1.4.11\logback-classic-1.4.11.jar;C:\Users\pzy\.m2\repository\ch\qos\logback\logback-core\1.4.11\logback-core-1.4.11.jar;C:\Users\pzy\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.21.1\log4j-to-slf4j-2.21.1.jar;C:\Users\pzy\.m2\repository\org\apache\logging\log4j\log4j-api\2.21.1\log4j-api-2.21.1.jar;C:\Users\pzy\.m2\repository\org\slf4j\jul-to-slf4j\2.0.9\jul-to-slf4j-2.0.9.jar;C:\Users\pzy\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\pzy\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.2.0\spring-boot-starter-json-3.2.0.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.15.3\jackson-datatype-jdk8-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.3\jackson-datatype-jsr310-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.15.3\jackson-module-parameter-names-2.15.3.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.2.0\spring-boot-starter-tomcat-3.2.0.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.16\tomcat-embed-core-10.1.16.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.16\tomcat-embed-websocket-10.1.16.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-web\6.1.1\spring-web-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-beans\6.1.1\spring-beans-6.1.1.jar;C:\Users\pzy\.m2\repository\io\micrometer\micrometer-observation\1.12.0\micrometer-observation-1.12.0.jar;C:\Users\pzy\.m2\repository\io\micrometer\micrometer-commons\1.12.0\micrometer-commons-1.12.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-webmvc\6.1.1\spring-webmvc-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-context\6.1.1\spring-context-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-expression\6.1.1\spring-expression-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.2.0\spring-boot-starter-validation-3.2.0.jar;C:\Users\pzy\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.16\tomcat-embed-el-10.1.16.jar;C:\Users\pzy\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\pzy\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\pzy\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\pzy\.m2\repository\com\fasterxml\classmate\1.6.0\classmate-1.6.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\3.2.0\spring-boot-starter-data-jpa-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-aop\3.2.0\spring-boot-starter-aop-3.2.0.jar;C:\Users\pzy\.m2\repository\org\aspectj\aspectjweaver\1.9.20.1\aspectjweaver-1.9.20.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.2.0\spring-boot-starter-jdbc-3.2.0.jar;C:\Users\pzy\.m2\repository\com\zaxxer\HikariCP\5.0.1\HikariCP-5.0.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-jdbc\6.1.1\spring-jdbc-6.1.1.jar;C:\Users\pzy\.m2\repository\org\hibernate\orm\hibernate-core\6.3.1.Final\hibernate-core-6.3.1.Final.jar;C:\Users\pzy\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\pzy\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\pzy\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\pzy\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\pzy\.m2\repository\net\bytebuddy\byte-buddy\1.14.10\byte-buddy-1.14.10.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.4\jaxb-runtime-4.0.4.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.4\jaxb-core-4.0.4.jar;C:\Users\pzy\.m2\repository\org\glassfish\jaxb\txw2\4.0.4\txw2-4.0.4.jar;C:\Users\pzy\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.2\istack-commons-runtime-4.1.2.jar;C:\Users\pzy\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\pzy\.m2\repository\org\antlr\antlr4-runtime\4.10.1\antlr4-runtime-4.10.1.jar;C:\Users\pzy\.m2\repository\org\springframework\data\spring-data-jpa\3.2.0\spring-data-jpa-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\data\spring-data-commons\3.2.0\spring-data-commons-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-orm\6.1.1\spring-orm-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-tx\6.1.1\spring-tx-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-aspects\6.1.1\spring-aspects-6.1.1.jar;C:\Users\pzy\.m2\repository\com\mysql\mysql-connector-j\8.1.0\mysql-connector-j-8.1.0.jar;C:\Users\pzy\.m2\repository\org\jsoup\jsoup\1.17.2\jsoup-1.17.2.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\client5\httpclient5\5.2.1\httpclient5-5.2.1.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\core5\httpcore5\5.2.3\httpcore5-5.2.3.jar;C:\Users\pzy\.m2\repository\org\apache\httpcomponents\core5\httpcore5-h2\5.2.3\httpcore5-h2-5.2.3.jar;C:\Users\pzy\.m2\repository\org\slf4j\slf4j-api\2.0.9\slf4j-api-2.0.9.jar;C:\Users\pzy\.m2\repository\com\rometools\rome\2.1.0\rome-2.1.0.jar;C:\Users\pzy\.m2\repository\com\rometools\rome-utils\2.1.0\rome-utils-2.1.0.jar;C:\Users\pzy\.m2\repository\org\jdom\jdom2\2.0.6.1\jdom2-2.0.6.1.jar;C:\Users\pzy\.m2\repository\com\alibaba\dashscope-sdk-java\2.8.0\dashscope-sdk-java-2.8.0.jar;C:\Users\pzy\.m2\repository\com\google\guava\guava\32.1.1-jre\guava-32.1.1-jre.jar;C:\Users\pzy\.m2\repository\com\google\guava\failureaccess\1.0.1\failureaccess-1.0.1.jar;C:\Users\pzy\.m2\repository\com\google\guava\listenablefuture\9999.0-empty-to-avoid-conflict-with-guava\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar;C:\Users\pzy\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\pzy\.m2\repository\org\checkerframework\checker-qual\3.33.0\checker-qual-3.33.0.jar;C:\Users\pzy\.m2\repository\com\google\errorprone\error_prone_annotations\2.18.0\error_prone_annotations-2.18.0.jar;C:\Users\pzy\.m2\repository\com\google\j2objc\j2objc-annotations\2.8\j2objc-annotations-2.8.jar;C:\Users\pzy\.m2\repository\io\reactivex\rxjava2\rxjava\2.2.21\rxjava-2.2.21.jar;C:\Users\pzy\.m2\repository\org\reactivestreams\reactive-streams\1.0.4\reactive-streams-1.0.4.jar;C:\Users\pzy\.m2\repository\com\google\code\gson\gson\2.10.1\gson-2.10.1.jar;C:\Users\pzy\.m2\repository\org\slf4j\slf4j-simple\2.0.9\slf4j-simple-2.0.9.jar;C:\Users\pzy\.m2\repository\com\squareup\okio\okio\3.5.0\okio-3.5.0.jar;C:\Users\pzy\.m2\repository\com\squareup\okio\okio-jvm\3.5.0\okio-jvm-3.5.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.9.20\kotlin-stdlib-common-1.9.20.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\logging-interceptor\4.12.0\logging-interceptor-4.12.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.9.20\kotlin-stdlib-jdk8-1.9.20.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.9.20\kotlin-stdlib-1.9.20.jar;C:\Users\pzy\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\pzy\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.9.20\kotlin-stdlib-jdk7-1.9.20.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\okhttp-sse\4.12.0\okhttp-sse-4.12.0.jar;C:\Users\pzy\.m2\repository\com\squareup\okhttp3\okhttp\4.12.0\okhttp-4.12.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-webflux\3.2.0\spring-boot-starter-webflux-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-reactor-netty\3.2.0\spring-boot-starter-reactor-netty-3.2.0.jar;C:\Users\pzy\.m2\repository\io\projectreactor\netty\reactor-netty-http\1.1.13\reactor-netty-http-1.1.13.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-http\4.1.101.Final\netty-codec-http-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-common\4.1.101.Final\netty-common-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-buffer\4.1.101.Final\netty-buffer-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport\4.1.101.Final\netty-transport-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec\4.1.101.Final\netty-codec-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-handler\4.1.101.Final\netty-handler-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-http2\4.1.101.Final\netty-codec-http2-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns\4.1.101.Final\netty-resolver-dns-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver\4.1.101.Final\netty-resolver-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-dns\4.1.101.Final\netty-codec-dns-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns-native-macos\4.1.101.Final\netty-resolver-dns-native-macos-4.1.101.Final-osx-x86_64.jar;C:\Users\pzy\.m2\repository\io\netty\netty-resolver-dns-classes-macos\4.1.101.Final\netty-resolver-dns-classes-macos-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-native-epoll\4.1.101.Final\netty-transport-native-epoll-4.1.101.Final-linux-x86_64.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-native-unix-common\4.1.101.Final\netty-transport-native-unix-common-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-transport-classes-epoll\4.1.101.Final\netty-transport-classes-epoll-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\projectreactor\netty\reactor-netty-core\1.1.13\reactor-netty-core-1.1.13.jar;C:\Users\pzy\.m2\repository\io\netty\netty-handler-proxy\4.1.101.Final\netty-handler-proxy-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\io\netty\netty-codec-socks\4.1.101.Final\netty-codec-socks-4.1.101.Final.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-webflux\6.1.1\spring-webflux-6.1.1.jar;C:\Users\pzy\.m2\repository\io\projectreactor\reactor-core\3.6.0\reactor-core-3.6.0.jar;C:\Users\pzy\.m2\repository\org\projectlombok\lombok\1.18.30\lombok-1.18.30.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-security\3.2.0\spring-boot-starter-security-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-aop\6.1.1\spring-aop-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-config\6.2.0\spring-security-config-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-core\6.2.0\spring-security-core-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-crypto\6.2.0\spring-security-crypto-6.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\security\spring-security-web\6.2.0\spring-security-web-6.2.0.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.3\jjwt-api-0.12.3.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.3\jjwt-impl-0.12.3.jar;C:\Users\pzy\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.3\jjwt-jackson-0.12.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.3\jackson-databind-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.3\jackson-annotations-2.15.3.jar;C:\Users\pzy\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.3\jackson-core-2.15.3.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-mail\3.2.0\spring-boot-starter-mail-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-context-support\6.1.1\spring-context-support-6.1.1.jar;C:\Users\pzy\.m2\repository\org\eclipse\angus\jakarta.mail\2.0.2\jakarta.mail-2.0.2.jar;C:\Users\pzy\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.2\jakarta.activation-api-2.1.2.jar;C:\Users\pzy\.m2\repository\org\eclipse\angus\angus-activation\2.0.1\angus-activation-2.0.1.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.2.0\spring-boot-starter-test-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-test\3.2.0\spring-boot-test-3.2.0.jar;C:\Users\pzy\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.2.0\spring-boot-test-autoconfigure-3.2.0.jar;C:\Users\pzy\.m2\repository\com\jayway\jsonpath\json-path\2.8.0\json-path-2.8.0.jar;C:\Users\pzy\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.1\jakarta.xml.bind-api-4.0.1.jar;C:\Users\pzy\.m2\repository\net\minidev\json-smart\2.5.0\json-smart-2.5.0.jar;C:\Users\pzy\.m2\repository\net\minidev\accessors-smart\2.5.0\accessors-smart-2.5.0.jar;C:\Users\pzy\.m2\repository\org\ow2\asm\asm\9.3\asm-9.3.jar;C:\Users\pzy\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\pzy\.m2\repository\org\awaitility\awaitility\4.2.0\awaitility-4.2.0.jar;C:\Users\pzy\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.1\junit-jupiter-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.1\junit-jupiter-api-5.10.1.jar;C:\Users\pzy\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\pzy\.m2\repository\org\junit\platform\junit-platform-commons\1.10.1\junit-platform-commons-1.10.1.jar;C:\Users\pzy\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.1\junit-jupiter-params-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.1\junit-jupiter-engine-5.10.1.jar;C:\Users\pzy\.m2\repository\org\junit\platform\junit-platform-engine\1.10.1\junit-platform-engine-1.10.1.jar;C:\Users\pzy\.m2\repository\org\mockito\mockito-core\5.7.0\mockito-core-5.7.0.jar;C:\Users\pzy\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.10\byte-buddy-agent-1.14.10.jar;C:\Users\pzy\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\pzy\.m2\repository\org\mockito\mockito-junit-jupiter\5.7.0\mockito-junit-jupiter-5.7.0.jar;C:\Users\pzy\.m2\repository\org\skyscreamer\jsonassert\1.5.1\jsonassert-1.5.1.jar;C:\Users\pzy\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-core\6.1.1\spring-core-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-jcl\6.1.1\spring-jcl-6.1.1.jar;C:\Users\pzy\.m2\repository\org\springframework\spring-test\6.1.1\spring-test-6.1.1.jar;C:\Users\pzy\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\pzy\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -33,7 +33,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="FILE_LOG_CHARSET" value="GBK"/>
     <property name="java.awt.headless" value="true"/>
-    <property name="surefire.real.class.path" value="C:\Users\pzy\AppData\Local\Temp\surefire7072438236985909420\surefirebooter-20260318200724398_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\pzy\AppData\Local\Temp\surefire12339876133275289497\surefirebooter-20260319022550026_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17+35-LTS-2724"/>
@@ -50,7 +50,7 @@
     <property name="user.dir" value="C:\Users\pzy\Documents\java\work\hh\springboot-backend"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="PID" value="45176"/>
+    <property name="PID" value="29744"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="CONSOLE_LOG_CHARSET" value="GBK"/>
     <property name="native.encoding" value="GBK"/>
@@ -61,9 +61,9 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="utc10_getDailyBriefing_invalidDateIgnored_returnsAll" classname="com.globalbuddy.controller.NewsControllerTest" time="0.336">
-    <system-out><![CDATA[20:07:25.337 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.globalbuddy.controller.NewsControllerTest]: NewsControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-20:07:25.501 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.globalbuddy.GlobalBuddyApplication for test class com.globalbuddy.controller.NewsControllerTest
+  <testcase name="utc10_getDailyBriefing_invalidDateIgnored_returnsAll" classname="com.globalbuddy.controller.NewsControllerTest" time="0.287">
+    <system-out><![CDATA[02:25:50.865 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.globalbuddy.controller.NewsControllerTest]: NewsControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+02:25:51.032 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.globalbuddy.GlobalBuddyApplication for test class com.globalbuddy.controller.NewsControllerTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -73,20 +73,20 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.2.0)
 
-2026-03-18T20:07:25.982+07:00  INFO 45176 --- [           main] c.g.controller.NewsControllerTest        : Starting NewsControllerTest using Java 17 with PID 45176 (started by pzy in C:\Users\pzy\Documents\java\work\hh\springboot-backend)
-2026-03-18T20:07:25.983+07:00  INFO 45176 --- [           main] c.g.controller.NewsControllerTest        : No active profile set, falling back to 1 default profile: "default"
-2026-03-18T20:07:28.737+07:00  INFO 45176 --- [           main] com.globalbuddy.config.WebMvcConfig      : Registering resource handler for /pictures/** -> file:C:/Users/pzy/Documents/java/work/hh/pictures/
-2026-03-18T20:07:28.746+07:00  INFO 45176 --- [           main] com.globalbuddy.config.WebMvcConfig      : Resource handlers registered: true
-2026-03-18T20:07:29.429+07:00  INFO 45176 --- [           main] c.g.controller.NewsControllerTest        : Started NewsControllerTest in 3.855 seconds (process running for 4.895)
-2026-03-18T20:07:29.594+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: null, startDate: invalid-date, endDate: null, keyword: null
-2026-03-18T20:07:29.596+07:00  WARN 45176 --- [           main] c.globalbuddy.controller.NewsController  : Invalid startDate format: invalid-date, ignoring filter
+2026-03-19T02:25:51.465+07:00  INFO 29744 --- [           main] c.g.controller.NewsControllerTest        : Starting NewsControllerTest using Java 17 with PID 29744 (started by pzy in C:\Users\pzy\Documents\java\work\hh\springboot-backend)
+2026-03-19T02:25:51.465+07:00  INFO 29744 --- [           main] c.g.controller.NewsControllerTest        : No active profile set, falling back to 1 default profile: "default"
+2026-03-19T02:25:54.046+07:00  INFO 29744 --- [           main] com.globalbuddy.config.WebMvcConfig      : Registering resource handler for /pictures/** -> file:C:/Users/pzy/Documents/java/work/hh/pictures/
+2026-03-19T02:25:54.059+07:00  INFO 29744 --- [           main] com.globalbuddy.config.WebMvcConfig      : Resource handlers registered: true
+2026-03-19T02:25:54.638+07:00  INFO 29744 --- [           main] c.g.controller.NewsControllerTest        : Started NewsControllerTest in 3.524 seconds (process running for 4.503)
+2026-03-19T02:25:54.825+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, startDate: invalid-date, endDate: null, keyword: null
+2026-03-19T02:25:54.827+07:00  WARN 29744 --- [           main] c.globalbuddy.controller.NewsController  : Invalid startDate format: invalid-date, ignoring filter
 
 java.time.format.DateTimeParseException: Text 'invalid-date' could not be parsed at index 0
 	at java.base/java.time.format.DateTimeFormatter.parseResolved0(DateTimeFormatter.java:2052) ~[na:na]
 	at java.base/java.time.format.DateTimeFormatter.parse(DateTimeFormatter.java:1954) ~[na:na]
 	at java.base/java.time.LocalDate.parse(LocalDate.java:430) ~[na:na]
 	at java.base/java.time.LocalDate.parse(LocalDate.java:415) ~[na:na]
-	at com.globalbuddy.controller.NewsController.getDailyBriefing(NewsController.java:79) ~[classes/:na]
+	at com.globalbuddy.controller.NewsController.getDailyBriefing(NewsController.java:77) ~[classes/:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
@@ -108,7 +108,7 @@ java.time.format.DateTimeParseException: Text 'invalid-date' could not be parsed
 	at org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:165) ~[spring-test-6.1.1.jar:6.1.1]
 	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132) ~[spring-test-6.1.1.jar:6.1.1]
 	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201) ~[spring-test-6.1.1.jar:6.1.1]
-	at com.globalbuddy.controller.NewsControllerTest.utc10_getDailyBriefing_invalidDateIgnored_returnsAll(NewsControllerTest.java:374) ~[test-classes/:na]
+	at com.globalbuddy.controller.NewsControllerTest.utc10_getDailyBriefing_invalidDateIgnored_returnsAll(NewsControllerTest.java:228) ~[test-classes/:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
@@ -181,31 +181,22 @@ java.time.format.DateTimeParseException: Text 'invalid-date' could not be parsed
 	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.1.2.jar:3.1.2]
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.1.2.jar:3.1.2]
 
-2026-03-18T20:07:29.606+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : No date filter provided, returning all news (paginated)
-2026-03-18T20:07:29.630+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/0
-2026-03-18T20:07:29.631+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 0 news items with filters
+2026-03-19T02:25:54.834+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : No date filter provided, returning all news (paginated)
+2026-03-19T02:25:54.835+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/0
+2026-03-19T02:25:54.835+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 0 news items with filters
 ]]></system-out>
     <system-err><![CDATA[SLF4J: Class path contains multiple SLF4J providers.
-SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@2ed2d9cb]
-SLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@d5b810e]
+SLF4J: Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@52af26ee]
+SLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@6fd83fc1]
 SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
-SLF4J: Actual provider is of type [ch.qos.logback.classic.spi.LogbackServiceProvider@2ed2d9cb]
+SLF4J: Actual provider is of type [ch.qos.logback.classic.spi.LogbackServiceProvider@52af26ee]
 ]]></system-err>
   </testcase>
-  <testcase name="utc10_getDailyBriefing_combinesKeywordSourceAndDateRange" classname="com.globalbuddy.controller.NewsControllerTest" time="0.052">
-    <system-out><![CDATA[2026-03-18T20:07:29.789+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: Bangkok Post, startDate: 2026-01-01, endDate: 2026-01-31, keyword: Thailand
-2026-03-18T20:07:29.790+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : User provided startDate: 2026-01-01 -> Thu Jan 01 00:00:00 ICT 2026
-2026-03-18T20:07:29.791+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : User provided endDate: 2026-01-31 -> Sat Jan 31 23:59:59 ICT 2026
-2026-03-18T20:07:29.792+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Using filtered query with keyword: Thailand, source: Bangkok Post, publish date range: Thu Jan 01 00:00:00 ICT 2026 to Sat Jan 31 23:59:59 ICT 2026
-2026-03-18T20:07:29.796+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
-2026-03-18T20:07:29.796+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
-]]></system-out>
-  </testcase>
-  <testcase name="utc11_getNewsDetail_hidesOriginalContent_whenThai" classname="com.globalbuddy.controller.NewsControllerTest" time="0.021">
-    <system-out><![CDATA[2026-03-18T20:07:29.842+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 123, lang: en
-2026-03-18T20:07:29.843+07:00 ERROR 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? No translation available for Thai news title: 123
-2026-03-18T20:07:29.844+07:00 ERROR 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? No translation available for Thai news summary: 123
-2026-03-18T20:07:29.845+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched news detail: 123
+  <testcase name="utc11_getNewsDetail_hidesOriginalContent_whenThai" classname="com.globalbuddy.controller.NewsControllerTest" time="0.069">
+    <system-out><![CDATA[2026-03-19T02:25:54.963+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 123, lang: en
+2026-03-19T02:25:54.966+07:00 ERROR 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? No translation available for Thai news title: 123
+2026-03-19T02:25:54.967+07:00 ERROR 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? No translation available for Thai news summary: 123
+2026-03-19T02:25:54.970+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched news detail: 123
 
 MockHttpServletRequest:
       HTTP Method = GET
@@ -239,18 +230,18 @@ MockHttpServletResponse:
     Error message = null
           Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
      Content type = application/json
-             Body = {"data":{"id":123,"title":"[News title translating...]","summary":"[News content translating...]","titleZh":null,"titleEn":null,"summaryZh":null,"summaryEn":null,"originalUrl":null,"source":null,"coverImageUrl":null,"publishDate":"2026-03-18T13:07:29.840+00:00","createTime":"2026-03-18T13:07:29.840+00:00"},"success":true,"originalContent":null}
+             Body = {"data":{"id":123,"title":"[News title translating...]","summary":"[News content translating...]","titleZh":null,"titleEn":null,"summaryZh":null,"summaryEn":null,"originalUrl":null,"source":null,"coverImageUrl":null,"publishDate":"2026-03-18T19:25:54.960+00:00","createTime":"2026-03-18T19:25:54.960+00:00"},"success":true,"originalContent":null}
     Forwarded URL = null
    Redirected URL = null
           Cookies = []
 ]]></system-out>
   </testcase>
-  <testcase name="utc10_getDailyBriefing_returnsErrorOnException" classname="com.globalbuddy.controller.NewsControllerTest" time="0.022">
-    <system-out><![CDATA[2026-03-18T20:07:29.870+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: null, startDate: null, endDate: null, keyword: null
-2026-03-18T20:07:29.872+07:00 ERROR 45176 --- [           main] c.globalbuddy.controller.NewsController  : Failed to fetch today's news briefing: Database connection error
+  <testcase name="utc10_getDailyBriefing_returnsErrorOnException" classname="com.globalbuddy.controller.NewsControllerTest" time="0.014">
+    <system-out><![CDATA[2026-03-19T02:25:55.036+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, startDate: null, endDate: null, keyword: null
+2026-03-19T02:25:55.036+07:00 ERROR 29744 --- [           main] c.globalbuddy.controller.NewsController  : Failed to fetch today's news briefing: Database connection error
 
 java.lang.RuntimeException: Database connection error
-	at com.globalbuddy.controller.NewsController.getDailyBriefing(NewsController.java:186) ~[classes/:na]
+	at com.globalbuddy.controller.NewsController.getDailyBriefing(NewsController.java:158) ~[classes/:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
@@ -272,7 +263,7 @@ java.lang.RuntimeException: Database connection error
 	at org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:165) ~[spring-test-6.1.1.jar:6.1.1]
 	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132) ~[spring-test-6.1.1.jar:6.1.1]
 	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201) ~[spring-test-6.1.1.jar:6.1.1]
-	at com.globalbuddy.controller.NewsControllerTest.utc10_getDailyBriefing_returnsErrorOnException(NewsControllerTest.java:393) ~[test-classes/:na]
+	at com.globalbuddy.controller.NewsControllerTest.utc10_getDailyBriefing_returnsErrorOnException(NewsControllerTest.java:247) ~[test-classes/:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
@@ -347,30 +338,23 @@ java.lang.RuntimeException: Database connection error
 
 ]]></system-out>
   </testcase>
-  <testcase name="utc09_convertToDTO_usesEnglishTranslation_whenLangEn" classname="com.globalbuddy.controller.NewsControllerTest" time="0.028">
-    <system-out><![CDATA[2026-03-18T20:07:29.886+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? Using English title translation for news 2
-2026-03-18T20:07:29.887+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? Using English summary translation for news 2
-]]></system-out>
-  </testcase>
-  <testcase name="utc10_getDailyBriefing_filtersBySourceOnly" classname="com.globalbuddy.controller.NewsControllerTest" time="0.009">
-    <system-out><![CDATA[2026-03-18T20:07:29.918+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: Bangkok Post, startDate: null, endDate: null, keyword: null
-2026-03-18T20:07:29.918+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Using filtered query with source: Bangkok Post (no date range, search in ALL news)
-2026-03-18T20:07:29.920+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
-2026-03-18T20:07:29.920+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
+  <testcase name="utc09_convertToDTO_usesEnglishTranslation_whenLangEn" classname="com.globalbuddy.controller.NewsControllerTest" time="0.01">
+    <system-out><![CDATA[2026-03-19T02:25:55.050+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? Using English title translation for news 2
+2026-03-19T02:25:55.050+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? Using English summary translation for news 2
 ]]></system-out>
   </testcase>
   <testcase name="utc11_getNewsDetail_returns404_whenNotFound" classname="com.globalbuddy.controller.NewsControllerTest" time="0.007">
-    <system-out><![CDATA[2026-03-18T20:07:29.927+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 99999, lang: en
-2026-03-18T20:07:29.928+07:00  WARN 45176 --- [           main] c.globalbuddy.controller.NewsController  : News not found with id: 99999
+    <system-out><![CDATA[2026-03-19T02:25:55.061+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 99999, lang: en
+2026-03-19T02:25:55.061+07:00  WARN 29744 --- [           main] c.globalbuddy.controller.NewsController  : News not found with id: 99999
 ]]></system-out>
   </testcase>
-  <testcase name="utc10_getDailyBriefing_returnsPaginatedList" classname="com.globalbuddy.controller.NewsControllerTest" time="0.015">
-    <system-out><![CDATA[2026-03-18T20:07:29.936+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: null, startDate: null, endDate: null, keyword: null
-2026-03-18T20:07:29.937+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : No date filter provided, returning all news (paginated)
-2026-03-18T20:07:29.937+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? Using English title translation for news 1
-2026-03-18T20:07:29.937+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? Using English summary translation for news 1
-2026-03-18T20:07:29.937+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 1/1
-2026-03-18T20:07:29.938+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
+  <testcase name="utc10_getDailyBriefing_returnsPaginatedList" classname="com.globalbuddy.controller.NewsControllerTest" time="0.017">
+    <system-out><![CDATA[2026-03-19T02:25:55.071+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, startDate: null, endDate: null, keyword: null
+2026-03-19T02:25:55.072+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : No date filter provided, returning all news (paginated)
+2026-03-19T02:25:55.073+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? Using English title translation for news 1
+2026-03-19T02:25:55.073+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? Using English summary translation for news 1
+2026-03-19T02:25:55.073+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 1/1
+2026-03-19T02:25:55.073+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
 
 MockHttpServletRequest:
       HTTP Method = GET
@@ -382,7 +366,7 @@ MockHttpServletRequest:
 
 Handler:
              Type = com.globalbuddy.controller.NewsController
-           Method = com.globalbuddy.controller.NewsController#getDailyBriefing(int, int, String, String, String, String, String)
+           Method = com.globalbuddy.controller.NewsController#getDailyBriefing(int, int, String, String, String, String)
 
 Async:
     Async started = false
@@ -404,22 +388,22 @@ MockHttpServletResponse:
     Error message = null
           Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
      Content type = application/json
-             Body = {"date":"2026-03-18","pagination":{"size":10,"totalPages":1,"hasPrevious":false,"hasNext":false,"page":0,"totalElements":1},"data":[{"id":1,"title":"Translated EN Title","summary":"Translated EN Summary","titleZh":null,"titleEn":"Translated EN Title","summaryZh":null,"summaryEn":"Translated EN Summary","originalUrl":"https://example.com/1","source":"Bangkok Post","coverImageUrl":null,"publishDate":"2026-03-18T13:07:29.934+00:00","createTime":"2026-03-18T13:07:29.934+00:00"}],"success":true}
+             Body = {"date":"2026-03-19","pagination":{"size":10,"totalPages":1,"hasPrevious":false,"hasNext":false,"page":0,"totalElements":1},"data":[{"id":1,"title":"Translated EN Title","summary":"Translated EN Summary","titleZh":null,"titleEn":"Translated EN Title","summaryZh":null,"summaryEn":"Translated EN Summary","originalUrl":"https://example.com/1","source":"Bangkok Post","coverImageUrl":null,"publishDate":"2026-03-18T19:25:55.069+00:00","createTime":"2026-03-18T19:25:55.069+00:00"}],"success":true}
     Forwarded URL = null
    Redirected URL = null
           Cookies = []
 ]]></system-out>
   </testcase>
-  <testcase name="utc10_getDailyBriefing_filtersByKeyword" classname="com.globalbuddy.controller.NewsControllerTest" time="0.008">
-    <system-out><![CDATA[2026-03-18T20:07:29.952+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: null, startDate: null, endDate: null, keyword:   Thailand  
-2026-03-18T20:07:29.953+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Using filtered query with keyword: Thailand (no date range, search in ALL news)
-2026-03-18T20:07:29.953+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
-2026-03-18T20:07:29.953+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
+  <testcase name="utc10_getDailyBriefing_filtersByKeyword" classname="com.globalbuddy.controller.NewsControllerTest" time="0.01">
+    <system-out><![CDATA[2026-03-19T02:25:55.092+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, startDate: null, endDate: null, keyword:   Thailand  
+2026-03-19T02:25:55.092+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Using filtered query with keyword: Thailand (no date range, search in ALL news)
+2026-03-19T02:25:55.093+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
+2026-03-19T02:25:55.093+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
 ]]></system-out>
   </testcase>
   <testcase name="utc11_getNewsDetail_returnsOriginalContent_whenNotThai" classname="com.globalbuddy.controller.NewsControllerTest" time="0.008">
-    <system-out><![CDATA[2026-03-18T20:07:29.960+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 123, lang: en
-2026-03-18T20:07:29.961+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched news detail: 123
+    <system-out><![CDATA[2026-03-19T02:25:55.102+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 123, lang: en
+2026-03-19T02:25:55.102+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched news detail: 123
 
 MockHttpServletRequest:
       HTTP Method = GET
@@ -453,55 +437,39 @@ MockHttpServletResponse:
     Error message = null
           Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
      Content type = application/json
-             Body = {"data":{"id":123,"title":"Hello","summary":"Summary","titleZh":null,"titleEn":null,"summaryZh":null,"summaryEn":null,"originalUrl":null,"source":null,"coverImageUrl":null,"publishDate":"2026-03-18T13:07:29.959+00:00","createTime":"2026-03-18T13:07:29.959+00:00"},"success":true,"originalContent":"English content"}
+             Body = {"data":{"id":123,"title":"Hello","summary":"Summary","titleZh":null,"titleEn":null,"summaryZh":null,"summaryEn":null,"originalUrl":null,"source":null,"coverImageUrl":null,"publishDate":"2026-03-18T19:25:55.100+00:00","createTime":"2026-03-18T19:25:55.100+00:00"},"success":true,"originalContent":"English content"}
     Forwarded URL = null
    Redirected URL = null
           Cookies = []
 ]]></system-out>
   </testcase>
   <testcase name="utc09_convertToDTO_thaiTitleNeverLeaks_useEnglishFallback" classname="com.globalbuddy.controller.NewsControllerTest" time="0.004">
-    <system-out><![CDATA[2026-03-18T20:07:29.970+07:00  WARN 45176 --- [           main] c.globalbuddy.controller.NewsController  : ?? Chinese title not available, using English fallback for Thai news: 7
-2026-03-18T20:07:29.970+07:00  WARN 45176 --- [           main] c.globalbuddy.controller.NewsController  : ?? Chinese summary not available, using English fallback for Thai news: 7
+    <system-out><![CDATA[2026-03-19T02:25:55.111+07:00  WARN 29744 --- [           main] c.globalbuddy.controller.NewsController  : ?? Chinese title not available, using English fallback for Thai news: 7
+2026-03-19T02:25:55.111+07:00  WARN 29744 --- [           main] c.globalbuddy.controller.NewsController  : ?? Chinese summary not available, using English fallback for Thai news: 7
 ]]></system-out>
   </testcase>
-  <testcase name="utc10_getDailyBriefing_combinesKeywordAndSource_noDate" classname="com.globalbuddy.controller.NewsControllerTest" time="0.007">
-    <system-out><![CDATA[2026-03-18T20:07:29.975+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: Bangkok Post, startDate: null, endDate: null, keyword: Thailand
-2026-03-18T20:07:29.975+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Using filtered query with keyword: Thailand, source: Bangkok Post (no date range, search in ALL news)
-2026-03-18T20:07:29.976+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
-2026-03-18T20:07:29.976+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
-]]></system-out>
-  </testcase>
-  <testcase name="utc10_getDailyBriefing_combinesSourceAndDateRange" classname="com.globalbuddy.controller.NewsControllerTest" time="0.006">
-    <system-out><![CDATA[2026-03-18T20:07:29.984+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: Bangkok Post, startDate: 2026-01-01, endDate: 2026-01-31, keyword: null
-2026-03-18T20:07:29.984+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : User provided startDate: 2026-01-01 -> Thu Jan 01 00:00:00 ICT 2026
-2026-03-18T20:07:29.984+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : User provided endDate: 2026-01-31 -> Sat Jan 31 23:59:59 ICT 2026
-2026-03-18T20:07:29.984+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Using filtered query with source: Bangkok Post, publish date range: Thu Jan 01 00:00:00 ICT 2026 to Sat Jan 31 23:59:59 ICT 2026
-2026-03-18T20:07:29.984+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
-2026-03-18T20:07:29.984+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
-]]></system-out>
-  </testcase>
-  <testcase name="utc10_getDailyBriefing_filtersByDateRange" classname="com.globalbuddy.controller.NewsControllerTest" time="0.006">
-    <system-out><![CDATA[2026-03-18T20:07:29.991+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: null, startDate: 2026-01-01, endDate: 2026-01-31, keyword: null
-2026-03-18T20:07:29.991+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : User provided startDate: 2026-01-01 -> Thu Jan 01 00:00:00 ICT 2026
-2026-03-18T20:07:29.991+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : User provided endDate: 2026-01-31 -> Sat Jan 31 23:59:59 ICT 2026
-2026-03-18T20:07:29.991+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Using publish date range filter: Thu Jan 01 00:00:00 ICT 2026 to Sat Jan 31 23:59:59 ICT 2026
-2026-03-18T20:07:29.992+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
-2026-03-18T20:07:29.992+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
+  <testcase name="utc10_getDailyBriefing_filtersByDateRange" classname="com.globalbuddy.controller.NewsControllerTest" time="0.008">
+    <system-out><![CDATA[2026-03-19T02:25:55.116+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, startDate: 2026-01-01, endDate: 2026-01-31, keyword: null
+2026-03-19T02:25:55.118+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : User provided startDate: 2026-01-01 -> Thu Jan 01 00:00:00 ICT 2026
+2026-03-19T02:25:55.118+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : User provided endDate: 2026-01-31 -> Sat Jan 31 23:59:59 ICT 2026
+2026-03-19T02:25:55.118+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Using publish date range filter: Thu Jan 01 00:00:00 ICT 2026 to Sat Jan 31 23:59:59 ICT 2026
+2026-03-19T02:25:55.118+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
+2026-03-19T02:25:55.118+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
 ]]></system-out>
   </testcase>
   <testcase name="utc11_getNewsDetail_returnsChineseTranslation_whenLangZh" classname="com.globalbuddy.controller.NewsControllerTest" time="0.007">
-    <system-out><![CDATA[2026-03-18T20:07:29.997+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 123, lang: zh
-2026-03-18T20:07:29.997+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? Using Chinese title translation for news 123
-2026-03-18T20:07:29.999+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? Using Chinese summary translation for news 123
-2026-03-18T20:07:29.999+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched news detail: 123
+    <system-out><![CDATA[2026-03-19T02:25:55.127+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 123, lang: zh
+2026-03-19T02:25:55.127+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? Using Chinese title translation for news 123
+2026-03-19T02:25:55.127+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? Using Chinese summary translation for news 123
+2026-03-19T02:25:55.127+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched news detail: 123
 ]]></system-out>
   </testcase>
   <testcase name="utc11_getNewsDetail_returnsErrorOnException" classname="com.globalbuddy.controller.NewsControllerTest" time="0.006">
-    <system-out><![CDATA[2026-03-18T20:07:30.006+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 123, lang: en
-2026-03-18T20:07:30.006+07:00 ERROR 45176 --- [           main] c.globalbuddy.controller.NewsController  : Failed to fetch news detail: Database error
+    <system-out><![CDATA[2026-03-19T02:25:55.134+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news detail, id: 123, lang: en
+2026-03-19T02:25:55.134+07:00 ERROR 29744 --- [           main] c.globalbuddy.controller.NewsController  : Failed to fetch news detail: Database error
 
 java.lang.RuntimeException: Database error
-	at com.globalbuddy.controller.NewsController.getNewsDetail(NewsController.java:448) ~[classes/:na]
+	at com.globalbuddy.controller.NewsController.getNewsDetail(NewsController.java:417) ~[classes/:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
@@ -523,7 +491,7 @@ java.lang.RuntimeException: Database error
 	at org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:165) ~[spring-test-6.1.1.jar:6.1.1]
 	at org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:132) ~[spring-test-6.1.1.jar:6.1.1]
 	at org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:201) ~[spring-test-6.1.1.jar:6.1.1]
-	at com.globalbuddy.controller.NewsControllerTest.utc11_getNewsDetail_returnsErrorOnException(NewsControllerTest.java:475) ~[test-classes/:na]
+	at com.globalbuddy.controller.NewsControllerTest.utc11_getNewsDetail_returnsErrorOnException(NewsControllerTest.java:329) ~[test-classes/:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
@@ -598,18 +566,18 @@ java.lang.RuntimeException: Database error
 
 ]]></system-out>
   </testcase>
-  <testcase name="utc09_convertToDTO_usesChineseTranslation_whenLangZh" classname="com.globalbuddy.controller.NewsControllerTest" time="0.004">
-    <system-out><![CDATA[2026-03-18T20:07:30.013+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? Using Chinese title translation for news 1
-2026-03-18T20:07:30.014+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : ? Using Chinese summary translation for news 1
+  <testcase name="utc09_convertToDTO_usesChineseTranslation_whenLangZh" classname="com.globalbuddy.controller.NewsControllerTest" time="0.005">
+    <system-out><![CDATA[2026-03-19T02:25:55.142+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? Using Chinese title translation for news 1
+2026-03-19T02:25:55.143+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : ? Using Chinese summary translation for news 1
 ]]></system-out>
   </testcase>
-  <testcase name="utc10_getDailyBriefing_combinesKeywordAndDateRange" classname="com.globalbuddy.controller.NewsControllerTest" time="0.005">
-    <system-out><![CDATA[2026-03-18T20:07:30.018+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, source: null, startDate: 2026-01-01, endDate: 2026-01-31, keyword: Thailand
-2026-03-18T20:07:30.018+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : User provided startDate: 2026-01-01 -> Thu Jan 01 00:00:00 ICT 2026
-2026-03-18T20:07:30.018+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : User provided endDate: 2026-01-31 -> Sat Jan 31 23:59:59 ICT 2026
-2026-03-18T20:07:30.019+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Using filtered query with keyword: Thailand, publish date range: Thu Jan 01 00:00:00 ICT 2026 to Sat Jan 31 23:59:59 ICT 2026
-2026-03-18T20:07:30.019+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
-2026-03-18T20:07:30.019+07:00  INFO 45176 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
+  <testcase name="utc10_getDailyBriefing_combinesKeywordAndDateRange" classname="com.globalbuddy.controller.NewsControllerTest" time="0.008">
+    <system-out><![CDATA[2026-03-19T02:25:55.149+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Fetching news briefing, page: 0, size: 10, lang: en, startDate: 2026-01-01, endDate: 2026-01-31, keyword: Thailand
+2026-03-19T02:25:55.150+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : User provided startDate: 2026-01-01 -> Thu Jan 01 00:00:00 ICT 2026
+2026-03-19T02:25:55.150+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : User provided endDate: 2026-01-31 -> Sat Jan 31 23:59:59 ICT 2026
+2026-03-19T02:25:55.150+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Using filtered query with keyword: Thailand, publish date range: Thu Jan 01 00:00:00 ICT 2026 to Sat Jan 31 23:59:59 ICT 2026
+2026-03-19T02:25:55.151+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : News items with English translation: 0/1
+2026-03-19T02:25:55.151+07:00  INFO 29744 --- [           main] c.globalbuddy.controller.NewsController  : Successfully fetched 1 news items with filters
 ]]></system-out>
   </testcase>
 </testsuite>
