@@ -4,7 +4,7 @@
     <div class="header-section">
       <h1 class="page-title">{{ t('messages.title') }}</h1>
       <button v-if="onBack" class="btn" @click="onBack">
-        ← {{ t('common.back') }}
+        ← {{ t('back') }}
       </button>
     </div>
 

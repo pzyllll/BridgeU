@@ -17,7 +17,7 @@
         v-if="onBack"
         class="btn-icon"
         @click="onBack"
-        :title="t('common.back')"
+        :title="t('back')"
       >
         ←
       </button>

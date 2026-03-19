@@ -2,7 +2,7 @@
   <div class="my-reports">
     <div class="reports-header">
       <button class="btn btn-back" @click="$emit('back')">
-        ← {{ t('common.back') }}
+        ← {{ t('back') }}
       </button>
       <h1 class="page-title">{{ t('postDetail.myReports') }}</h1>
     </div>

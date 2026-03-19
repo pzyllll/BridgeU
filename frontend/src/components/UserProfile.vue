@@ -23,7 +23,7 @@
       <!-- Back Button -->
       <div class="back-section" v-if="onBack">
         <button class="btn" @click="onBack">
-          ← {{ t('common.back') }}
+          ← {{ t('back') }}
         </button>
       </div>
 

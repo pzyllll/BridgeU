@@ -80,7 +80,7 @@ const translations = {
     },
     // Post List
     postList: {
-      searchPlaceholder: 'Semantic search, e.g. food, rent, visa',
+      searchPlaceholder: 'Keyword search, e.g. food, rent, visa',
       search: 'Search',
       loading: 'Loading...',
       anonymous: 'Anonymous',
@@ -436,7 +436,7 @@ const translations = {
     },
     // Post List
     postList: {
-      searchPlaceholder: '语义搜索，例如：吃饭、租房、签证',
+      searchPlaceholder: '关键词搜索，例如：吃饭、租房、签证',
       search: '搜索',
       loading: '加载中...',
       anonymous: '匿名',
